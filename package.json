@@ -21,8 +21,14 @@
   },
   "homepage": "https://github.com/Cyber4All/user-service#readme",
   "devDependencies": {
+    "@types/express": "^4.11.0",
+    "@types/node": "^9.3.0",
     "gulp": "^3.9.1",
     "gulp-nodemon": "^2.2.1",
-    "gulp-typescript": "^4.0.0-alpha.1"
+    "gulp-typescript": "^4.0.0-alpha.1",
+    "typescript": "^2.6.2"
+  },
+  "dependencies": {
+    "@oriented/express": "^1.0.3"
   }
 }
