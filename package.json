@@ -4,7 +4,11 @@
   "description": "A microservice for handling user account actions in the CLARK platform.",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "npm run gulp-tsc",
+    "build": "node_modules/.bin/gulp tsc",
+    "gulp-tsc": "node_modules/.bin/gulp start",
+    "lint": "node_modules/.bin/tslint --project ./src/**",
+    "pack": "npm run build && cp ./package.json ./dist && cd ./dist && zip -r ../dist.zip  ./* & cd .."
   },
   "repository": {
     "type": "git",
@@ -15,5 +19,10 @@
   "bugs": {
     "url": "https://github.com/Cyber4All/user-service/issues"
   },
-  "homepage": "https://github.com/Cyber4All/user-service#readme"
+  "homepage": "https://github.com/Cyber4All/user-service#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-nodemon": "^2.2.1",
+    "gulp-typescript": "^4.0.0-alpha.1"
+  }
 }
