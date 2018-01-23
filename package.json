@@ -29,6 +29,7 @@
     "typescript": "^2.6.2"
   },
   "dependencies": {
-    "@oriented/express": "^1.0.3"
+    "@oriented/express": "^1.0.3",
+    "jsonwebtoken": "^8.1.1"
   }
 }

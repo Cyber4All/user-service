@@ -1,3 +1,4 @@
-import { DataStore } from './DataStore';
+import { DataStore } from './DataStore'
+import { Responder } from './Responder'
 
-export { DataStore }
+export { DataStore, Responder }
