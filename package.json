@@ -1,0 +1,19 @@
+{
+  "name": "user-service",
+  "version": "1.0.0",
+  "description": "A microservice for handling user account actions in the CLARK platform.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cyber4All/user-service.git"
+  },
+  "author": "Sean Donnelly",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Cyber4All/user-service/issues"
+  },
+  "homepage": "https://github.com/Cyber4All/user-service#readme"
+}
