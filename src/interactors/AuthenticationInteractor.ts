@@ -25,6 +25,7 @@ export async function login(dataStore: DataStore, responder: Responder, username
       responder.sendUser(user);
     })
     .catch((error) => {
+      console.log(error);
       responder.invalidLogin();
     });
 }
@@ -50,6 +51,7 @@ export async function register(datastore: DataStore, responder: Responder, user)
       responder.sendUser(newUser);
     })
     .catch((error) => {
+      console.log(error);
       // Clean user object for safe local storage in the client
       if (error === 'email') {
         responder.sendOperationError('Email is already in use.', 420);
@@ -61,6 +63,7 @@ export async function register(datastore: DataStore, responder: Responder, user)
 }
 
 export async function validateToken(responder: Responder, token: string) {
+  console.log(token);
   if (!verifyJWT(token, responder, null)) {
     responder.invalidAccess();
   } else {

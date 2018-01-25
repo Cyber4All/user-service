@@ -7,7 +7,7 @@ import { key, issuer } from '../environment/config';
  */
 export function generateToken(user) {
   let payload = {
-    userid: user.id,
+    username: user.username,
     firstname: user.name.split(' ')[0],
     lastname: user.name.split(' ')[1],
     email: user.email
