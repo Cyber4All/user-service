@@ -7,8 +7,8 @@ export const CHECK_EMAIL_REGISTERED = '/emailRegistered';
 export const FIND_USER = '/findUser';
 export const LOAD_USER = '/loadUser';
 export const EDIT_USER = '/editUser';
-export const DB_INTERACTION_URI = 'http://learning-object-service-production.us-east-1.elasticbeanstalk.com/api';
-export const LO_SUGGESTION_URI = 'http://54.92.208.221:27015';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 // FIXME: Connect directly to a users db instead of db-interaction and its monolith
 export default class MongoDriver implements DataStore {
@@ -29,11 +29,11 @@ export default class MongoDriver implements DataStore {
       user.password
     );
     console.log(user);
-    let emailRegistered = await this.request(DB_INTERACTION_URI, CHECK_EMAIL_REGISTERED, { email: user.email });
+    let emailRegistered = await this.request(process.env.LEARNING_OBJECT_SERVICE_URI, CHECK_EMAIL_REGISTERED, { email: user.email });
     console.log(emailRegistered);
     if (emailRegistered) return Promise.reject('email');
 
-    let registeredUser = await this.request(DB_INTERACTION_URI, ADD_USER, { user: User.serialize(newUser) });
+    let registeredUser = await this.request(process.env.LEARNING_OBJECT_SERVICE_URI, ADD_USER, { user: User.serialize(newUser) });
     console.log(registeredUser);
     if (registeredUser && !registeredUser.error) {
       // FIXME: stabilize user serialization
@@ -54,7 +54,7 @@ export default class MongoDriver implements DataStore {
    * @memberof DatabseInteractionConnector
    */
   async login(username: string, password: string): Promise<User> {
-    let user = await this.request(DB_INTERACTION_URI, AUTHENTICATE, { username: username, pwd: password });
+    let user = await this.request(process.env.LEARNING_OBJECT_SERVICE_URI, AUTHENTICATE, { username: username, pwd: password });
     console.log(user);
     if (user && !user.error) {
       if (typeof (user) === "string") {
@@ -66,7 +66,7 @@ export default class MongoDriver implements DataStore {
   private async request(URI: string, event: string, params: {}): Promise<any> {
     return rp({
       method: 'POST',
-      uri: URI + event,
+      uri: URI + 'api' + event,
       body: params,
       json: true,
     });

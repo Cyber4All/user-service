@@ -8,7 +8,8 @@
     "build": "node_modules/.bin/gulp tsc",
     "gulp-tsc": "node_modules/.bin/gulp start",
     "lint": "node_modules/.bin/tslint --project ./src/**",
-    "pack": "npm run build && cp ./package.json ./dist && cd ./dist && zip -r ../dist.zip  ./* & cd .."
+    "pack": "npm run build && cp ./package.json ./dist && cd ./dist && zip -r ../dist.zip  ./* & cd ..",
+    "deploy": "eb deploy User-Service-Production --profile clark"
   },
   "repository": {
     "type": "git",
@@ -31,6 +32,8 @@
   "dependencies": {
     "@cyber4all/clark-entity": "^1.0.20",
     "@oriented/express": "^1.0.3",
+    "@types/dotenv": "^4.0.2",
+    "dotenv": "^5.0.0",
     "jsonwebtoken": "^8.1.1",
     "request": "^2.83.0",
     "request-promise": "^4.2.2"
