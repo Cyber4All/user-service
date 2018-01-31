@@ -14,7 +14,7 @@ dotenv.config();
 export default class MongoDriver implements DataStore {
   /**
    * Registers new user
-   * If username unique new user is created; Unserialized User Object is returned
+   * If username is unique, new user is created; Unserialized User Object is returned
    *
    * @param {username: string, firstname: string, lastname: string, email: string, password: string} user
    * @returns {Promise<User>}
