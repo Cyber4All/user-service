@@ -5,8 +5,8 @@ import { login, register, validateToken } from '../interactors/AuthenticationInt
 import { UserResponseFactory } from './drivers';
 
 export default class RouteHandler {
-  
-  constructor(private dataStore: DataStore, private responseFactory: UserResponseFactory) { }
+
+  constructor(private dataStore: DataStore, private responseFactory: UserResponseFactory) {}
 
   /**
    * Produces a configured express router
@@ -22,11 +22,13 @@ export default class RouteHandler {
 
   private setRoutes(router: Router) {
     router.get('/users', (req, res) => {
-      res.json({ message: 'Welcome to the Users API' });
+      res.json({
+        message: 'Welcome to the Users API'
+      });
     });
     // Register
     router.post('/users', async (req, res) => {
-        await register(this.dataStore, this.responseFactory.buildResponder(res), req.body);
+      await register(this.dataStore, this.responseFactory.buildResponder(res), req.body);
     });
     // Login
     router.post('/users/tokens', async (req, res) => {
