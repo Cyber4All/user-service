@@ -21,20 +21,20 @@ export default class MongoDriver implements DataStore {
    * @memberof DatabseInteractionConnector
    */
   async register(user: { username: string, firstname: string, lastname: string, email: string, password: string }): Promise<User> {
-    console.log('register hit');
+    
     let newUser = new User(
       user.username,
       `${user.firstname} ${user.lastname}`,
       user.email,
       user.password
     );
-    console.log(user);
+    
     let emailRegistered = await this.request(process.env.LEARNING_OBJECT_SERVICE_URI, CHECK_EMAIL_REGISTERED, { email: user.email });
-    console.log(emailRegistered);
+    
     if (emailRegistered) return Promise.reject('email');
 
     let registeredUser = await this.request(process.env.LEARNING_OBJECT_SERVICE_URI, ADD_USER, { user: User.serialize(newUser) });
-    console.log(registeredUser);
+    
     if (registeredUser && !registeredUser.error) {
       // FIXME: stabilize user serialization
       if (typeof (registeredUser) === "string") {
@@ -55,7 +55,7 @@ export default class MongoDriver implements DataStore {
    */
   async login(username: string, password: string): Promise<User> {
     let user = await this.request(process.env.LEARNING_OBJECT_SERVICE_URI, AUTHENTICATE, { username: username, pwd: password });
-    console.log(user);
+    
     if (user && !user.error) {
       if (typeof (user) === "string") {
         return User.unserialize(user);

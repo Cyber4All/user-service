@@ -17,7 +17,6 @@ export default class RouteResponder implements Responder {
           : this.res.status(400).send("Server error encounter.");
   }
   sendUser(user: any) {
-    console.log('send user', user);
     this.res.status(200).json(user);
   }
   invalidLogin() {

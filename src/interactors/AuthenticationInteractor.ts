@@ -63,11 +63,9 @@ export async function register(datastore: DataStore, responder: Responder, user)
 }
 
 export async function validateToken(responder: Responder, token: string) {
-  console.log(token);
   if (!verifyJWT(token, responder, null)) {
     responder.invalidAccess();
   } else {
-    console.log('we\'ve got success!');
     responder.sendOperationSuccess();
   }
 }
