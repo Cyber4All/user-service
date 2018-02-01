@@ -30,7 +30,7 @@
     "typescript": "^2.6.2"
   },
   "dependencies": {
-    "@cyber4all/clark-entity": "^1.0.20",
+    "@cyber4all/clark-entity": "^1.1.1",
     "@oriented/express": "^1.0.3",
     "@types/dotenv": "^4.0.2",
     "dotenv": "^5.0.0",
