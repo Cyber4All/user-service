@@ -3,7 +3,7 @@ import { Router } from 'express';
 import { DataStore, Responder } from '../interfaces/interfaces';
 import { login, register, validateToken } from '../interactors/AuthenticationInteractor';
 import { UserResponseFactory } from './drivers';
-
+const version = require('../package.json').version;
 export default class RouteHandler {
 
   constructor(private dataStore: DataStore, private responseFactory: UserResponseFactory) {}
@@ -23,7 +23,8 @@ export default class RouteHandler {
   private setRoutes(router: Router) {
     router.get('/users', (req, res) => {
       res.json({
-        message: 'Welcome to the Users API'
+        message: `Welcome to the Users API v${version}`,
+        version: version
       });
     });
     // Register

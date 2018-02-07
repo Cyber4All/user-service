@@ -2,7 +2,7 @@ const gulp = require('gulp');
 const nodemon = require('gulp-nodemon');
 const ts = require('gulp-typescript');
 var exec = require('child_process').exec;
-const JSON_FILES = ['src/*.json', 'src/**/*.json'];
+const JSON_FILES = ['package.json','src/*.json', 'src/**/*.json'];
 
 // pull in the project TypeScript config
 const tsProject = ts.createProject('tsconfig.json');
@@ -22,7 +22,7 @@ gulp.task('assets', function () {
     .pipe(gulp.dest('dist'));
 });
 
-gulp.task('start', ['watch'], function () {
+gulp.task('start', ['assets', 'watch'], function () {
   nodemon({
     script: 'dist/app.js'
     , ext: 'js html'

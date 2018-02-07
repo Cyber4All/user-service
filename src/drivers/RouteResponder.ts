@@ -35,6 +35,7 @@ export default class RouteResponder implements Responder {
    * @param user 
    */
   sendUser(user: any) {
+    // FIXME: User should be typed to ensure proper data is being sent to the client
     this.res.status(200).json(user);
   }
 
