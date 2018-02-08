@@ -10,7 +10,6 @@ A microservice for handling user account actions in the CLARK platform.
 | --- | --- | --- | --- |
 | GET |  |  |  |
 | POST | `email` | `string` | User's email address |
-| HEAD |  |  |  |
 
 | Response Body | Type | Description |
 | --- | --- | --- |
@@ -18,8 +17,6 @@ A microservice for handling user account actions in the CLARK platform.
 | "Welcome to the Users API" | `string` | Welcome message |
 | POST |  |  |
 | "Invalid registration credentials" | `string` | If invalid or empty credentials are provided, an error is returned |
-| HEAD |  |  |
-|  | `void` | Empty response |
 
 ### /users/tokens
 
@@ -41,14 +38,10 @@ A microservice for handling user account actions in the CLARK platform.
 | Request Type | Request Body | Type | Description |
 | --- | --- | --- | --- |
 | GET |  |  |  |
-| HEAD |  |  |  |
-| POST | `email` | `string` | User's email address |
 
 | Response Body | Type | Description |
 | --- | --- | --- |
 | GET |  |  |
 | "Welcome to the Users API" | `string` | Welcome message |
-| HEAD |  |  |
-|  | `void` | Empty response |
 | POST |  |  |
 | "Welcome to the Users API" | `string` | Error message |
