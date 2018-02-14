@@ -18,30 +18,90 @@ A microservice for handling user account actions in the CLARK platform.
 | POST |  |  |
 | "Invalid registration credentials" | `string` | If invalid or empty credentials are provided, an error is returned |
 
-### /users/tokens
+### `POST /users/tokens` - Create a new token for a user (log in)
+Request | []() | []()
+---|---|---
+`username` | `string` | user's unique name
+`password` | `string`|user's password
+`email` | `string` | user's unique email address
 
-| Request Type | Request Body | Type | Description |
-| --- | --- | --- | --- |
-| DELETE |  |  |  |
-| POST | `username` | `string` | User's username |
-|  | `pwd` | `string` | User's password |
+#### On Success
+Response | []() | []()
+---|---|---
+`_username` | `string` | user's unique username
+`_name` | `string` | user's first and last name (concatenated)
+`_email` | `string` | user's email
+`_objects` | [LearningObject[]](https://github.com/Cyber4All/clark-entity#LearningObject) | user's learning objects
+`token` | `string` | user's access token
 
-| Response Body | Type | Description |
-| --- | --- | --- |
-| DELETE |  |  |
-| "Cannot delete user accounts at this time" | `string` | Error message; unhandled promise rejection. |
-| POST |  |  |
-| "Invalid username or password" | `string` | Error message |
+#### On Error
+status | body | statusText
+---|---|---
+`400` | `{ message: "Invalid username or password" }` | `Bad Request`
 
-### /users/:username
+### `DELETE /users/tokens` - Delete a user account
+Request | []() | []()
+---|---|---
+| |
 
-| Request Type | Request Body | Type | Description |
-| --- | --- | --- | --- |
-| GET |  |  |  |
+#### On Success
+Response | []() | []()
+---|---|---
+| | 
 
-| Response Body | Type | Description |
-| --- | --- | --- |
-| GET |  |  |
-| "Welcome to the Users API" | `string` | Welcome message |
-| POST |  |  |
-| "Welcome to the Users API" | `string` | Error message |
+#### On Error
+status | body | statusText
+---|---|---
+`400` | `Cannot delete user accounts at this time` | `Bad Request`
+
+### `GET /users/:username` -
+Request | []() | []()
+---|---|---
+| |
+
+#### On Success
+status | body | statusText
+---|---|---
+`200` | `{message: "Welcome to the users API v1.0.0", "version": "1.0.0"}` |`OK`
+
+#### On Error
+status | body | statusText
+---|---|---
+| |
+
+### `HEAD /users/:username` - 
+Request | []() | []()
+---|---|---
+| |
+
+#### On Success
+Response | []() | []()
+---|---|---
+| | 
+
+#### On Error
+status | body | statusText
+---|---|---
+| |
+
+### `POST /users/:username` - Validate token
+Request | []() | []()
+---|---|---
+`username` | `string` | user's unique name
+`password` | `string` | user's password
+`email` | `string` | user's unique email address
+
+#### On Success
+Response | []() | []()
+---|---|---
+`_username` | `string` | user's unique username
+`_name` | `string` | user's first and last name (concatenated)
+`_email` | `string` | user's email
+`_objects` | [LearningObject[]](https://github.com/Cyber4All/clark-entity#LearningObject) | user's learning objects
+`token` | `string` | user's access token
+
+#### On Error
+status | body | statusText
+---|---|---
+`400` | `Cannot delete user accounts at this time` | `Bad Request`
+`420` | `Email is already in use` | `unknown`
