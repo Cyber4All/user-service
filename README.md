@@ -55,19 +55,11 @@ status | body | statusText
 `400` | `Cannot delete user accounts at this time` | `Bad Request`
 
 ### `GET /users/:username` -
-Request | []() | []()
----|---|---
-| |
 
 #### On Success
 status | body | statusText
 ---|---|---
 `200` | `{message: "Welcome to the users API v1.0.0", "version": "1.0.0"}` |`OK`
-
-#### On Error
-status | body | statusText
----|---|---
-| |
 
 ### `HEAD /users/:username` - 
 Request | []() | []()
