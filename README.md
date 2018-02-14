@@ -23,7 +23,6 @@ Request | []() | []()
 ---|---|---
 `username` | `string` | user's unique name
 `password` | `string`|user's password
-`email` | `string` | user's unique email address
 
 #### On Success
 Response | []() | []()
@@ -54,31 +53,22 @@ status | body | statusText
 ---|---|---
 `400` | `Cannot delete user accounts at this time` | `Bad Request`
 
-### `GET /users/:username` -
+### `DELETE /users/:username` 
 
-#### On Success
+#### On Error
 status | body | statusText
 ---|---|---
-`200` | `{message: "Welcome to the users API v1.0.0", "version": "1.0.0"}` |`OK`
+`400` | `Cannnot delete user accounts at this time` | `Bad Request`
 
-### `POST /users/:username` - Validate token
+### `POST /users/:username/tokens` - Validate tokens (login)
 Request | []() | []()
 ---|---|---
-`username` | `string` | user's unique name
-`password` | `string` | user's password
-`email` | `string` | user's unique email address
-
-#### On Success
-Response | []() | []()
----|---|---
-`_username` | `string` | user's unique username
-`_name` | `string` | user's first and last name (concatenated)
-`_email` | `string` | user's unique email address
-`_objects` | [LearningObject[]](https://github.com/Cyber4All/clark-entity#LearningObject) | user's learning objects
 `token` | `string` | user's access token
 
 #### On Error
 status | body | statusText
 ---|---|---
-`400` | `Invalid registration credentials` | `Bad Request`
-`420` | `Email is already in use` | `unknown`
+`401` | `Invalid access token` | `Unauthorized`
+
+### `DELETE /users/:username/tokens` - Delete tokens (logout)
+| `Error: Cannot log out at this time` |
