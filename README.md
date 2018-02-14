@@ -73,4 +73,4 @@ status | body | statusText
 ### `DELETE /users/:username/tokens` - Delete tokens (logout)
 status | body | statusText
 ---|---|---
-| `Error: Cannot log out at this time` |
+`Error` | `Cannot log out at this time` |
