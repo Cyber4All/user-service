@@ -65,6 +65,11 @@ Request | []() | []()
 ---|---|---
 `token` | `string` | user's access token
 
+### On Success
+status | body | statusText
+---|---|---
+`200` | `OK` | `OK`
+
 #### On Error
 status | body | statusText
 ---|---|---
