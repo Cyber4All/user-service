@@ -31,16 +31,15 @@ export default class RouteHandler {
       });
     });
 
-
     // Register
     // POST: provide JSON object with new user info
     /*
     {
-      username: string, 
-      firstname: string, 
-      lastname: string, 
-      email: string, 
-      password: string
+      "username": "string", 
+      "firstname": "string", 
+      "lastname": "string", 
+      "email": "string", 
+      "password": "string"
     }
     */
     // Returns either message warning invalid info, or success
@@ -55,20 +54,25 @@ export default class RouteHandler {
 
     // TODO: Remove account
     // When implemented...
-    // provide JSON object of user info
-    // return either invalid input warning, or success message
+    // provide token, which is then unauthorized, and return success message
+    // Need to implement promise rejection catch - error message in console on failure.
     router.delete('/users/:username', async (req, res) => {
-      console.log(req.params['username']);
       this.responseFactory.buildResponder(res).sendOperationError('Cannot delete user accounts at this time');
       throw new Error('Cannot delete user accounts at this time');
     });
+
     
     router.route('/users/:username/tokens')
       // Validate Token
+      // Param: Valid token (for testing, get from users/tokens route)
+      // if valid, returns OK
+      // else, returns "INVALID TOKEN"
       .post(async (req, res) => {
         validateToken(this.responseFactory.buildResponder(res), req.body.token);
       })
+
       // TODO: Logout
+      // Currently throws unhandled promise rejection error, request cannot complete in postman
       .delete(async (req, res) => {
         throw new Error('Cannot logout at this time');
       });
