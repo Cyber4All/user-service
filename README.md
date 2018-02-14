@@ -103,5 +103,5 @@ Response | []() | []()
 #### On Error
 status | body | statusText
 ---|---|---
-`400` | `Cannot delete user accounts at this time` | `Bad Request`
+`400` | `Invalid registration credentials` | `Bad Request`
 `420` | `Email is already in use` | `unknown`
