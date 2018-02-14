@@ -39,7 +39,7 @@ status | body | statusText
 ---|---|---
 `400` | `{ message: "Invalid username or password" }` | `Bad Request`
 
-### `DELETE /users/tokens` - Delete a user account
+### `DELETE /users/tokens` - Delete a user account ***to be implented***
 Request | []() | []()
 ---|---|---
 | |
