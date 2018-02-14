@@ -61,21 +61,6 @@ status | body | statusText
 ---|---|---
 `200` | `{message: "Welcome to the users API v1.0.0", "version": "1.0.0"}` |`OK`
 
-### `HEAD /users/:username` - 
-Request | []() | []()
----|---|---
-| |
-
-#### On Success
-Response | []() | []()
----|---|---
-| | 
-
-#### On Error
-status | body | statusText
----|---|---
-| |
-
 ### `POST /users/:username` - Validate token
 Request | []() | []()
 ---|---|---
