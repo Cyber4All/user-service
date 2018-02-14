@@ -58,6 +58,7 @@ export default class RouteHandler {
     // provide JSON object of user info
     // return either invalid input warning, or success message
     router.delete('/users/:username', async (req, res) => {
+      console.log(req.params['username']);
       this.responseFactory.buildResponder(res).sendOperationError('Cannot delete user accounts at this time');
       throw new Error('Cannot delete user accounts at this time');
     });

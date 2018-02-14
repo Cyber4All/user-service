@@ -1,5 +1,5 @@
 import { DataStore, Responder } from './../interfaces/interfaces';
-import { generateToken, verifyJWT } from '../drivers/TokenManager';
+import { TokenManager } from '../drivers/drivers';
 
 
 /**
@@ -19,7 +19,7 @@ export async function login(dataStore: DataStore, responder: Responder, username
   dataStore.login(username, password)
     .then((user) => {
       // Get access token and add to user object
-      user['token'] = generateToken(user);
+      user['token'] = TokenManager.generateToken(user);
       // Clean user object for safe local storage in the client
       delete user.id;
       responder.sendUser(user);
@@ -46,7 +46,7 @@ export async function register(datastore: DataStore, responder: Responder, user)
   datastore.register(user)
     .then((newUser) => {
       // Get access token and add to user object
-      newUser['token'] = generateToken(newUser);
+      newUser['token'] = TokenManager.generateToken(newUser);
       delete newUser.id;
       responder.sendUser(newUser);
     })
@@ -63,7 +63,7 @@ export async function register(datastore: DataStore, responder: Responder, user)
 }
 
 export async function validateToken(responder: Responder, token: string) {
-  if (!verifyJWT(token, responder, null)) {
+  if (!TokenManager.verifyJWT(token, responder, null)) {
     responder.invalidAccess();
   } else {
     responder.sendOperationSuccess();
