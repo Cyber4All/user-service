@@ -71,4 +71,6 @@ status | body | statusText
 `401` | `Invalid access token` | `Unauthorized`
 
 ### `DELETE /users/:username/tokens` - Delete tokens (logout)
+status | body | statusText
+---|---|---
 | `Error: Cannot log out at this time` |
