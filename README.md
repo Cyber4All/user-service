@@ -30,7 +30,7 @@ Response | []() | []()
 ---|---|---
 `_username` | `string` | user's unique username
 `_name` | `string` | user's first and last name (concatenated)
-`_email` | `string` | user's email
+`_email` | `string` | user's unique email address
 `_objects` | [LearningObject[]](https://github.com/Cyber4All/clark-entity#LearningObject) | user's learning objects
 `token` | `string` | user's access token
 
@@ -96,7 +96,7 @@ Response | []() | []()
 ---|---|---
 `_username` | `string` | user's unique username
 `_name` | `string` | user's first and last name (concatenated)
-`_email` | `string` | user's email
+`_email` | `string` | user's unique email address
 `_objects` | [LearningObject[]](https://github.com/Cyber4All/clark-entity#LearningObject) | user's learning objects
 `token` | `string` | user's access token
 
