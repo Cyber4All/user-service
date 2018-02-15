@@ -1,5 +1,5 @@
 import { ExpressResponder } from "@oriented/express";
-import { Responder } from "../interfaces/interfaces";
+import { Responder, User } from "../interfaces/interfaces";
 import { Response } from 'express';
 
 export default class RouteResponder implements Responder {
@@ -34,8 +34,7 @@ export default class RouteResponder implements Responder {
    * 
    * @param user 
    */
-  sendUser(user: any) {
-    // FIXME: User should be typed to ensure proper data is being sent to the client
+  sendUser(user: User) {
     this.res.status(200).json(user);
   }
 

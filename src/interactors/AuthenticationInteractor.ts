@@ -1,4 +1,4 @@
-import { DataStore, Responder } from './../interfaces/interfaces';
+import { DataStore, Responder, User } from './../interfaces/interfaces';
 import { TokenManager } from '../drivers/drivers';
 
 
@@ -38,7 +38,7 @@ export async function login(dataStore: DataStore, responder: Responder, username
  * @export
  * @param {DataStore} datastore
  * @param {Responder} responder
- * @param {any} user
+ * @param {User} user
  */
 export async function register(datastore: DataStore, responder: Responder, user) {
   // Try register with datastore
