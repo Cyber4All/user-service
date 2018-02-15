@@ -4,18 +4,30 @@ A microservice for handling user account actions in the CLARK platform.
 
 ## Routes
 
-### /users
+### `POST /users` - Register a new account
+Request | []() | []()
+---|---|---
+`username` | `string` | user's unique account name
+`firstname` | `string` | user's first name
+`lastname`| `string` | user's last name
+`email` | `string` | user's unique email
+`organization` | `string` | user's affiliated organization
+`objects` | object | contains two strings - the user's password, and the confirmation of that password
 
-| Request Type | Request Body | Type | Description |
-| --- | --- | --- | --- |
-| GET |  |  |  |
-| POST | `email` | `string` | User's email address |
+#### On Success
+Response | []() | []()
+---|---|---
+`_username` | `string` | user's unique account name
+`_firstname` | `string` | user's first name
+`_lastname`| `string` | user's last name
+`_email` | `string` | user's unique email
+`_organization` | `string` | user's affiliated organization
+`_objects` | object | contains two strings - the user's password, and the confirmation of that password
 
-| Response Body | Type | Description |
-| --- | --- | --- |
-| GET |  |  |
-| "Welcome to the Users API" | `string` | Welcome message |
-| POST |  |  |
+
+#### On Error
+status | body | statusText
+---|---|---
 | "Invalid registration credentials" | `string` | If invalid or empty credentials are provided, an error is returned |
 
 ### `POST /users/tokens` - Create a new token for a user (log in)
