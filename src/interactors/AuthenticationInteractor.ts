@@ -1,5 +1,5 @@
-import { DataStore, Responder } from './../interfaces/interfaces';
-import { generateToken, verifyJWT } from '../drivers/TokenManager';
+import { DataStore, Responder, User } from './../interfaces/interfaces';
+import { TokenManager } from '../drivers/drivers';
 
 
 /**
@@ -19,7 +19,7 @@ export async function login(dataStore: DataStore, responder: Responder, username
   dataStore.login(username, password)
     .then((user) => {
       // Get access token and add to user object
-      user['token'] = generateToken(user);
+      user['token'] = TokenManager.generateToken(user);
       responder.sendUser(user);
     })
     .catch((error) => {
@@ -36,7 +36,7 @@ export async function login(dataStore: DataStore, responder: Responder, username
  * @export
  * @param {DataStore} datastore
  * @param {Responder} responder
- * @param {any} user
+ * @param {User} user
  */
 export async function register(datastore: DataStore, responder: Responder, user) {
   // Try register with datastore
@@ -44,7 +44,7 @@ export async function register(datastore: DataStore, responder: Responder, user)
   datastore.register(user)
     .then((newUser) => {
       // Get access token and add to user object
-      newUser['token'] = generateToken(newUser);
+      newUser['token'] = TokenManager.generateToken(newUser);
       responder.sendUser(newUser);
     })
     .catch((error) => {
@@ -58,7 +58,7 @@ export async function register(datastore: DataStore, responder: Responder, user)
 }
 
 export async function validateToken(responder: Responder, token: string) {
-  if (!verifyJWT(token, responder, null)) {
+  if (!TokenManager.verifyJWT(token, responder, null)) {
     responder.invalidAccess();
   } else {
     responder.sendOperationSuccess();
