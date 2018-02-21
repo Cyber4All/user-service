@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { Router } from 'express';
+type Router = express.Router;
 import { DataStore, Responder } from '../interfaces/interfaces';
 import {
   login,
@@ -8,6 +8,7 @@ import {
 } from '../interactors/AuthenticationInteractor';
 import { UserResponseFactory } from './drivers';
 const version = require('../package.json').version;
+
 export default class RouteHandler {
   constructor(
     private dataStore: DataStore,
@@ -20,8 +21,8 @@ export default class RouteHandler {
    * @param dataStore the data store that the routes should utilize
    */
   public static buildRouter(dataStore, responseFactory) {
-    let e = new RouteHandler(dataStore, responseFactory);
-    let router: Router = express.Router();
+    const e = new RouteHandler(dataStore, responseFactory);
+    const router: Router = express.Router();
     e.setRoutes(router);
     return router;
   }
@@ -31,8 +32,8 @@ export default class RouteHandler {
     // No params necessary
     router.get('/users', (req, res) => {
       res.json({
-        message: `Welcome to the Users API v${version}`,
-        version: version
+        version,
+        message: `Welcome to the Users API v${version}`
       });
     });
 

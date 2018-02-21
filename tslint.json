@@ -2,6 +2,8 @@
     "defaultSeverity": "warning",
     "extends": "tslint-config-airbnb",
     "jsRules": {},
-    "rules": {},
+    "rules": {
+        "trailing-comma": false
+    },
     "rulesDirectory": []
 }
