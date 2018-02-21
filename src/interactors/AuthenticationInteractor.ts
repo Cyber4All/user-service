@@ -20,8 +20,6 @@ export async function login(dataStore: DataStore, responder: Responder, username
     .then((user) => {
       // Get access token and add to user object
       user['token'] = TokenManager.generateToken(user);
-      // Clean user object for safe local storage in the client
-      delete user.id;
       responder.sendUser(user);
     })
     .catch((error) => {
@@ -47,12 +45,9 @@ export async function register(datastore: DataStore, responder: Responder, user)
     .then((newUser) => {
       // Get access token and add to user object
       newUser['token'] = TokenManager.generateToken(newUser);
-      delete newUser.id;
       responder.sendUser(newUser);
     })
     .catch((error) => {
-      console.log(error);
-      // Clean user object for safe local storage in the client
       if (error === 'email') {
         responder.sendOperationError('Email is already in use.', 420);
       } else {
