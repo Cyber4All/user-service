@@ -9,7 +9,4 @@ export interface User {
     _organization: string;
     _pwd: string;
     _objects: LearningObject[];
-
-    addObject(): LearningObject;
-    removeObject(i: number): LearningObject;
 }
