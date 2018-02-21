@@ -28,7 +28,6 @@ export function generateToken(user) {
  * @param callback the function to execute after verification
  */
 export function verifyJWT(token, res, callback): boolean {
-
   try {
     let decoded = jwt.verify(token, key, {});
 

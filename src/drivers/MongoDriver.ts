@@ -1,5 +1,5 @@
 import * as rp from 'request-promise';
-import { DataStore } from "../interfaces/interfaces";
+import { DataStore } from '../interfaces/interfaces';
 import { User } from '@cyber4all/clark-entity';
 export const AUTHENTICATE = '/authenticate';
 export const ADD_USER = '/register';
@@ -20,24 +20,37 @@ export default class MongoDriver implements DataStore {
    * @returns {Promise<User>}
    * @memberof DatabseInteractionConnector
    */
-  async register(user: { username: string, firstname: string, lastname: string, email: string, password: string }): Promise<User> {
-    
+  async register(user: {
+    username: string;
+    firstname: string;
+    lastname: string;
+    email: string;
+    password: string;
+  }): Promise<User> {
     let newUser = new User(
       user.username,
       `${user.firstname} ${user.lastname}`,
       user.email,
       user.password
     );
-    
-    let emailRegistered = await this.request(process.env.LEARNING_OBJECT_SERVICE_URI, CHECK_EMAIL_REGISTERED, { email: user.email });
-    
+
+    let emailRegistered = await this.request(
+      process.env.LEARNING_OBJECT_SERVICE_URI,
+      CHECK_EMAIL_REGISTERED,
+      { email: user.email }
+    );
+
     if (emailRegistered) return Promise.reject('email');
 
-    let registeredUser = await this.request(process.env.LEARNING_OBJECT_SERVICE_URI, ADD_USER, { user: User.serialize(newUser) });
-    
+    let registeredUser = await this.request(
+      process.env.LEARNING_OBJECT_SERVICE_URI,
+      ADD_USER,
+      { user: User.serialize(newUser) }
+    );
+
     if (registeredUser && !registeredUser.error) {
       // FIXME: stabilize user serialization
-      if (typeof (registeredUser) === "string") {
+      if (typeof registeredUser === 'string') {
         return User.unserialize(registeredUser);
       } else return registeredUser;
     }
@@ -54,10 +67,14 @@ export default class MongoDriver implements DataStore {
    * @memberof DatabseInteractionConnector
    */
   async login(username: string, password: string): Promise<User> {
-    let user = await this.request(process.env.LEARNING_OBJECT_SERVICE_URI, AUTHENTICATE, { username: username, pwd: password });
-    
+    let user = await this.request(
+      process.env.LEARNING_OBJECT_SERVICE_URI,
+      AUTHENTICATE,
+      { username: username, pwd: password }
+    );
+
     if (user && !user.error) {
-      if (typeof (user) === "string") {
+      if (typeof user === 'string') {
         return User.unserialize(user);
       } else return user;
     } else return null;
@@ -68,7 +85,7 @@ export default class MongoDriver implements DataStore {
       method: 'POST',
       uri: URI + 'api' + event,
       body: params,
-      json: true,
+      json: true
     });
   }
 }

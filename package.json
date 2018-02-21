@@ -9,7 +9,8 @@
     "gulp-tsc": "node_modules/.bin/gulp start",
     "lint": "node_modules/.bin/tslint --project ./src/**",
     "pack": "npm run build && cp ./package.json ./dist && cd ./dist && zip -r ../dist.zip  ./* & cd ..",
-    "deploy": "eb deploy User-Service-Production --profile clark"
+    "deploy": "eb deploy User-Service-Production --profile clark",
+    "prettify": "node_modules/.bin/prettier --write ./src/**/* --single-quote"
   },
   "repository": {
     "type": "git",
