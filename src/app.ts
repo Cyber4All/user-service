@@ -7,7 +7,7 @@ import { UserResponseFactory } from './drivers/UserResponseFactory';
 const mongoDriver = new MongoDriver();
 const sendgridDriver = new SendgridDriver();
 const bcryptDriver = new BcryptDriver(10);
-let app = ExpressDriver.start();
+const app = ExpressDriver.start();
 const responseFactory = new UserResponseFactory();
 
 app.use('/', RouteHandler.buildRouter(mongoDriver, bcryptDriver, sendgridDriver, responseFactory));

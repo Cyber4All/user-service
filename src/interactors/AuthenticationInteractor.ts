@@ -14,7 +14,13 @@ import { User } from '@cyber4all/clark-entity';
  * @param {string} username
  * @param {string} password
  */
-export async function login(dataStore: DataStore, responder: Responder, hasher: HashInterface, username: string, password: string) {
+export async function login(
+  dataStore: DataStore,
+  responder: Responder,
+  hasher: HashInterface,
+  username: string,
+  password: string
+) {
   try {
     let id = await dataStore.findUser(username);
     let user = await dataStore.loadUser(id);
@@ -42,7 +48,12 @@ export async function login(dataStore: DataStore, responder: Responder, hasher: 
  * @param {Responder} responder
  * @param {User} user
  */
-export async function register(datastore: DataStore, responder: Responder, hasher: HashInterface, _user: User) {
+export async function register(
+  datastore: DataStore,
+  responder: Responder,
+  hasher: HashInterface,
+  _user: User
+) {
   try {
     let pwdhash = await hasher.hash(_user.pwd);
     await datastore.insertUser(_user);
@@ -63,7 +74,12 @@ export async function validateToken(responder: Responder, token: string) {
   }
 }
 
-export async function sendPasswordReset(datastore: DataStore, responder: Responder, mailer: MailerInteractor, email: string) {
+export async function sendPasswordReset(
+  datastore: DataStore,
+  responder: Responder,
+  mailer: MailerInteractor,
+  email: string
+) {
   try {
     let emailValid = await datastore.emailRegistered(email);
     emailValid ? await mailer.sendPasswordReset(email)

@@ -1,6 +1,6 @@
 {
   "name": "user-service",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.0.0",
   "description": "A microservice for handling user account actions in the CLARK platform.",
   "main": "app.js",
   "scripts": {
@@ -9,7 +9,8 @@
     "gulp-tsc": "node_modules/.bin/gulp start",
     "lint": "node_modules/.bin/tslint --project ./src/**",
     "pack": "npm run build && cp ./package.json ./dist && cd ./dist && zip -r ../dist.zip  ./* & cd ..",
-    "deploy": "eb deploy User-Service-Production --profile clark"
+    "deploy": "eb deploy User-Service-Production --profile clark",
+    "prettify": "node_modules/.bin/prettier --write ./src/**/* --single-quote"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,9 @@
     "gulp-nodemon": "^2.2.1",
     "gulp-typescript": "^4.0.0-alpha.1",
     "@types/mongodb": "^2.2.13",
+    "prettier": "1.10.2",
+    "tslint": "^5.9.1",
+    "tslint-config-airbnb": "^5.7.0",
     "typescript": "^2.6.2"
   },
   "dependencies": {
