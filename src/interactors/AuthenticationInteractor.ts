@@ -1,5 +1,5 @@
 import { DataStore, Responder, HashInterface, Mailer } from './../interfaces/interfaces';
-import { TokenManager } from '../drivers/drivers';
+import { TokenManager, OTACodeManager } from '../drivers/drivers';
 import { MailerInteractor } from './MailInteractor';
 import { User } from '@cyber4all/clark-entity';
 
@@ -82,9 +82,14 @@ export async function sendPasswordReset(
 ) {
   try {
     let emailValid = await datastore.emailRegistered(email);
-    emailValid ? await mailer.sendPasswordReset(email)
-      : responder.sendOperationSuccess();
-    responder.sendOperationSuccess();
+    if (emailValid) {
+      let otaCode = OTACodeManager.generateOTACode();
+      await datastore.insertOTACode(email, otaCode);
+      await mailer.sendPasswordReset(email, otaCode);
+      responder.sendOperationSuccess();
+    } else {
+      responder.sendOperationSuccess();
+    }
   } catch (e) {
     responder.sendOperationError(`Problem sending email. Error: ${e}`)
   }

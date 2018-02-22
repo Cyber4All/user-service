@@ -9,4 +9,6 @@ export interface DataStore {
   loadUser(id: string): Promise<User>;
   editUser(id: string, user): Promise<void>;
   deleteUser(id: string);
+  insertOTACode(id: string, otaCode: string, expiration?: string | number | Date): Promise<void>;
+  findOTACode(id: string);
 }

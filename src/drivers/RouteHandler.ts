@@ -10,7 +10,8 @@ import {
   login,
   register,
   validateToken,
-  sendPasswordReset
+  sendPasswordReset,
+  resetPassword,
 } from '../interactors/AuthenticationInteractor';
 import { UserResponseFactory } from './drivers';
 import { MailerInteractor } from '../interactors/MailInteractor';
@@ -110,9 +111,25 @@ export default class RouteHandler {
       });
 
     router.post('/users/passwords', async (req, res) => {
-      let email = req.body.email;
-      let mailer = new MailerInteractor(this.mailer);
-      await sendPasswordReset(this.dataStore, this.responseFactory.buildResponder(res), mailer, email);
+      try {
+        let email = req.body.email;
+        let mailer = new MailerInteractor(this.mailer);
+        await sendPasswordReset(this.dataStore, this.responseFactory.buildResponder(res), mailer, email);
+      } catch (e) {
+        console.log(e);
+        this.responseFactory.buildResponder(res).sendOperationError(e);
+      }
+    });
+
+    router.get('/users/accounts', async (req, res) => {
+      try {
+        let action = req.query.action;
+        let otaCode = req.query.otaCode;
+        //verify ota code & redirect back to auth;
+      } catch (e) {
+        console.log(e);
+        this.responseFactory.buildResponder(res).sendOperationError(e);
+      }
     })
   }
 }

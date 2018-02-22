@@ -18,6 +18,8 @@ import {
   Insert
 } from '@cyber4all/clark-schema';
 
+const OTACodes = 'otaCodes';
+
 import { DataStore } from "../interfaces/interfaces";
 import { User } from '@cyber4all/clark-entity';
 export const AUTHENTICATE = '/authenticate';
@@ -158,6 +160,23 @@ export default class MongoDriver implements DataStore {
     return this.remove(UserSchema, id);
   }
 
+
+  async insertOTACode(email: string, otaCode: string, expiration?: string): Promise<void> {
+    try {
+      await this.db.collection(OTACodes).insertOne({ email: email, otaCode: otaCode, expiration: expiration });
+      return Promise.resolve();
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+
+  async findOTACode(id: string): Promise<string> {
+    try {
+
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
 
 
   ////////////////////////////////////////////////

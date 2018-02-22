@@ -1,23 +1,21 @@
 import { Mailer } from '../interfaces/interfaces';
+import * as MAIL_DEFAULTS from '../interfaces/Mailer.defaults';
 
 export class MailerInteractor {
 
-    constructor(private mailer: Mailer) {
+    constructor(private mailer: Mailer) { }
 
-    }
-
-    async sendPasswordReset(email: string) {
+    async sendPasswordReset(email: string, otaCode: string) {
         try {
-            return await this.mailer.sendSingle(email, FROM.NO_REPLY, SUBJECTS.PASSWORD_RESET)
+            return await this.mailer.sendSingleTemplate(
+                email,
+                MAIL_DEFAULTS.FROM.NO_REPLY,
+                MAIL_DEFAULTS.SUBJECTS.PASSWORD_RESET,
+                MAIL_DEFAULTS.TEMPLATES.RESET_PASSWORD,
+                { action: MAIL_DEFAULTS.ACCOUNT_ACTIONS.RESET_PASSWORD, otaCode: otaCode }
+            );
         } catch (e) {
             return Promise.reject(e);
         }
     }
 }
-
-export const enum FROM {
-    NO_REPLY = 'noreply@clark.center',
-}
-export const enum SUBJECTS {
-    PASSWORD_RESET = 'Reset your password',
-} 

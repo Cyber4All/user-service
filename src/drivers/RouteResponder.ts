@@ -1,5 +1,5 @@
 import { ExpressResponder } from '@oriented/express';
-import { Responder, User } from '../interfaces/interfaces';
+import { Responder } from '../interfaces/interfaces';
 import { Response } from 'express';
 
 export default class RouteResponder implements Responder {
@@ -7,7 +7,7 @@ export default class RouteResponder implements Responder {
    *
    * @param res
    */
-  constructor(private res: Response) {}
+  constructor(private res: Response) { }
 
   /**
    *
