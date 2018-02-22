@@ -1,27 +1,28 @@
 import * as express from 'express';
 import { Router } from 'express';
-import { DataStore, Responder } from '../interfaces/interfaces';
-import { login, register, validateToken } from '../interactors/AuthenticationInteractor';
+import { DataStore, Responder, Mailer, HashInterface } from '../interfaces/interfaces';
+import { login, register, validateToken, sendPasswordReset } from '../interactors/AuthenticationInteractor';
 import { UserResponseFactory } from './drivers';
+import { MailerInteractor } from '../interactors/MailInteractor';
 const version = require('../package.json').version;
 export default class RouteHandler {
 
-  constructor(private dataStore: DataStore, private responseFactory: UserResponseFactory) {}
+  constructor(private dataStore: DataStore, private hasher: HashInterface, private mailer: Mailer, private responseFactory: UserResponseFactory) { }
 
   /**
    * Produces a configured express router
    *
    * @param dataStore the data store that the routes should utilize
    */
-  public static buildRouter(dataStore, responseFactory) {
-    let e = new RouteHandler(dataStore, responseFactory);
+  public static buildRouter(dataStore: DataStore, hasher: HashInterface, mailer: Mailer, responseFactory) {
+    let e = new RouteHandler(dataStore, hasher, mailer, responseFactory);
     let router: Router = express.Router();
     e.setRoutes(router);
     return router;
   }
 
   private setRoutes(router: Router) {
-    
+
     // GET: returns welcome message and version number
     // No params necessary
     router.get('/users', (req, res) => {
@@ -44,12 +45,12 @@ export default class RouteHandler {
     */
     // Returns either message warning invalid info, or success
     router.post('/users', async (req, res) => {
-      await register(this.dataStore, this.responseFactory.buildResponder(res), req.body);
+      await register(this.dataStore, this.responseFactory.buildResponder(res), this.hasher, req.body);
     });
 
     // Login
     router.post('/users/tokens', async (req, res) => {
-      await login(this.dataStore, this.responseFactory.buildResponder(res), req.body.username, req.body.password);
+      await login(this.dataStore, this.responseFactory.buildResponder(res), this.hasher, req.body.username, req.body.password);
     });
 
     // TODO: Remove account
@@ -61,7 +62,7 @@ export default class RouteHandler {
       throw new Error('Cannot delete user accounts at this time');
     });
 
-    
+
     router.route('/users/:username/tokens')
       // Validate Token
       // Param: Valid token (for testing, get from users/tokens route)
@@ -76,5 +77,11 @@ export default class RouteHandler {
       .delete(async (req, res) => {
         throw new Error('Cannot logout at this time');
       });
+
+    router.post('/users/passwords', async (req, res) => {
+      let email = req.body.email;
+      let mailer = new MailerInteractor(this.mailer);
+      await sendPasswordReset(this.dataStore, this.responseFactory.buildResponder(res), mailer, email);
+    })
   }
 }

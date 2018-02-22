@@ -1,6 +1,7 @@
-import { DataStore, Responder, User } from './../interfaces/interfaces';
+import { DataStore, Responder, HashInterface, Mailer } from './../interfaces/interfaces';
 import { TokenManager } from '../drivers/drivers';
-
+import { MailerInteractor } from './MailInteractor';
+import { User } from '@cyber4all/clark-entity';
 
 /**
  * Attempts user login via datastore and issues JWT access token
@@ -13,19 +14,22 @@ import { TokenManager } from '../drivers/drivers';
  * @param {string} username
  * @param {string} password
  */
-export async function login(dataStore: DataStore, responder: Responder, username: string, password: string) {
-  // Try to login with the datastore
-  // response should be the user object
-  dataStore.login(username, password)
-    .then((user) => {
-      // Get access token and add to user object
+export async function login(dataStore: DataStore, responder: Responder, hasher: HashInterface, username: string, password: string) {
+  try {
+    let id = await dataStore.findUser(username);
+    let user = await dataStore.loadUser(id);
+    let authenticated = await hasher.verify(password, user.pwd);
+
+    if (authenticated) {
       user['token'] = TokenManager.generateToken(user);
       responder.sendUser(user);
-    })
-    .catch((error) => {
-      console.log(error);
+    } else {
       responder.invalidLogin();
-    });
+    }
+  } catch (e) {
+    console.log(e);
+    responder.sendOperationError(e);
+  }
 }
 
 /**
@@ -38,23 +42,17 @@ export async function login(dataStore: DataStore, responder: Responder, username
  * @param {Responder} responder
  * @param {User} user
  */
-export async function register(datastore: DataStore, responder: Responder, user) {
-  // Try register with datastore
-  // response should be the user object
-  datastore.register(user)
-    .then((newUser) => {
-      // Get access token and add to user object
-      newUser['token'] = TokenManager.generateToken(newUser);
-      responder.sendUser(newUser);
-    })
-    .catch((error) => {
-      if (error === 'email') {
-        responder.sendOperationError('Email is already in use.', 420);
-      } else {
-        responder.invalidRegistration();
-
-      }
-    });
+export async function register(datastore: DataStore, responder: Responder, hasher: HashInterface, _user: User) {
+  try {
+    let pwdhash = await hasher.hash(_user.pwd);
+    await datastore.insertUser(_user);
+    let user = new User(_user.username, _user.name, _user.email, _user.organization, null);
+    user['token'] = TokenManager.generateToken(user);
+    responder.sendUser(user);
+  } catch (e) {
+    console.log(e);
+    responder.sendOperationError(e);
+  }
 }
 
 export async function validateToken(responder: Responder, token: string) {
@@ -63,5 +61,18 @@ export async function validateToken(responder: Responder, token: string) {
   } else {
     responder.sendOperationSuccess();
   }
+}
+
+export async function sendPasswordReset(datastore: DataStore, responder: Responder, mailer: MailerInteractor, email: string) {
+  try {
+    let emailValid = await datastore.emailRegistered(email);
+    emailValid ? await mailer.sendPasswordReset(email)
+      : responder.sendOperationSuccess();
+    responder.sendOperationSuccess();
+  } catch (e) {
+    responder.sendOperationError(`Problem sending email. Error: ${e}`)
+  }
+
+
 }
 

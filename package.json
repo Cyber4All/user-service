@@ -27,14 +27,19 @@
     "gulp": "^3.9.1",
     "gulp-nodemon": "^2.2.1",
     "gulp-typescript": "^4.0.0-alpha.1",
+    "@types/mongodb": "^2.2.13",
     "typescript": "^2.6.2"
   },
   "dependencies": {
-    "@cyber4all/clark-entity": "^1.1.1",
+    "@cyber4all/clark-entity": "^1.1.71",
+    "@cyber4all/clark-schema": "^1.0.7",
     "@oriented/express": "^1.0.3",
+    "@sendgrid/mail": "^6.2.1",
     "@types/dotenv": "^4.0.2",
+    "bcrypt": "^1.0.3",
     "dotenv": "^5.0.0",
     "jsonwebtoken": "^8.1.1",
+    "mongodb": "^2.2.31",
     "request": "^2.83.0",
     "request-promise": "^4.2.2"
   }

@@ -1,5 +1,10 @@
 import { DataStore } from './DataStore'
 import { Responder } from './Responder'
-import { User } from './User'
-
-export { DataStore, Responder,  User }
+import { HashInterface } from './HashInterface';
+import { Mailer } from './Mailer';
+export {
+    DataStore,
+    Responder,
+    HashInterface,
+    Mailer
+}
