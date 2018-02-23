@@ -7,7 +7,7 @@ export default class RouteResponder implements Responder {
    *
    * @param res
    */
-  constructor(private res: Response) { }
+  constructor(private res: Response) {}
 
   /**
    *

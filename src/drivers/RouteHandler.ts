@@ -11,7 +11,7 @@ import {
   register,
   validateToken,
   sendPasswordReset,
-  resetPassword,
+  resetPassword
 } from '../interactors/AuthenticationInteractor';
 import { UserResponseFactory } from './drivers';
 import { MailerInteractor } from '../interactors/MailInteractor';
@@ -23,7 +23,7 @@ export default class RouteHandler {
     private hasher: HashInterface,
     private mailer: Mailer,
     private responseFactory: UserResponseFactory
-  ) { }
+  ) {}
 
   /**
    * Produces a configured express router
@@ -34,7 +34,8 @@ export default class RouteHandler {
     dataStore: DataStore,
     hasher: HashInterface,
     mailer: Mailer,
-    responseFactory: UserResponseFactory) {
+    responseFactory: UserResponseFactory
+  ) {
     let e = new RouteHandler(dataStore, hasher, mailer, responseFactory);
     let router: Router = express.Router();
     e.setRoutes(router);
@@ -114,7 +115,12 @@ export default class RouteHandler {
       try {
         let email = req.body.email;
         let mailer = new MailerInteractor(this.mailer);
-        await sendPasswordReset(this.dataStore, this.responseFactory.buildResponder(res), mailer, email);
+        await sendPasswordReset(
+          this.dataStore,
+          this.responseFactory.buildResponder(res),
+          mailer,
+          email
+        );
       } catch (e) {
         console.log(e);
         this.responseFactory.buildResponder(res).sendOperationError(e);
@@ -130,6 +136,6 @@ export default class RouteHandler {
         console.log(e);
         this.responseFactory.buildResponder(res).sendOperationError(e);
       }
-    })
+    });
   }
 }

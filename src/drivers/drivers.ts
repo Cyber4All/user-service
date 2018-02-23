@@ -15,5 +15,5 @@ export {
   UserResponseFactory,
   SendgridDriver,
   BcryptDriver,
-  OTACodeManager,
-}
+  OTACodeManager
+};

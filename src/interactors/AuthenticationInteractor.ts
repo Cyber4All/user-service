@@ -1,4 +1,9 @@
-import { DataStore, Responder, HashInterface, Mailer } from './../interfaces/interfaces';
+import {
+  DataStore,
+  Responder,
+  HashInterface,
+  Mailer
+} from './../interfaces/interfaces';
 import { TokenManager, OTACodeManager } from '../drivers/drivers';
 import { MailerInteractor } from './MailInteractor';
 import { User } from '@cyber4all/clark-entity';
@@ -57,7 +62,13 @@ export async function register(
   try {
     let pwdhash = await hasher.hash(_user.pwd);
     await datastore.insertUser(_user);
-    let user = new User(_user.username, _user.name, _user.email, _user.organization, null);
+    let user = new User(
+      _user.username,
+      _user.name,
+      _user.email,
+      _user.organization,
+      null
+    );
     user['token'] = TokenManager.generateToken(user);
     responder.sendUser(user);
   } catch (e) {
@@ -91,9 +102,6 @@ export async function sendPasswordReset(
       responder.sendOperationSuccess();
     }
   } catch (e) {
-    responder.sendOperationError(`Problem sending email. Error: ${e}`)
+    responder.sendOperationError(`Problem sending email. Error: ${e}`);
   }
-
-
 }
-
