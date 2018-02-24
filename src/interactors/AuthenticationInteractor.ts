@@ -1,7 +1,7 @@
 import { DataStore, Responder, HashInterface, Mailer } from './../interfaces/interfaces';
 import { TokenManager, OTACodeManager } from '../drivers/drivers';
-import { MailerInteractor } from './MailInteractor';
 import { User } from '@cyber4all/clark-entity';
+import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
 
 /**
  * Attempts user login via datastore and issues JWT access token
@@ -72,28 +72,5 @@ export async function validateToken(responder: Responder, token: string) {
   } else {
     responder.sendOperationSuccess();
   }
-}
-
-export async function sendPasswordReset(
-  datastore: DataStore,
-  responder: Responder,
-  mailer: MailerInteractor,
-  email: string
-) {
-  try {
-    let emailValid = await datastore.emailRegistered(email);
-    if (emailValid) {
-      let otaCode = OTACodeManager.generateOTACode();
-      await datastore.insertOTACode(email, otaCode);
-      await mailer.sendPasswordReset(email, otaCode);
-      responder.sendOperationSuccess();
-    } else {
-      responder.sendOperationSuccess();
-    }
-  } catch (e) {
-    responder.sendOperationError(`Problem sending email. Error: ${e}`)
-  }
-
-
 }
 

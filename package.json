@@ -40,6 +40,7 @@
     "@oriented/express": "^1.0.3",
     "@sendgrid/mail": "^6.2.1",
     "@types/dotenv": "^4.0.2",
+    "@types/jsonwebtoken": "^7.2.5",
     "bcrypt": "^1.0.3",
     "dotenv": "^5.0.0",
     "jsonwebtoken": "^8.1.1",

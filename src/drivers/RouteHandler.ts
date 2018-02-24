@@ -1,21 +1,24 @@
-import * as express from 'express';
+import * as express from "express";
 type Router = express.Router;
 import {
   DataStore,
   Responder,
   Mailer,
   HashInterface
-} from '../interfaces/interfaces';
+} from "../interfaces/interfaces";
 import {
   login,
   register,
-  validateToken,
-  sendPasswordReset,
-  resetPassword,
-} from '../interactors/AuthenticationInteractor';
-import { UserResponseFactory } from './drivers';
-import { MailerInteractor } from '../interactors/MailInteractor';
-const version = require('../package.json').version;
+  validateToken
+} from "../interactors/AuthenticationInteractor";
+import { UserResponseFactory, OTACodeManager } from "./drivers";
+import {
+  UserInteractor,
+  MailerInteractor,
+  OTACodeInteractor
+} from "../interactors/interactors";
+import { ACCOUNT_ACTIONS } from "../interfaces/Mailer.defaults";
+const version = require("../package.json").version;
 
 export default class RouteHandler {
   constructor(
@@ -23,7 +26,7 @@ export default class RouteHandler {
     private hasher: HashInterface,
     private mailer: Mailer,
     private responseFactory: UserResponseFactory
-  ) { }
+  ) {}
 
   /**
    * Produces a configured express router
@@ -34,7 +37,8 @@ export default class RouteHandler {
     dataStore: DataStore,
     hasher: HashInterface,
     mailer: Mailer,
-    responseFactory: UserResponseFactory) {
+    responseFactory: UserResponseFactory
+  ) {
     let e = new RouteHandler(dataStore, hasher, mailer, responseFactory);
     let router: Router = express.Router();
     e.setRoutes(router);
@@ -44,7 +48,7 @@ export default class RouteHandler {
   private setRoutes(router: Router) {
     // GET: returns welcome message and version number
     // No params necessary
-    router.get('/users', (req, res) => {
+    router.get("/users", (req, res) => {
       res.json({
         version,
         message: `Welcome to the Users API v${version}`
@@ -63,7 +67,7 @@ export default class RouteHandler {
     }
     */
     // Returns either message warning invalid info, or success
-    router.post('/users', async (req, res) => {
+    router.post("/users", async (req, res) => {
       await register(
         this.dataStore,
         this.responseFactory.buildResponder(res),
@@ -73,7 +77,7 @@ export default class RouteHandler {
     });
 
     // Login
-    router.post('/users/tokens', async (req, res) => {
+    router.post("/users/tokens", async (req, res) => {
       await login(
         this.dataStore,
         this.responseFactory.buildResponder(res),
@@ -87,15 +91,15 @@ export default class RouteHandler {
     // When implemented...
     // provide token, which is then unauthorized, and return success message
     // Need to implement promise rejection catch - error message in console on failure.
-    router.delete('/users/:username', async (req, res) => {
+    router.delete("/users/:username", async (req, res) => {
       this.responseFactory
         .buildResponder(res)
-        .sendOperationError('Cannot delete user accounts at this time');
-      throw new Error('Cannot delete user accounts at this time');
+        .sendOperationError("Cannot delete user accounts at this time");
+      throw new Error("Cannot delete user accounts at this time");
     });
 
     router
-      .route('/users/:username/tokens')
+      .route("/users/:username/tokens")
       // Validate Token
       // Param: Valid token (for testing, get from users/tokens route)
       // if valid, returns OK
@@ -107,29 +111,74 @@ export default class RouteHandler {
       // TODO: Logout
       // Currently throws unhandled promise rejection error, request cannot complete in postman
       .delete(async (req, res) => {
-        throw new Error('Cannot logout at this time');
+        throw new Error("Cannot logout at this time");
       });
 
-    router.post('/users/passwords', async (req, res) => {
-      try {
-        let email = req.body.email;
-        let mailer = new MailerInteractor(this.mailer);
-        await sendPasswordReset(this.dataStore, this.responseFactory.buildResponder(res), mailer, email);
-      } catch (e) {
-        console.log(e);
-        this.responseFactory.buildResponder(res).sendOperationError(e);
-      }
-    });
+    router
+      .route("/users/ota-codes")
+      .post(async (req, res) => {
+        try {
+          let action = req.query.action;
+          let payload = req.body.payload;
+          let mailer = new MailerInteractor(this.mailer);
+          await OTACodeInteractor.handleAction(
+            this.dataStore,
+            this.responseFactory.buildResponder(res),
+            payload,
+            mailer
+          );
+        } catch (e) {
+          console.log(e);
+          this.responseFactory.buildResponder(res).sendOperationError(e);
+        }
+      })
+      .get(async (req, res) => {
+        try {
+          let otaCode = req.query.otaCode;
+          await OTACodeInteractor.handleRedirect(
+            this.dataStore,
+            this.responseFactory.buildResponder(res),
+            otaCode
+          );
+        } catch (e) {
+          console.log(e);
+          this.responseFactory.buildResponder(res).sendOperationError(e);
+        }
+      })
+      .patch(async (req, res) => {
+        try {
+          let otaCode = req.query.otaCode;
+          let payload = req.query.payload;
 
-    router.get('/users/accounts', async (req, res) => {
-      try {
-        let action = req.query.action;
-        let otaCode = req.query.otaCode;
-        //verify ota code & redirect back to auth;
-      } catch (e) {
-        console.log(e);
-        this.responseFactory.buildResponder(res).sendOperationError(e);
-      }
-    })
+          let decoded = await OTACodeInteractor.applyOTACode(
+            this.dataStore,
+            otaCode
+          );
+          if (decoded) {
+            switch (decoded.action as ACCOUNT_ACTIONS) {
+              case ACCOUNT_ACTIONS.RESET_PASSWORD:
+                await UserInteractor.updatePassword(
+                  this.dataStore,
+                  this.responseFactory.buildResponder(res),
+                  this.hasher,
+                  decoded.data,
+                  payload
+                );
+                break;
+              default:
+                this.responseFactory
+                  .buildResponder(res)
+                  .sendOperationError("Invalid action.");
+                break;
+            }
+          } else {
+            this.responseFactory
+              .buildResponder(res)
+              .sendOperationError("Invalid OTA Code.");
+          }
+        } catch (e) {
+          console.log(e);
+        }
+      });
   }
 }

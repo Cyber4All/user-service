@@ -13,6 +13,8 @@ export class SendgridDriver implements Mailer {
         this.mailer.setApiKey(process.env.SENDGRID_API_KEY);
 
         // Add template ids
+        this.SENDGRID_TEMPLATES.set(MAIL_DEFAULTS.TEMPLATES.VERIFY_EMAIL, '');
+        this.SENDGRID_TEMPLATES.set(MAIL_DEFAULTS.TEMPLATES.WELCOME_EMAIL, '');
         this.SENDGRID_TEMPLATES.set(MAIL_DEFAULTS.TEMPLATES.RESET_PASSWORD, '');
     }
 

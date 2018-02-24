@@ -1,8 +1,10 @@
 import { ExpressResponder } from '@oriented/express';
 import { Responder } from '../interfaces/interfaces';
 import { Response } from 'express';
+import { User } from '@cyber4all/clark-entity';
 
 export default class RouteResponder implements Responder {
+
   /**
    *
    * @param res
@@ -35,7 +37,7 @@ export default class RouteResponder implements Responder {
    *
    * @param user
    */
-  sendUser(user: User) {
+  sendUser(user: {} | User) {
     this.res.status(200).json(user);
   }
 
@@ -58,5 +60,9 @@ export default class RouteResponder implements Responder {
    */
   invalidAccess() {
     this.res.status(401).send('Invalid access token');
+  }
+
+  redirectTo(url: string) {
+    this.res.redirect(url);
   }
 }
