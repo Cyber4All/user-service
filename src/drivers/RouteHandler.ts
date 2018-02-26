@@ -9,7 +9,8 @@ import {
 import {
   login,
   register,
-  validateToken
+  validateToken,
+  logout
 } from "../interactors/AuthenticationInteractor";
 import { UserResponseFactory, OTACodeManager } from "./drivers";
 import {
@@ -87,17 +88,6 @@ export default class RouteHandler {
       );
     });
 
-    // TODO: Remove account
-    // When implemented...
-    // provide token, which is then unauthorized, and return success message
-    // Need to implement promise rejection catch - error message in console on failure.
-    router.delete("/users/:username", async (req, res) => {
-      this.responseFactory
-        .buildResponder(res)
-        .sendOperationError("Cannot delete user accounts at this time");
-      throw new Error("Cannot delete user accounts at this time");
-    });
-
     router
       .route("/users/:username/tokens")
       // Validate Token
@@ -105,13 +95,14 @@ export default class RouteHandler {
       // if valid, returns OK
       // else, returns "INVALID TOKEN"
       .post(async (req, res) => {
-        validateToken(this.responseFactory.buildResponder(res), req.body.token);
+        validateToken(this.responseFactory.buildResponder(res), req.cookies.presence);
       })
 
       // TODO: Logout
       // Currently throws unhandled promise rejection error, request cannot complete in postman
       .delete(async (req, res) => {
-        throw new Error("Cannot logout at this time");
+        // TODO invalidate JWT here as well as clearing the login cookie
+        logout(this.dataStore, this.responseFactory.buildResponder(res));
       });
 
     router
@@ -180,5 +171,16 @@ export default class RouteHandler {
           console.log(e);
         }
       });
+
+    // TODO: Remove account
+    // When implemented...
+    // provide token, which is then unauthorized, and return success message
+    // Need to implement promise rejection catch - error message in console on failure.
+    router.delete("/users/:username", async (req, res) => {
+      this.responseFactory
+        .buildResponder(res)
+        .sendOperationError("Cannot delete user accounts at this time");
+      throw new Error("Cannot delete user accounts at this time");
+    });
   }
 }
