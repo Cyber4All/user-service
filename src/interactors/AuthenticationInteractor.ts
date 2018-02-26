@@ -3,10 +3,10 @@ import {
   Responder,
   HashInterface,
   Mailer
-} from "./../interfaces/interfaces";
-import { TokenManager, OTACodeManager } from "../drivers/drivers";
-import { User } from "@cyber4all/clark-entity";
-import { ACCOUNT_ACTIONS } from "../interfaces/Mailer.defaults";
+} from './../interfaces/interfaces';
+import { TokenManager, OTACodeManager } from '../drivers/drivers';
+import { User } from '@cyber4all/clark-entity';
+import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
 
 /**
  * Attempts user login via datastore and issues JWT access token
@@ -32,7 +32,8 @@ export async function login(
     let authenticated = await hasher.verify(password, user.pwd);
 
     if (authenticated) {
-      user["token"] = TokenManager.generateToken(user);
+      user['token'] = TokenManager.generateToken(user);
+
       responder.sendUser(user);
     } else {
       responder.invalidLogin();
@@ -41,6 +42,11 @@ export async function login(
     console.log(e);
     responder.sendOperationError(e);
   }
+}
+
+export async function logout(dataStore: DataStore, responder: Responder) {
+  responder.removeCookie('presence');
+  responder.sendOperationSuccess();
 }
 
 /**
