@@ -38,10 +38,13 @@ export default class RouteResponder implements Responder {
    * @param user
    */
   sendUser(user: {} | User) {
-    this.res.status(200).json(user);
+    const t = user['token'];
+    delete user['token'];
+    delete user['_pwd'];
+    this.setCookie('presence', t).status(200).json(user);
   }
-
   /**
+
    *
    */
   invalidLogin() {
@@ -64,5 +67,14 @@ export default class RouteResponder implements Responder {
 
   redirectTo(url: string) {
     this.res.redirect(url);
+  }
+
+  setCookie(key: string, value: string): Response {
+    return this.res.cookie(key, value, { maxAge: 900000, httpOnly: false });
+  }
+
+  removeCookie(name: string): Response {
+    return this.res.clearCookie(name);
+    return this.res;
   }
 }
