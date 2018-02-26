@@ -4,17 +4,32 @@ import { Mailer } from "../interfaces/interfaces";
 import * as MAIL_DEFAULTS from "../interfaces/Mailer.defaults";
 dotenv.config();
 
+export enum SENDGRID_TEMPLATES {
+  VERIFY_EMAIL = "3b741215-9b4c-4a2a-9fb0-27c1b9bf950f",
+  WELCOME_EMAIL = "9c64ee0e-c772-4887-b510-38d13fd02338",
+  RESET_PASSWORD = "ef42659c-df2a-4c29-a8bc-cc99054cd3fa"
+}
 export class SendgridDriver implements Mailer {
   private mailer = sgMail;
-  private SENDGRID_TEMPLATES = new Map<MAIL_DEFAULTS.TEMPLATES, string>();
+  private TEMPLATES = new Map<MAIL_DEFAULTS.TEMPLATES, string>();
 
   constructor() {
     this.mailer.setApiKey(process.env.SENDGRID_API_KEY);
+    this.mailer.setSubstitutionWrappers("{{", "}}");
 
     // Add template ids
-    this.SENDGRID_TEMPLATES.set(MAIL_DEFAULTS.TEMPLATES.VERIFY_EMAIL, "");
-    this.SENDGRID_TEMPLATES.set(MAIL_DEFAULTS.TEMPLATES.WELCOME_EMAIL, "");
-    this.SENDGRID_TEMPLATES.set(MAIL_DEFAULTS.TEMPLATES.RESET_PASSWORD, "");
+    this.TEMPLATES.set(
+      MAIL_DEFAULTS.TEMPLATES.VERIFY_EMAIL,
+      SENDGRID_TEMPLATES.VERIFY_EMAIL
+    );
+    this.TEMPLATES.set(
+      MAIL_DEFAULTS.TEMPLATES.WELCOME_EMAIL,
+      SENDGRID_TEMPLATES.WELCOME_EMAIL
+    );
+    this.TEMPLATES.set(
+      MAIL_DEFAULTS.TEMPLATES.RESET_PASSWORD,
+      SENDGRID_TEMPLATES.RESET_PASSWORD
+    );
   }
 
   async sendSingle(
@@ -115,6 +130,8 @@ export class SendgridDriver implements Mailer {
   }
 
   private getTemplate(template: MAIL_DEFAULTS.TEMPLATES): string {
-    return this.SENDGRID_TEMPLATES.get(template);
+    let id = this.TEMPLATES.get(template);
+    if (id) return id;
+    throw new Error(`No existing template for: ${template}`);
   }
 }

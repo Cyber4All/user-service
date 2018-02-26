@@ -60,15 +60,17 @@ export async function register(
   _user: User
 ) {
   try {
-    let pwdhash = await hasher.hash(_user.pwd);
-    await datastore.insertUser(_user);
-    let user = new User(
-      _user.username,
-      _user.name,
-      _user.email,
-      _user.organization,
-      null
-    );
+    // FIXME: Needs consistent typing here
+    let pwdhash = await hasher.hash(_user.pwd ? _user.pwd : _user["password"]);
+    _user.pwd = pwdhash;
+    let user = await datastore.insertUser({
+      username: _user.username,
+      name_: `${_user.firstname} ${_user.lastname}`,
+      organization: _user.organization,
+      email: _user.email,
+      pwdhash: pwdhash,
+      objects: []
+    });
     user["token"] = TokenManager.generateToken(user);
     responder.sendUser(user);
   } catch (e) {

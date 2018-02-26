@@ -1,15 +1,17 @@
-export const enum FROM {
-  NO_REPLY = 'noreply@clark.center'
+export enum FROM {
+  NO_REPLY = "noreply@clark.center"
 }
-export const enum SUBJECTS {
-  PASSWORD_RESET = 'Reset your password'
+export enum SUBJECTS {
+  VERIFY_EMAIL = "Verify your email",
+  WELCOME_EMAIL = "Welcome to C.L.A.R.K.",
+  RESET_PASSWORD = "Reset your password"
 }
-export const enum ACCOUNT_ACTIONS {
-    VERIFY_EMAIL = 'verifyEmail',
-    RESET_PASSWORD = 'resetPassword',
+export enum ACCOUNT_ACTIONS {
+  VERIFY_EMAIL = "verifyEmail",
+  RESET_PASSWORD = "resetPassword"
 }
-export const enum TEMPLATES {
-    VERIFY_EMAIL = 'verify email',
-    WELCOME_EMAIL = 'welcome email',
-    RESET_PASSWORD = 'reset password',
+export enum TEMPLATES {
+  VERIFY_EMAIL = "verify email",
+  WELCOME_EMAIL = "welcome email",
+  RESET_PASSWORD = "reset password"
 }

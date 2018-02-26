@@ -1,60 +1,71 @@
-import { DataStore, Responder } from "../interfaces/interfaces";
-import { MailerInteractor } from "./MailerInteractor";
+import {
+  DataStore,
+  Responder,
+  MailerInteractorInterface
+} from "../interfaces/interfaces";
 import { OTACodeManager } from "../drivers/drivers";
 import { ACCOUNT_ACTIONS } from "../interfaces/Mailer.defaults";
 import { REDIRECT_ROUTES } from "../environment/routes";
-import { DecodedOTACode } from "../drivers/OTACodeManager";
+import { DecodedOTACode, OTACode } from "../drivers/OTACodeManager";
+import * as request from "request";
 
 export class OTACodeInteractor {
-  public static handleAction(
+  public static async generateOTACode(
     dataStore: DataStore,
-    responder: Responder,
     action: ACCOUNT_ACTIONS,
-    data: any,
-    mailer?: MailerInteractor
-  ): Promise<any> {
-    switch (action) {
-      case ACCOUNT_ACTIONS.VERIFY_EMAIL:
-        return; //SUM FUNCTION THAT SENDS EMAIL VERIFICATION EMAIL
-      case ACCOUNT_ACTIONS.RESET_PASSWORD:
-        return this.sendPasswordReset(dataStore, responder, mailer, data);
-      default:
-        responder.sendOperationError("Action invalid");
-        break;
+    email: string
+  ): Promise<string> {
+    try {
+      if (Object.values(ACCOUNT_ACTIONS).includes(action)) {
+        let otaCode = await this.getOTACode(dataStore, email, action);
+        return otaCode;
+      } else {
+        return Promise.reject("Invalid action");
+      }
+    } catch (e) {
+      return Promise.reject(e);
     }
   }
 
-  public static async handleRedirect(
+  public static async decode(
     dataStore: DataStore,
-    responder: Responder,
     otaCode: string
   ): Promise<any> {
     try {
       let decoded = await this.verifyOTACode(dataStore, otaCode);
-      if (decoded)
-        switch (decoded.action) {
-          case ACCOUNT_ACTIONS.VERIFY_EMAIL:
-            responder.redirectTo(REDIRECT_ROUTES.VERIFY_EMAIL);
-            break; //SUM FUNCTION THAT SENDS EMAIL VERIFICATION EMAIL
-          case ACCOUNT_ACTIONS.RESET_PASSWORD:
-            responder.redirectTo(REDIRECT_ROUTES.RESET_PASSWORD(otaCode));
-            break;
-          default:
-            responder.sendOperationError("Action invalid");
-            break;
-        }
+      return decoded;
     } catch (e) {
-      responder.sendOperationError(e);
+      return Promise.reject(e);
     }
   }
 
   public static async applyOTACode(
     dataStore: DataStore,
-    otaCode: any
+    otaCode: string
   ): Promise<any> {
     try {
       let decoded = await this.verifyOTACode(dataStore, otaCode, true);
-      return decoded ? decoded : Promise.reject("Invalid OTA Code.");
+      return decoded;
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+
+  private static async getOTACode(
+    dataStore: DataStore,
+    email: string,
+    action: ACCOUNT_ACTIONS
+  ): Promise<string> {
+    try {
+      let emailValid = await dataStore.emailRegistered(email);
+      if (emailValid) {
+        let otaCode = await OTACodeManager.generate(
+          { email: email },
+          ACCOUNT_ACTIONS.RESET_PASSWORD
+        );
+        await dataStore.insertOTACode(otaCode);
+        return otaCode.code;
+      }
     } catch (e) {
       return Promise.reject(e);
     }
@@ -72,31 +83,7 @@ export class OTACodeInteractor {
       return decoded;
     } catch (e) {
       console.log(e);
-      return Promise.resolve(null);
-    }
-  }
-
-  private static async sendPasswordReset(
-    datastore: DataStore,
-    responder: Responder,
-    mailer: MailerInteractor,
-    email: string
-  ) {
-    try {
-      let emailValid = await datastore.emailRegistered(email);
-      if (emailValid) {
-        let otaCode = await OTACodeManager.generate(
-          { email: email },
-          ACCOUNT_ACTIONS.RESET_PASSWORD
-        );
-        await datastore.insertOTACode(otaCode);
-        await mailer.sendPasswordReset(email, otaCode.code);
-        responder.sendOperationSuccess();
-      } else {
-        responder.sendOperationSuccess();
-      }
-    } catch (e) {
-      responder.sendOperationError(`Problem sending email. Error: ${e}`);
+      return Promise.reject(e);
     }
   }
 }

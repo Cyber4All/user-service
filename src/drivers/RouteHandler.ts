@@ -18,6 +18,7 @@ import {
   OTACodeInteractor
 } from "../interactors/interactors";
 import { ACCOUNT_ACTIONS } from "../interfaces/Mailer.defaults";
+import { REDIRECT_ROUTES } from "../environment/routes";
 const version = require("../package.json").version;
 
 export default class RouteHandler {
@@ -119,14 +120,33 @@ export default class RouteHandler {
       .post(async (req, res) => {
         try {
           let action = req.query.action;
-          let payload = req.body.payload;
-          let mailer = new MailerInteractor(this.mailer);
-          await OTACodeInteractor.handleAction(
+          let email = req.body.email;
+          let responder = this.responseFactory.buildResponder(res);
+          let otaCode = await OTACodeInteractor.generateOTACode(
             this.dataStore,
-            this.responseFactory.buildResponder(res),
-            payload,
-            mailer
+            action,
+            email
           );
+          switch (action) {
+            case ACCOUNT_ACTIONS.VERIFY_EMAIL:
+              await MailerInteractor.sendEmailVerification(
+                this.mailer,
+                email,
+                otaCode
+              );
+              responder.sendOperationSuccess();
+              break;
+            case ACCOUNT_ACTIONS.RESET_PASSWORD:
+              await MailerInteractor.sendPasswordReset(
+                this.mailer,
+                email,
+                otaCode
+              );
+              responder.sendOperationSuccess();
+              break;
+            default:
+              responder.sendOperationError("Invalid action");
+          }
         } catch (e) {
           console.log(e);
           this.responseFactory.buildResponder(res).sendOperationError(e);
@@ -135,11 +155,24 @@ export default class RouteHandler {
       .get(async (req, res) => {
         try {
           let otaCode = req.query.otaCode;
-          await OTACodeInteractor.handleRedirect(
-            this.dataStore,
-            this.responseFactory.buildResponder(res),
-            otaCode
-          );
+          let responder = this.responseFactory.buildResponder(res);
+          let decoded = await OTACodeInteractor.decode(this.dataStore, otaCode);
+          switch (decoded.action as ACCOUNT_ACTIONS) {
+            case ACCOUNT_ACTIONS.VERIFY_EMAIL:
+              let user = await UserInteractor.verifyEmail(
+                this.dataStore,
+                decoded.data.email
+              );
+              await MailerInteractor.sendWelcomeEmail(this.mailer, user);
+              responder.redirectTo(REDIRECT_ROUTES.VERIFY_EMAIL);
+              break;
+            case ACCOUNT_ACTIONS.RESET_PASSWORD:
+              responder.redirectTo(REDIRECT_ROUTES.RESET_PASSWORD(otaCode));
+              break;
+            default:
+              responder.sendOperationError("Action invalid");
+              break;
+          }
         } catch (e) {
           console.log(e);
           this.responseFactory.buildResponder(res).sendOperationError(e);
@@ -148,36 +181,34 @@ export default class RouteHandler {
       .patch(async (req, res) => {
         try {
           let otaCode = req.query.otaCode;
-          let payload = req.query.payload;
+          let payload = req.body.payload;
+          let responder = this.responseFactory.buildResponder(res);
 
           let decoded = await OTACodeInteractor.applyOTACode(
             this.dataStore,
             otaCode
           );
-          if (decoded) {
-            switch (decoded.action as ACCOUNT_ACTIONS) {
-              case ACCOUNT_ACTIONS.RESET_PASSWORD:
-                await UserInteractor.updatePassword(
-                  this.dataStore,
-                  this.responseFactory.buildResponder(res),
-                  this.hasher,
-                  decoded.data,
-                  payload
-                );
-                break;
-              default:
-                this.responseFactory
-                  .buildResponder(res)
-                  .sendOperationError("Invalid action.");
-                break;
-            }
-          } else {
-            this.responseFactory
-              .buildResponder(res)
-              .sendOperationError("Invalid OTA Code.");
+
+          switch (decoded.action as ACCOUNT_ACTIONS) {
+            case ACCOUNT_ACTIONS.VERIFY_EMAIL:
+              break;
+            case ACCOUNT_ACTIONS.RESET_PASSWORD:
+              await UserInteractor.updatePassword(
+                this.dataStore,
+                this.responseFactory.buildResponder(res),
+                this.hasher,
+                decoded.data.email,
+                payload
+              );
+              break;
+            default:
+              responder.sendOperationError("Invalid action.");
+              break;
           }
         } catch (e) {
-          console.log(e);
+          this.responseFactory
+            .buildResponder(res)
+            .sendOperationError("Invalid OTA Code.");
         }
       });
   }
