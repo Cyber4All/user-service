@@ -1,13 +1,7 @@
 {
   "name": "user-service",
-<<<<<<< HEAD
   "version": "1.0.0-alpha.2.0",
   "description": "A microservice for handling user account actions in the CLARK platform.",
-=======
-  "version": "1.0.0-alpha.1.0",
-  "description":
-    "A microservice for handling user account actions in the CLARK platform.",
->>>>>>> 61cb165d027d124d6c1969c83bd5d90f9b5d63dd
   "main": "app.js",
   "scripts": {
     "start": "npm run gulp-tsc",
