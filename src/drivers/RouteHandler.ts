@@ -50,7 +50,7 @@ export default class RouteHandler {
   private setRoutes(router: Router) {
     // GET: returns welcome message and version number
     // No params necessary
-    router.get("/users", (req, res) => {
+    router.get("/", (req, res) => {
       res.json({
         version,
         message: `Welcome to the Users API v${version}`
@@ -65,7 +65,8 @@ export default class RouteHandler {
       "firstname": "string", 
       "lastname": "string", 
       "email": "string", 
-      "password": "string"
+      "password": "string",
+      organization: string
     }
     */
     // Returns either message warning invalid info, or success
@@ -90,13 +91,13 @@ export default class RouteHandler {
     });
 
     router
-      .route("/users/:username/tokens")
+      .route("/users/tokens")
       // Validate Token
       // Param: Valid token (for testing, get from users/tokens route)
       // if valid, returns OK
       // else, returns "INVALID TOKEN"
-      .post(async (req, res) => {
-        validateToken(this.responseFactory.buildResponder(res), req.cookies.presence);
+      .get(async (req, res) => {
+        this.responseFactory.buildResponder(res).sendUser(req['user']);
       })
 
       // TODO: Logout

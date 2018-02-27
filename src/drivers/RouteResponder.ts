@@ -41,7 +41,7 @@ export default class RouteResponder implements Responder {
     const t = user['token'];
     delete user['token'];
     delete user['_pwd'];
-    this.setCookie('presence', t).status(200).json(user);
+    this.res.status(200).json(user);
   }
   /**
 
