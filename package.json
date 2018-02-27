@@ -1,14 +1,16 @@
 {
   "name": "user-service",
   "version": "1.0.0-alpha.1.0",
-  "description": "A microservice for handling user account actions in the CLARK platform.",
+  "description":
+    "A microservice for handling user account actions in the CLARK platform.",
   "main": "app.js",
   "scripts": {
     "start": "npm run gulp-tsc",
     "build": "node_modules/.bin/gulp tsc",
     "gulp-tsc": "node_modules/.bin/gulp start",
     "lint": "node_modules/.bin/tslint --project ./src/**",
-    "pack": "npm run build && cp ./package.json ./dist && cd ./dist && zip -r ../dist.zip  ./* & cd ..",
+    "pack":
+      "npm run build && cp ./package.json ./dist && cd ./dist && zip -r ../dist.zip  ./* & cd ..",
     "deploy": "eb deploy User-Service-Production --profile clark",
     "prettify": "node_modules/.bin/prettier --write ./src/**/* --single-quote"
   },
@@ -50,5 +52,8 @@
     "morgan": "^1.9.0",
     "request": "^2.83.0",
     "request-promise": "^4.2.2"
+  },
+  "prettier": {
+    "singleQuote": true
   }
 }
