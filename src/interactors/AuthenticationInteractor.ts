@@ -34,7 +34,8 @@ export async function login(
     if (authenticated) {
       user['token'] = TokenManager.generateToken(user);
 
-      responder.sendUser(user);
+      responder.setCookie('presence', user['token']);
+      responder.sendOperationSuccess();
     } else {
       responder.invalidLogin();
     }
@@ -78,7 +79,8 @@ export async function register(
       objects: []
     });
     user["token"] = TokenManager.generateToken(user);
-    responder.sendUser(user);
+    responder.setCookie('presence', user['token']);
+    responder.sendOperationSuccess();
   } catch (e) {
     console.log(e);
     responder.sendOperationError(e);
@@ -89,6 +91,7 @@ export async function validateToken(responder: Responder, token: string) {
   if (!TokenManager.verifyJWT(token, responder, null)) {
     responder.invalidAccess();
   } else {
+
     responder.sendOperationSuccess();
   }
 }
