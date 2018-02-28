@@ -1,13 +1,13 @@
-import sgMail = require("@sendgrid/mail");
-import * as dotenv from "dotenv";
-import { Mailer } from "../interfaces/interfaces";
-import * as MAIL_DEFAULTS from "../interfaces/Mailer.defaults";
+import sgMail = require('@sendgrid/mail');
+import * as dotenv from 'dotenv';
+import { Mailer } from '../interfaces/interfaces';
+import * as MAIL_DEFAULTS from '../interfaces/Mailer.defaults';
 dotenv.config();
 
 export enum SENDGRID_TEMPLATES {
-  VERIFY_EMAIL = "3b741215-9b4c-4a2a-9fb0-27c1b9bf950f",
-  WELCOME_EMAIL = "9c64ee0e-c772-4887-b510-38d13fd02338",
-  RESET_PASSWORD = "ef42659c-df2a-4c29-a8bc-cc99054cd3fa"
+  VERIFY_EMAIL = '3b741215-9b4c-4a2a-9fb0-27c1b9bf950f',
+  WELCOME_EMAIL = '9c64ee0e-c772-4887-b510-38d13fd02338',
+  RESET_PASSWORD = 'ef42659c-df2a-4c29-a8bc-cc99054cd3fa'
 }
 export class SendgridDriver implements Mailer {
   private mailer = sgMail;
@@ -15,7 +15,7 @@ export class SendgridDriver implements Mailer {
 
   constructor() {
     this.mailer.setApiKey(process.env.SENDGRID_API_KEY);
-    this.mailer.setSubstitutionWrappers("{{", "}}");
+    this.mailer.setSubstitutionWrappers('{{', '}}');
 
     // Add template ids
     this.TEMPLATES.set(
@@ -48,12 +48,12 @@ export class SendgridDriver implements Mailer {
       from: from,
       subject: subject
     };
-    text ? (email["text"] = text) : "NO TEXT";
-    html ? (email["html"] = text) : "NO HTML";
-    cc ? (email["cc"] = text) : "NO CC";
-    bcc ? (email["bcc"] = text) : "NO BCC";
-    replyTo ? (email["replyTo"] = text) : "NO REPLY TO";
-    headers ? (email["headers"] = text) : "NO HEADERS";
+    text ? (email['text'] = text) : 'NO TEXT';
+    html ? (email['html'] = text) : 'NO HTML';
+    cc ? (email['cc'] = text) : 'NO CC';
+    bcc ? (email['bcc'] = text) : 'NO BCC';
+    replyTo ? (email['replyTo'] = text) : 'NO REPLY TO';
+    headers ? (email['headers'] = text) : 'NO HEADERS';
 
     return this.mailer.send(email);
   }
@@ -74,12 +74,12 @@ export class SendgridDriver implements Mailer {
       from: from,
       subject: subject
     };
-    text ? (email["text"] = text) : "NO TEXT";
-    html ? (email["html"] = text) : "NO HTML";
-    cc ? (email["cc"] = text) : "NO CC";
-    bcc ? (email["bcc"] = text) : "NO BCC";
-    replyTo ? (email["replyTo"] = text) : "NO REPLY TO";
-    headers ? (email["headers"] = text) : "NO HEADERS";
+    text ? (email['text'] = text) : 'NO TEXT';
+    html ? (email['html'] = text) : 'NO HTML';
+    cc ? (email['cc'] = text) : 'NO CC';
+    bcc ? (email['bcc'] = text) : 'NO BCC';
+    replyTo ? (email['replyTo'] = text) : 'NO REPLY TO';
+    headers ? (email['headers'] = text) : 'NO HEADERS';
 
     return this.mailer.sendMultiple(email);
   }
@@ -104,12 +104,12 @@ export class SendgridDriver implements Mailer {
       templateId: this.getTemplate(templateType),
       substitutions: templateVars
     };
-    text ? (email["text"] = text) : "NO TEXT";
-    html ? (email["html"] = text) : "NO HTML";
-    cc ? (email["cc"] = text) : "NO CC";
-    bcc ? (email["bcc"] = text) : "NO BCC";
-    replyTo ? (email["replyTo"] = text) : "NO REPLY TO";
-    headers ? (email["headers"] = text) : "NO HEADERS";
+    text ? (email['text'] = text) : 'NO TEXT';
+    html ? (email['html'] = text) : 'NO HTML';
+    cc ? (email['cc'] = text) : 'NO CC';
+    bcc ? (email['bcc'] = text) : 'NO BCC';
+    replyTo ? (email['replyTo'] = text) : 'NO REPLY TO';
+    headers ? (email['headers'] = text) : 'NO HEADERS';
 
     return this.mailer.send(email);
   }
@@ -126,7 +126,7 @@ export class SendgridDriver implements Mailer {
     replyTo?: string,
     headers?: {}
   ): Promise<any> {
-    throw new Error("Send multiple templates not yet implemented for Sendgrid");
+    throw new Error('Send multiple templates not yet implemented for Sendgrid');
   }
 
   private getTemplate(template: MAIL_DEFAULTS.TEMPLATES): string {

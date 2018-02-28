@@ -1,4 +1,4 @@
-import { MongoClient, Db, Cursor, ObjectID } from "mongodb";
+import { MongoClient, Db, Cursor, ObjectID } from 'mongodb';
 
 import {
   autosFor,
@@ -16,22 +16,22 @@ import {
   UserEdit,
   RecordID,
   Insert
-} from "@cyber4all/clark-schema";
+} from '@cyber4all/clark-schema';
 
-import { DataStore } from "../interfaces/interfaces";
-import { User } from "@cyber4all/clark-entity";
-import * as dotenv from "dotenv";
-import { OTACode } from "./OTACodeManager";
+import { DataStore } from '../interfaces/interfaces';
+import { User } from '@cyber4all/clark-entity';
+import * as dotenv from 'dotenv';
+import { OTACode } from './OTACodeManager';
 dotenv.config();
 
-const OTACodes = "otaCodes";
+const OTACodes = 'otaCodes';
 
 export default class MongoDriver implements DataStore {
   private db: Db;
 
   constructor() {
     let dburi =
-      process.env.NODE_ENV === "production"
+      process.env.NODE_ENV === 'production'
         ? process.env.CLARK_DB_URI.replace(
             /<DB_PASSWORD>/g,
             process.env.CLARK_DB_PWD
@@ -66,7 +66,7 @@ export default class MongoDriver implements DataStore {
       this.db = await MongoClient.connect(dbURI);
     } catch (e) {
       return Promise.reject(
-        "Problem connecting to database at " + dbURI + ":\n\t" + e
+        'Problem connecting to database at ' + dbURI + ':\n\t' + e
       );
     }
   }
@@ -91,8 +91,8 @@ export default class MongoDriver implements DataStore {
     try {
       let emailRegistered = await this.emailRegistered(user.email);
       if (emailRegistered)
-        return Promise.reject({ error: "Email is already in use." });
-      user["_id"] = new ObjectID().toHexString();
+        return Promise.reject({ error: 'Email is already in use.' });
+      user['_id'] = new ObjectID().toHexString();
       await this.insert(UserSchema, user);
       return new User(
         user.username,
@@ -137,16 +137,16 @@ export default class MongoDriver implements DataStore {
     try {
       let query = {};
       if (isEmail(username)) {
-        query["email"] = username;
+        query['email'] = username;
       } else {
-        query["username"] = username;
+        query['username'] = username;
       }
       let userRecord = await this.db
         .collection(collectionFor(UserSchema))
         .findOne<UserRecord>(query);
       if (!userRecord)
         return Promise.reject(
-          "No user with username or email" + username + " exists."
+          'No user with username or email' + username + ' exists.'
         );
       return `${userRecord._id}`;
     } catch (e) {
@@ -168,7 +168,7 @@ export default class MongoDriver implements DataStore {
         userRecord.username,
         userRecord.name_,
         userRecord.email,
-        userRecord["organization"],
+        userRecord['organization'],
         userRecord.pwdhash
       );
       return user;
@@ -213,7 +213,7 @@ export default class MongoDriver implements DataStore {
         .findOne<OTACode>({ code: code });
       return otaCodeRecord
         ? otaCodeRecord.id
-        : Promise.reject("No record found");
+        : Promise.reject('No record found');
     } catch (e) {
       return Promise.reject(e);
     }
@@ -267,7 +267,7 @@ export default class MongoDriver implements DataStore {
         }
       return id;
     } catch (e) {
-      return Promise.reject("Problem inserting a " + schema.name + ":\n\t" + e);
+      return Promise.reject('Problem inserting a ' + schema.name + ':\n\t' + e);
     }
   }
 
@@ -283,9 +283,9 @@ export default class MongoDriver implements DataStore {
         .findOne<T>({ _id: id });
       if (!record)
         return Promise.reject(
-          "Problem fetching a " +
+          'Problem fetching a ' +
             schema.name +
-            ":\n\tInvalid database id " +
+            ':\n\tInvalid database id ' +
             JSON.stringify(id)
         );
       return record;
@@ -345,7 +345,7 @@ export default class MongoDriver implements DataStore {
       // perform actual deletion
       await this.db.collection(collection).deleteOne({ _id: id });
     } catch (e) {
-      return Promise.reject("Problem deleting a " + schema.name + ":\n\t" + e);
+      return Promise.reject('Problem deleting a ' + schema.name + ':\n\t' + e);
     }
   }
 
@@ -378,20 +378,20 @@ export default class MongoDriver implements DataStore {
               .count({ _id: key });
             if (count === 0) {
               return Promise.reject(
-                "Foreign key error for " +
+                'Foreign key error for ' +
                   record +
-                  ": " +
+                  ': ' +
                   key +
-                  " not in " +
+                  ' not in ' +
                   data.target +
-                  " collection"
+                  ' collection'
               );
             }
           }
         }
     } catch (e) {
       return Promise.reject(
-        "Problem validating key constraint for a " + schema.name + ":\n\t" + e
+        'Problem validating key constraint for a ' + schema.name + ':\n\t' + e
       );
     }
   }
@@ -418,7 +418,7 @@ export default class MongoDriver implements DataStore {
         .findOne({ _id: ownerID });
       if (!record)
         return Promise.reject(
-          "Registration failed: no owner " + ownerID + "found in " + collection
+          'Registration failed: no owner ' + ownerID + 'found in ' + collection
         );
       // NOTE: below line is no good because schemaFor(outcomes) is arbitrary
       // let mapping = await this.db.collection(foreignData(schemaFor(collection), registry).target).findOne({ _id: item });
@@ -434,11 +434,11 @@ export default class MongoDriver implements DataStore {
         .updateOne({ _id: ownerID }, { $push: pushdoc });
     } catch (e) {
       return Promise.reject(
-        "Problem registering to a " +
+        'Problem registering to a ' +
           collections +
-          " " +
+          ' ' +
           registry +
-          " field:\n\t" +
+          ' field:\n\t' +
           e
       );
     }
@@ -466,18 +466,18 @@ export default class MongoDriver implements DataStore {
         .findOne({ _id: ownerID });
       if (!record)
         return Promise.reject(
-          "Unregistration failed: no record " +
+          'Unregistration failed: no record ' +
             ownerID +
-            "found in " +
+            'found in ' +
             collection
         );
       if (!record[registry].includes(itemID)) {
         return Promise.reject(
-          "Unregistration failed: record " +
+          'Unregistration failed: record ' +
             ownerID +
             "'s " +
             registry +
-            " field has no element " +
+            ' field has no element ' +
             itemID
         );
       }
@@ -490,11 +490,11 @@ export default class MongoDriver implements DataStore {
         .updateOne({ _id: ownerID }, { $pull: pulldoc });
     } catch (e) {
       return Promise.reject(
-        "Problem unregistering from a " +
+        'Problem unregistering from a ' +
           collections +
-          " " +
+          ' ' +
           registry +
-          " field:\n\t" +
+          ' field:\n\t' +
           e
       );
     }

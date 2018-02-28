@@ -1,10 +1,8 @@
-import { ExpressResponder } from '@oriented/express';
 import { Responder } from '../interfaces/interfaces';
 import { Response } from 'express';
 import { User } from '@cyber4all/clark-entity';
 
 export default class RouteResponder implements Responder {
-
   /**
    *
    * @param res

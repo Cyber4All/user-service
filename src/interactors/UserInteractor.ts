@@ -3,8 +3,8 @@ import {
   Responder,
   HashInterface,
   MailerInteractorInterface
-} from "../interfaces/interfaces";
-import { User } from "@cyber4all/clark-entity";
+} from '../interfaces/interfaces';
+import { User } from '@cyber4all/clark-entity';
 
 export class UserInteractor {
   public static async verifyEmail(
