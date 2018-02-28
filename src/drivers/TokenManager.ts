@@ -1,5 +1,4 @@
 import * as jwt from 'jsonwebtoken';
-import { key, issuer } from '../environment/config';
 import { User } from '@cyber4all/clark-entity';
 
 /**
@@ -14,11 +13,11 @@ export function generateToken(user: User) {
     email: user.email
   };
   const options = {
-    issuer,
+    issuer: process.env.ISSUER,
     expiresIn: 86400,
     audience: user.username
   };
-  const token = jwt.sign(payload, key, options);
+  const token = jwt.sign(payload, process.env.KEY, options);
   return token;
 }
 
@@ -34,7 +33,7 @@ export function verifyJWT(
   callback: Function
 ): boolean {
   try {
-    const decoded = jwt.verify(token, key, {});
+    const decoded = jwt.verify(token, process.env.KEY, {});
 
     if (typeof callback === 'function') {
       callback(status, decoded);
