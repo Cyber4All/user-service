@@ -98,14 +98,12 @@ export default class RouteHandler {
       // else, returns "INVALID TOKEN"
       .get(async (req, res) => {
         this.responseFactory.buildResponder(res).sendUser(req['user']);
-      })
-
-      // TODO: Logout
-      // Currently throws unhandled promise rejection error, request cannot complete in postman
-      .delete(async (req, res) => {
-        // TODO invalidate JWT here as well as clearing the login cookie
-        logout(this.dataStore, this.responseFactory.buildResponder(res));
       });
+
+    router.delete('/users/:username/tokens', async (req, res) => {
+      // TODO invalidate JWT here as well as clearing the login cookie
+      logout(this.dataStore, this.responseFactory.buildResponder(res));
+    });
 
     router
       .route("/users/ota-codes")

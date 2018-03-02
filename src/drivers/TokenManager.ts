@@ -8,9 +8,9 @@ import { key, issuer } from '../environment/config';
 export function generateToken(user) {
   const payload = {
     username: user.username,
-    firstname: user.name.split(' ')[0],
-    lastname: user.name.split(' ')[1],
-    email: user.email
+    name: user.name,
+    email: user.email,
+    organization: user.organization,
   };
   const options = {
     issuer,

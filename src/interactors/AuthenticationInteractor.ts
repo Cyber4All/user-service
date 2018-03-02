@@ -32,10 +32,9 @@ export async function login(
     let authenticated = await hasher.verify(password, user.pwd);
 
     if (authenticated) {
-      user['token'] = TokenManager.generateToken(user);
 
-      responder.setCookie('presence', user['token']);
-      responder.sendOperationSuccess();
+      responder.setCookie('presence', TokenManager.generateToken(user));
+      responder.sendUser(user);
     } else {
       responder.invalidLogin();
     }
