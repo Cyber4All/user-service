@@ -73,7 +73,6 @@ export default class RouteResponder implements Responder {
   }
 
   removeCookie(name: string): Response {
-    return this.res.clearCookie(name);
-    return this.res;
+    return this.res.clearCookie(name, { path: '/' });
   }
 }
