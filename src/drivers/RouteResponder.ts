@@ -37,10 +37,9 @@ export default class RouteResponder implements Responder {
    *
    * @param user
    */
-  sendUser(user: {} | User) {
-    const t = user['token'];
-    delete user['token'];
+  sendUser(user: User) {
     delete user['_pwd'];
+    console.log(user);
     this.res.status(200).json(user);
   }
   /**
