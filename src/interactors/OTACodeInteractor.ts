@@ -16,7 +16,9 @@ export class OTACodeInteractor {
     email: string
   ): Promise<string> {
     try {
-      if (Object.values(ACCOUNT_ACTIONS).includes(action)) {
+      const actions = Object.keys(ACCOUNT_ACTIONS).map(k => ACCOUNT_ACTIONS[k]);
+
+      if (actions.includes(action)) {
         let otaCode = await this.getOTACode(dataStore, email, action);
         return otaCode;
       } else {
