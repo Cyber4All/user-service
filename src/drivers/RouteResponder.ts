@@ -69,10 +69,22 @@ export default class RouteResponder implements Responder {
   }
 
   setCookie(key: string, value: string): Response {
-    return this.res.cookie(key, value, { domain: 'clark.center', maxAge: 900000, httpOnly: false, secure: true });
+    let options = {
+      maxAge: 900000,
+      httpOnly: false,
+      domain: process.env.COOKIE_DOMAIN,
+      secure: process.env.NODE_ENV !== 'development'
+    };
+
+    return this.res.cookie(key, value, options);
   }
 
   removeCookie(name: string): Response {
-    return this.res.clearCookie(name, { domain: 'clark.center', path: '/' });
+    let options = {
+      domain: process.env.COOKIE_DOMAIN,
+      path: '/'
+    };
+
+    return this.res.clearCookie(name, options);
   }
 }
