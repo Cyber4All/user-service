@@ -35,10 +35,10 @@ export default class RouteResponder implements Responder {
    *
    * @param user
    */
-  sendUser(user: {} | User) {
-    const t = user['token'];
-    delete user['token'];
-    delete user['_pwd'];
+  sendUser(user: User) {
+    const t = user.token;
+    delete user.token;
+    delete user.password;
     this.res.status(200).json(user);
   }
   /**
@@ -73,6 +73,5 @@ export default class RouteResponder implements Responder {
 
   removeCookie(name: string): Response {
     return this.res.clearCookie(name);
-    return this.res;
   }
 }

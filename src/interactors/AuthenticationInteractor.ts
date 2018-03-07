@@ -64,22 +64,15 @@ export async function register(
   datastore: DataStore,
   responder: Responder,
   hasher: HashInterface,
-  _user: User
+  user: User
 ) {
   try {
-    // FIXME: Needs consistent typing here
-    let pwdhash = await hasher.hash(_user.password);
-    _user.password = pwdhash;
-    let user = await datastore.insertUser({
-      username: _user.username,
-      name_: _user.name,
-      organization: _user.organization,
-      email: _user.email,
-      pwdhash: pwdhash,
-      objects: []
-    });
-    user['token'] = TokenManager.generateToken(user);
-    responder.setCookie('presence', user['token']);
+    let pwdhash = await hasher.hash(user.password);
+    user.password = pwdhash;
+    let userID = await datastore.insertUser(user);
+    user.token = TokenManager.generateToken(user);
+    delete user.password;
+    responder.setCookie('presence', user.token);
     responder.sendOperationSuccess();
   } catch (e) {
     console.log(e);

@@ -5,7 +5,7 @@ export interface DataStore {
   connect(dbURI: string): Promise<void>;
   disconnect(): void;
   // Properly type to match schema
-  insertUser(user: any): Promise<any>;
+  insertUser(user: User): Promise<string>;
   emailRegistered(email: string): Promise<boolean>;
   findUser(username: string): Promise<string>;
   loadUser(id: string): Promise<User>;

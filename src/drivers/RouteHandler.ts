@@ -19,6 +19,7 @@ import {
 } from '../interactors/interactors';
 import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
 import { REDIRECT_ROUTES } from '../environment/routes';
+import { User } from '@cyber4all/clark-entity';
 const version = require('../package.json').version;
 
 export default class RouteHandler {
@@ -70,11 +71,12 @@ export default class RouteHandler {
     */
     // Returns either message warning invalid info, or success
     router.post('/users', async (req, res) => {
+      let user = User.instantiate(req.body);
       await register(
         this.dataStore,
         this.responseFactory.buildResponder(res),
         this.hasher,
-        req.body
+        user
       );
     });
 
