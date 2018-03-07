@@ -39,7 +39,6 @@ export default class RouteResponder implements Responder {
    */
   sendUser(user: User) {
     delete user['_pwd'];
-    console.log(user);
     this.res.status(200).json(user);
   }
   /**
@@ -70,7 +69,7 @@ export default class RouteResponder implements Responder {
 
   setCookie(key: string, value: string): Response {
     let options = {
-      maxAge: 900000,
+      maxAge: 604800000,
       httpOnly: false,
       domain: process.env.COOKIE_DOMAIN,
       secure: process.env.NODE_ENV !== 'development'
