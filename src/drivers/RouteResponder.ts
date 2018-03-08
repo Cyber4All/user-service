@@ -1,10 +1,8 @@
-import { ExpressResponder } from '@oriented/express';
 import { Responder } from '../interfaces/interfaces';
 import { Response } from 'express';
 import { User } from '@cyber4all/clark-entity';
 
 export default class RouteResponder implements Responder {
-
   /**
    *
    * @param res
@@ -38,7 +36,9 @@ export default class RouteResponder implements Responder {
    * @param user
    */
   sendUser(user: User) {
-    delete user['_pwd'];
+    const t = user.token;
+    delete user.token;
+    delete user.password;
     this.res.status(200).json(user);
   }
   /**

@@ -1,37 +1,99 @@
-import { MongoClient, Db, Cursor, ObjectID } from "mongodb";
+import { MongoClient, Db, Cursor, ObjectID } from 'mongodb';
 
-import {
-  autosFor,
-  fixedsFor,
-  foreignsFor,
-  collections,
-  collectionFor,
-  schemaFor,
-  foreignData,
-  Record,
-  UserSchema,
-  UserRecord,
-  UserUpdate,
-  UserInsert,
-  UserEdit,
-  RecordID,
-  Insert
-} from "@cyber4all/clark-schema";
+import { UserDocument } from '@cyber4all/clark-schema';
 
-import { DataStore } from "../interfaces/interfaces";
-import { User } from "@cyber4all/clark-entity";
-import * as dotenv from "dotenv";
-import { OTACode } from "./OTACodeManager";
+import { DataStore } from '../interfaces/interfaces';
+import { User } from '@cyber4all/clark-entity';
+import * as dotenv from 'dotenv';
+import { OTACode } from './OTACodeManager';
 dotenv.config();
 
-const OTACodes = "otaCodes";
+export interface Collection {
+  name: string;
+  foreigns?: Foriegn[];
+  uniques?: string[];
+  text?: string[];
+}
+export interface Foriegn {
+  name: string;
+  data: ForiegnData;
+}
+
+export interface ForiegnData {
+  target: string;
+  child: boolean;
+  registry?: string;
+}
+export class COLLECTIONS {
+  public static User: Collection = {
+    name: 'users-temp',
+    foreigns: [
+      {
+        name: 'objects',
+        data: {
+          target: 'LearningObject',
+          child: true
+        }
+      }
+    ],
+    uniques: ['username']
+  };
+  public static LearningObject: Collection = {
+    name: 'objects-temp',
+    foreigns: [
+      {
+        name: 'authorID',
+        data: {
+          target: 'User',
+          child: false,
+          registry: 'objects'
+        }
+      },
+      {
+        name: 'outcomes',
+        data: {
+          target: 'LearningOutcome',
+          child: true,
+          registry: 'source'
+        }
+      }
+    ]
+  };
+  public static LearningOutcome: Collection = {
+    name: 'learning-outcomes',
+    foreigns: [
+      {
+        name: 'source',
+        data: {
+          target: 'LearningObject',
+          child: false,
+          registry: 'outcomes'
+        }
+      }
+    ]
+  };
+  public static StandardOutcome: Collection = { name: 'outcomes-temp' };
+  public static LearningObjectCollection: Collection = { name: 'collections' };
+  public static OTACode: Collection = { name: 'otaCodes' };
+}
+
+const COLLECTIONS_MAP = new Map<string, Collection>();
+COLLECTIONS_MAP.set('User', COLLECTIONS.User);
+COLLECTIONS_MAP.set('LearningObject', COLLECTIONS.LearningObject);
+COLLECTIONS_MAP.set('LearningOutcome', COLLECTIONS.LearningOutcome);
+COLLECTIONS_MAP.set('StandardOutcome', COLLECTIONS.StandardOutcome);
+COLLECTIONS_MAP.set(
+  'LearningObjectCollection',
+  COLLECTIONS.LearningObjectCollection
+);
+COLLECTIONS_MAP.set('OTACode', COLLECTIONS.OTACode);
 
 export default class MongoDriver implements DataStore {
   private db: Db;
 
   constructor() {
     let dburi =
-      process.env.NODE_ENV === "production"
+      process.env.NODE_ENV === 'production'
         ? process.env.CLARK_DB_URI.replace(
             /<DB_PASSWORD>/g,
             process.env.CLARK_DB_PWD
@@ -66,7 +128,7 @@ export default class MongoDriver implements DataStore {
       this.db = await MongoClient.connect(dbURI);
     } catch (e) {
       return Promise.reject(
-        "Problem connecting to database at " + dbURI + ":\n\t" + e
+        'Problem connecting to database at ' + dbURI + ':\n\t' + e
       );
     }
   }
@@ -87,20 +149,16 @@ export default class MongoDriver implements DataStore {
    *
    * @returns {UserID} the database id of the new record
    */
-  async insertUser(user: any): Promise<User> {
+  async insertUser(user: any): Promise<string> {
     try {
       let emailRegistered = await this.emailRegistered(user.email);
       if (emailRegistered)
-        return Promise.reject({ error: "Email is already in use." });
-      user["_id"] = new ObjectID().toHexString();
-      await this.insert(UserSchema, user);
-      return new User(
-        user.username,
-        user.name_,
-        user.email,
-        user.organization,
-        null
-      );
+        return Promise.reject({
+          error: 'Email is already in use.'
+        });
+      user._id = new ObjectID().toHexString();
+      await this.insert(COLLECTIONS.User, user);
+      return user._id;
     } catch (e) {
       return Promise.reject(e);
     }
@@ -116,8 +174,8 @@ export default class MongoDriver implements DataStore {
   async emailRegistered(email: string): Promise<boolean> {
     try {
       let doc = await this.db
-        .collection(collectionFor(UserSchema))
-        .findOne<UserRecord>({ email: email });
+        .collection(COLLECTIONS.User.name)
+        .findOne<UserDocument>({ email: email });
       if (doc) return true;
       return false;
     } catch (e) {
@@ -137,16 +195,16 @@ export default class MongoDriver implements DataStore {
     try {
       let query = {};
       if (isEmail(username)) {
-        query["email"] = username;
+        query['email'] = username;
       } else {
-        query["username"] = username;
+        query['username'] = username;
       }
       let userRecord = await this.db
-        .collection(collectionFor(UserSchema))
-        .findOne<UserRecord>(query);
+        .collection(COLLECTIONS.User.name)
+        .findOne<UserDocument>(query);
       if (!userRecord)
         return Promise.reject(
-          "No user with username or email" + username + " exists."
+          'No user with username or email' + username + ' exists.'
         );
       return `${userRecord._id}`;
     } catch (e) {
@@ -163,13 +221,13 @@ export default class MongoDriver implements DataStore {
    */
   async loadUser(id: string): Promise<User> {
     try {
-      let userRecord = await this.fetch<UserRecord>(UserSchema, id);
+      let userRecord = await this.fetch<UserDocument>(COLLECTIONS.User, id);
       let user = new User(
         userRecord.username,
-        userRecord.name_,
+        userRecord.name,
         userRecord.email,
-        userRecord["organization"],
-        userRecord.pwdhash
+        userRecord.organization,
+        userRecord.password
       );
       return user;
     } catch (e) {
@@ -178,7 +236,7 @@ export default class MongoDriver implements DataStore {
   }
   async editUser(id: string, object: {}): Promise<void> {
     try {
-      await this.db.collection(collectionFor(UserSchema)).update(
+      await this.db.collection(COLLECTIONS.User.name).update(
         { _id: id },
         {
           $set: object
@@ -195,12 +253,12 @@ export default class MongoDriver implements DataStore {
    * @param {UserID} id which document to delete
    */
   async deleteUser(id: string): Promise<void> {
-    return this.remove(UserSchema, id);
+    return this.remove(COLLECTIONS.User, id);
   }
 
   async insertOTACode(otaCode: OTACode): Promise<void> {
     try {
-      await this.db.collection(OTACodes).insertOne(otaCode);
+      await this.db.collection(COLLECTIONS.OTACode.name).insertOne(otaCode);
     } catch (e) {
       return Promise.reject(e);
     }
@@ -209,11 +267,11 @@ export default class MongoDriver implements DataStore {
   async findOTACode(code: string): Promise<string> {
     try {
       let otaCodeRecord = await this.db
-        .collection(OTACodes)
+        .collection(COLLECTIONS.OTACode.name)
         .findOne<OTACode>({ code: code });
       return otaCodeRecord
         ? otaCodeRecord.id
-        : Promise.reject("No record found");
+        : Promise.reject('No record found');
     } catch (e) {
       return Promise.reject(e);
     }
@@ -221,7 +279,7 @@ export default class MongoDriver implements DataStore {
 
   async deleteOTACode(id: string): Promise<void> {
     try {
-      await this.db.collection(OTACodes).deleteOne({ id: id });
+      await this.db.collection(COLLECTIONS.OTACode.name).deleteOne({ id: id });
     } catch (e) {
       return Promise.reject(e);
     }
@@ -230,124 +288,6 @@ export default class MongoDriver implements DataStore {
   ////////////////////////////////////////////////
   // GENERIC HELPER METHODS - not in public API //
   ////////////////////////////////////////////////
-
-  /**
-   * Insert a generic item to the database.
-   * @async
-   *
-   * @param {Function} schema provides collection/validation information
-   * @param {Insert} record document to insert
-   *
-   * @returns {RecordID} the database id of the new record
-   */
-  async insert(schema: Function, record: Insert): Promise<RecordID> {
-    try {
-      let collection = collectionFor(schema);
-      let foreigns = foreignsFor(schema);
-
-      // check validity of all foreign keys
-      await this.validateForeignKeys(schema, record, foreigns);
-
-      // perform the actual insert
-      let insert_ = await this.db.collection(collection).insertOne(record);
-      let id = insert_.insertedId;
-
-      // register the new record as needed
-      if (foreigns)
-        for (let foreign of foreigns) {
-          let data = foreignData(schema, foreign);
-          if (data.registry) {
-            await this.addToRegistry(
-              data.target,
-              record[foreign],
-              data.registry,
-              `${id}`
-            );
-          }
-        }
-      return id;
-    } catch (e) {
-      return Promise.reject("Problem inserting a " + schema.name + ":\n\t" + e);
-    }
-  }
-
-  /**
-   * Fetch a database record by its id.
-   * @param {Function} schema provides collection information
-   * @param {RecordID} id the document to fetch
-   */
-  async fetch<T>(schema: Function, id: string): Promise<T> {
-    try {
-      let record = await this.db
-        .collection(collectionFor(schema))
-        .findOne<T>({ _id: id });
-      if (!record)
-        return Promise.reject(
-          "Problem fetching a " +
-            schema.name +
-            ":\n\tInvalid database id " +
-            JSON.stringify(id)
-        );
-      return record;
-    } catch (e) {
-      return Promise.reject(e);
-    }
-  }
-
-  /**
-   * Cascade delete a record and its children.
-   * @async
-   *
-   * @param {Function} schema provides collection/hierarcy information
-   * @param {RecordID} id the document to delete
-   */
-  async remove(schema: Function, id: string): Promise<void> {
-    try {
-      let collection = collectionFor(schema);
-
-      // fetch data to be deleted ... for the last time :(
-      let record = await this.db
-        .collection(collection)
-        .findOne<Record>({ _id: id });
-
-      // remove all children recursively, and unregister from parents
-      let foreigns = foreignsFor(schema);
-      if (foreigns)
-        for (let foreign of foreigns) {
-          let data = foreignData(schema, foreign);
-
-          if (data.child) {
-            // get children to remove, as an array
-            let keys = record[foreign];
-            if (!(keys instanceof Array)) keys = [keys];
-            // remove each child
-            for (let key of keys) {
-              await this.remove(schemaFor(data.target), key);
-            }
-          }
-
-          if (data.registry) {
-            // get registries to edit, as an array
-            let keys = record[foreign];
-            if (!(keys instanceof Array)) keys = [keys];
-            // unregister from each key
-            for (let key of keys) {
-              await this.removeFromRegistry(
-                data.target,
-                key,
-                data.registry,
-                id
-              );
-            }
-          }
-        }
-
-      // perform actual deletion
-      await this.db.collection(collection).deleteOne({ _id: id });
-    } catch (e) {
-      return Promise.reject("Problem deleting a " + schema.name + ":\n\t" + e);
-    }
-  }
 
   /**
    * Reject promise if any foreign keys in a record do not exist.
@@ -359,40 +299,39 @@ export default class MongoDriver implements DataStore {
    *
    * @returns none, but promise will be rejected if there is a problem
    */
-  async validateForeignKeys(
-    schema: Function,
-    record: Record,
-    foreigns: Set<string>
+  private async validateForeignKeys<T>(
+    record: T,
+    foreigns: Foriegn[]
   ): Promise<void> {
     try {
       if (foreigns)
         for (let foreign of foreigns) {
-          let data = foreignData(schema, foreign);
+          let data = foreign.data;
           // get id's to check, as an array
-          let keys = record[foreign];
+          let keys = record[foreign.name];
           if (!(keys instanceof Array)) keys = [keys];
           // fetch foreign document and reject if it doesn't exist
           for (let key of keys) {
+            let collection = COLLECTIONS_MAP.get(data.target);
             let count = await this.db
-              .collection(data.target)
+              .collection(collection.name)
               .count({ _id: key });
             if (count === 0) {
               return Promise.reject(
-                "Foreign key error for " +
+                'Foreign key error for ' +
                   record +
-                  ": " +
+                  ': ' +
                   key +
-                  " not in " +
+                  ' not in ' +
                   data.target +
-                  " collection"
+                  ' collection'
               );
             }
           }
         }
+      return Promise.resolve();
     } catch (e) {
-      return Promise.reject(
-        "Problem validating key constraint for a " + schema.name + ":\n\t" + e
-      );
+      return Promise.reject('Problem validating key constraint :\n\t' + e);
     }
   }
 
@@ -405,20 +344,23 @@ export default class MongoDriver implements DataStore {
    * @param {string} registry field name of the registry
    * @param {RecordID} item which item to add
    */
-  async addToRegistry(
-    collection: string,
-    ownerID: string,
+  private async register(
+    collection: Collection,
+    owner: string,
     registry: string,
-    itemID: string
+    item: string
   ): Promise<void> {
     try {
       // check validity of values before making any changes
       let record = await this.db
-        .collection(collection)
-        .findOne({ _id: ownerID });
+        .collection(collection.name)
+        .findOne({ _id: owner });
       if (!record)
         return Promise.reject(
-          "Registration failed: no owner " + ownerID + "found in " + collection
+          'Registration failed: no owner ' +
+            owner +
+            'found in ' +
+            collection.name
         );
       // NOTE: below line is no good because schemaFor(outcomes) is arbitrary
       // let mapping = await this.db.collection(foreignData(schemaFor(collection), registry).target).findOne({ _id: item });
@@ -427,18 +369,19 @@ export default class MongoDriver implements DataStore {
       // if (!mapping) return Promise.reject('Registration failed: no mapping ' + mapping + 'found in ' + collection);
 
       let pushdoc = {};
-      pushdoc[registry] = itemID;
+      pushdoc[registry] = item;
 
       await this.db
-        .collection(collection)
-        .updateOne({ _id: ownerID }, { $push: pushdoc });
+        .collection(collection.name)
+        .updateOne({ _id: owner }, { $push: pushdoc });
+      return Promise.resolve();
     } catch (e) {
       return Promise.reject(
-        "Problem registering to a " +
-          collections +
-          " " +
+        'Problem registering to a ' +
+          collection.name +
+          ' ' +
           registry +
-          " field:\n\t" +
+          ' field:\n\t' +
           e
       );
     }
@@ -453,51 +396,256 @@ export default class MongoDriver implements DataStore {
    * @param {string} registry field name of the registry
    * @param {RecordID} item which item to remove
    */
-  async removeFromRegistry(
-    collection: string,
-    ownerID: string,
+  private async unregister(
+    collection: Collection,
+    owner: string,
     registry: string,
-    itemID: string
+    item: string
   ): Promise<void> {
     try {
       // check validity of values before making any changes
       let record = await this.db
-        .collection(collection)
-        .findOne({ _id: ownerID });
+        .collection(collection.name)
+        .findOne({ _id: owner });
       if (!record)
         return Promise.reject(
-          "Unregistration failed: no record " +
-            ownerID +
-            "found in " +
-            collection
+          'Unregistration failed: no record ' + owner + 'found in ' + collection
         );
-      if (!record[registry].includes(itemID)) {
+      if (!record[registry].includes(item)) {
         return Promise.reject(
-          "Unregistration failed: record " +
-            ownerID +
+          'Unregistration failed: record ' +
+            owner +
             "'s " +
             registry +
-            " field has no element " +
-            itemID
+            ' field has no element ' +
+            item
         );
       }
 
       let pulldoc = {};
-      pulldoc[registry] = itemID;
+      pulldoc[registry] = item;
 
       await this.db
-        .collection(collection)
-        .updateOne({ _id: ownerID }, { $pull: pulldoc });
+        .collection(collection.name)
+        .updateOne({ _id: owner }, { $pull: pulldoc });
+
+      return Promise.resolve();
     } catch (e) {
       return Promise.reject(
-        "Problem unregistering from a " +
-          collections +
-          " " +
+        'Problem unregistering from a ' +
+          collection.name +
+          ' ' +
           registry +
-          " field:\n\t" +
+          ' field:\n\t' +
           e
       );
     }
+  }
+
+  /**
+   * Reorder an item in a registry.
+   * @async
+   *
+   * @param {string} collection where to find the registry owner
+   * @param {RecordID} owner the registry owner
+   * @param {string} registry field name of the registry
+   * @param {RecordID} item which item to move
+   * @param {number} index the new index for item
+   */
+  private async reorder(
+    collection: Collection,
+    owner: string,
+    registry: string,
+    item: string,
+    index: number
+  ): Promise<void> {
+    try {
+      // check validity of values before making any changes
+      let record = await this.db
+        .collection(collection.name)
+        .findOne({ _id: owner });
+      if (!record)
+        return Promise.reject(
+          'Reorder failed: no record ' + owner + 'found in ' + collection.name
+        );
+      if (!record[registry].includes(item)) {
+        return Promise.reject(
+          'Reorder failed: record ' +
+            owner +
+            "'s " +
+            registry +
+            ' field has no element ' +
+            item
+        );
+      }
+      if (index < 0)
+        return Promise.reject('Reorder failed: index cannot be negative');
+      if (index >= record[registry].length) {
+        return Promise.reject(
+          'Reorder failed: index exceeds length of ' + registry + ' field'
+        );
+      }
+
+      // perform the necessary operations
+      await this.unregister(collection, owner, registry, item);
+
+      let pushdoc = {};
+      pushdoc[registry] = { $each: [item], $position: index };
+
+      await this.db
+        .collection(collection.name)
+        .updateOne({ _id: owner }, { $push: pushdoc });
+
+      return Promise.resolve();
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+
+  /**
+   * Insert a generic item to the database.
+   * @async
+   *
+   * @param {Function} schema provides collection/validation information
+   * @param {Insert} record document to insert
+   *
+   * @returns {RecordID} the database id of the new record
+   */
+  private async insert<T>(collection: Collection, record: T): Promise<string> {
+    try {
+      let foreigns = collection.foreigns;
+      if (foreigns) {
+        // check validity of all foreign keys
+        await this.validateForeignKeys(record, foreigns);
+      }
+
+      // perform the actual insert
+      let insert_ = await this.db.collection(collection.name).insertOne(record);
+      let id = insert_.insertedId;
+
+      // register the new record as needed
+      if (foreigns)
+        for (let foreign of foreigns) {
+          let data = foreign.data;
+          if (!data.child && data.registry) {
+            let collection = COLLECTIONS_MAP.get(data.target);
+            await this.register(
+              collection,
+              record[foreign.name],
+              data.registry,
+              `${id}`
+            );
+          }
+        }
+      return Promise.resolve(`${id}`);
+    } catch (e) {
+      return Promise.reject(
+        'Problem inserting a ' + collection.name + ':\n\t' + e
+      );
+    }
+  }
+
+  /**
+   * Edit (update without foreigns) a generic item in the database.
+   * @async
+   *
+   * @param {Function} schema provides collection/validation information
+   * @param {RecordID} id which document to edit
+   * @param {Edit} record the values to change to
+   */
+  private async edit<T>(
+    collection: Collection,
+    id: string,
+    record: T
+  ): Promise<void> {
+    try {
+      // no foreign fields, no need to validate
+
+      // perform the actual update
+      await this.db
+        .collection(collection.name)
+        .updateOne({ _id: id }, { $set: record });
+
+      // registered fields must be fixed, nothing to change here
+
+      return Promise.resolve();
+    } catch (e) {
+      console.log(e);
+      return Promise.reject(
+        'Problem editing a ' + collection.name + ':\n\t' + e
+      );
+    }
+  }
+
+  /**
+   * Cascade delete a record and its children.
+   * @async
+   *
+   * @param {COLLECTIONS} collection provides collection information
+   * @param {string} id the document to delete
+   */
+  private async remove<T>(collection: Collection, id: string): Promise<void> {
+    try {
+      // fetch data to be deleted ... for the last time :(
+      let record = await this.db
+        .collection(collection.name)
+        .findOne<T>({ _id: id });
+
+      // remove all children recursively, and unregister from parents
+      let foreigns = collection.foreigns;
+      if (foreigns)
+        for (let foreign of foreigns) {
+          let data = foreign.data;
+
+          if (data.child) {
+            // get children to remove, as an array
+            let keys = record[foreign.name];
+            if (!(keys instanceof Array)) keys = [keys];
+            // remove each child
+            for (let key of keys) {
+              let collection = COLLECTIONS_MAP.get(data.target);
+              await this.remove(collection, key);
+            }
+          }
+
+          if (!data.child && data.registry) {
+            // get registries to edit, as an array
+            let keys = record[foreign.name];
+            if (!(keys instanceof Array)) keys = [keys];
+            // unregister from each key
+            for (let key of keys) {
+              let collection = COLLECTIONS_MAP.get(data.target);
+              await this.unregister(collection, key, data.registry, id);
+            }
+          }
+        }
+
+      // perform actual deletion
+      await this.db.collection(collection.name).deleteOne({ _id: id });
+
+      return Promise.resolve();
+    } catch (e) {
+      return Promise.reject('Problem deleting a ' + collection + ':\n\t' + e);
+    }
+  }
+
+  /**
+   * Fetch a database record by its id.
+   * @param {Function} schema provides collection information
+   * @param {string} id the document to fetch
+   */
+  private async fetch<T>(collection: Collection, id: string): Promise<T> {
+    let record = await this.db
+      .collection(collection.name)
+      .findOne<T>({ _id: id });
+    if (!record)
+      return Promise.reject(
+        'Problem fetching a ' +
+          collection +
+          ':\n\tInvalid database id ' +
+          JSON.stringify(id)
+      );
+    return Promise.resolve(record);
   }
 }
 
