@@ -26,7 +26,7 @@ export interface ForiegnData {
 }
 export class COLLECTIONS {
   public static User: Collection = {
-    name: 'users-temp',
+    name: 'users',
     foreigns: [
       {
         name: 'objects',
@@ -39,7 +39,7 @@ export class COLLECTIONS {
     uniques: ['username']
   };
   public static LearningObject: Collection = {
-    name: 'objects-temp',
+    name: 'objects',
     foreigns: [
       {
         name: 'authorID',
@@ -72,7 +72,7 @@ export class COLLECTIONS {
       }
     ]
   };
-  public static StandardOutcome: Collection = { name: 'outcomes-temp' };
+  public static StandardOutcome: Collection = { name: 'outcomes' };
   public static LearningObjectCollection: Collection = { name: 'collections' };
   public static OTACode: Collection = { name: 'otaCodes' };
 }
@@ -93,7 +93,7 @@ export default class MongoDriver implements DataStore {
 
   constructor() {
     let dburi =
-      process.env.NODE_ENV === 'production'
+      process.env.NODE_ENV === 'development'
         ? process.env.CLARK_DB_URI.replace(
             /<DB_PASSWORD>/g,
             process.env.CLARK_DB_PWD
