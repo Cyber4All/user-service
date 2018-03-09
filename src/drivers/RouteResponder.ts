@@ -69,10 +69,10 @@ export default class RouteResponder implements Responder {
   }
 
   setCookie(key: string, value: string): Response {
-    return this.res.cookie(key, value, { domain: 'clark.center', maxAge: 900000, httpOnly: false, secure: true });
+    return this.res.cookie(key, value, { maxAge: 900000, httpOnly: false });
   }
 
   removeCookie(name: string): Response {
-    return this.res.clearCookie(name, { domain: 'clark.center', path: '/' });
+    return this.res.clearCookie(name, { path: '/' });
   }
 }
