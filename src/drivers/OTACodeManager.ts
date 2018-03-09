@@ -1,13 +1,13 @@
-import * as jwt from "jsonwebtoken";
-import * as util from "util";
-import { ObjectID } from "mongodb";
-import { ACCOUNT_ACTIONS } from "../interfaces/Mailer.defaults";
-import * as dotenv from "dotenv";
+import * as jwt from 'jsonwebtoken';
+import * as util from 'util';
+import { ObjectID } from 'mongodb';
+import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
+import * as dotenv from 'dotenv';
 dotenv.config();
 
 // TODO: Create constructor that takes enviornment options so they can be injected by client instead of pulling from .env
 
-const DEFAULT_EXP = "1h";
+const DEFAULT_EXP = '1h';
 
 export interface OTACode {
   id: string;

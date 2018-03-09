@@ -1,6 +1,6 @@
-import { Mailer } from "../interfaces/interfaces";
-import * as MAIL_DEFAULTS from "../interfaces/Mailer.defaults";
-import { User } from "@cyber4all/clark-entity";
+import { Mailer } from '../interfaces/interfaces';
+import * as MAIL_DEFAULTS from '../interfaces/Mailer.defaults';
+import { User } from '@cyber4all/clark-entity';
 
 export class MailerInteractor {
   public static async sendEmailVerification(

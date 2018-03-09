@@ -2,12 +2,12 @@ import {
   DataStore,
   Responder,
   MailerInteractorInterface
-} from "../interfaces/interfaces";
-import { OTACodeManager } from "../drivers/drivers";
-import { ACCOUNT_ACTIONS } from "../interfaces/Mailer.defaults";
-import { REDIRECT_ROUTES } from "../environment/routes";
-import { DecodedOTACode, OTACode } from "../drivers/OTACodeManager";
-import * as request from "request";
+} from '../interfaces/interfaces';
+import { OTACodeManager } from '../drivers/drivers';
+import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
+import { REDIRECT_ROUTES } from '../environment/routes';
+import { DecodedOTACode, OTACode } from '../drivers/OTACodeManager';
+import * as request from 'request';
 
 export class OTACodeInteractor {
   public static async generateOTACode(
@@ -16,11 +16,13 @@ export class OTACodeInteractor {
     email: string
   ): Promise<string> {
     try {
-      if (Object.values(ACCOUNT_ACTIONS).includes(action)) {
+      const actions = Object.keys(ACCOUNT_ACTIONS).map(k => ACCOUNT_ACTIONS[k]);
+
+      if (actions.includes(action)) {
         let otaCode = await this.getOTACode(dataStore, email, action);
         return otaCode;
       } else {
-        return Promise.reject("Invalid action");
+        return Promise.reject('Invalid action');
       }
     } catch (e) {
       return Promise.reject(e);
@@ -79,7 +81,7 @@ export class OTACodeInteractor {
     try {
       let otaID = await dataStore.findOTACode(otaCode);
       let decoded = await OTACodeManager.decode(otaCode, otaID);
-      remove ? await dataStore.deleteOTACode(otaID) : "DO NOT DELETE";
+      remove ? await dataStore.deleteOTACode(otaID) : 'DO NOT DELETE';
       return decoded;
     } catch (e) {
       console.log(e);

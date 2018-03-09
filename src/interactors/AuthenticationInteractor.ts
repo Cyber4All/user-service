@@ -29,7 +29,7 @@ export async function login(
   try {
     let id = await dataStore.findUser(username);
     let user = await dataStore.loadUser(id);
-    let authenticated = await hasher.verify(password, user.pwd);
+    let authenticated = await hasher.verify(password, user.password);
 
     if (authenticated) {
 
@@ -63,34 +63,18 @@ export async function register(
   datastore: DataStore,
   responder: Responder,
   hasher: HashInterface,
-  _user: User
+  user: User
 ) {
   try {
-    // FIXME: Needs consistent typing here
-    let pwdhash = await hasher.hash(_user.pwd ? _user.pwd : _user["password"]);
-    _user.pwd = pwdhash;
-    let user = await datastore.insertUser({
-      username: _user.username,
-      name_: `${_user.firstname} ${_user.lastname}`,
-      organization: _user.organization,
-      email: _user.email,
-      pwdhash: pwdhash,
-      objects: []
-    });
-    user["token"] = TokenManager.generateToken(user);
-    responder.setCookie('presence', user['token']);
+    let pwdhash = await hasher.hash(user.password);
+    user.password = pwdhash;
+    let userID = await datastore.insertUser(user);
+    user.token = TokenManager.generateToken(user);
+    delete user.password;
+    responder.setCookie('presence', user.token);
     responder.sendOperationSuccess();
   } catch (e) {
     console.log(e);
     responder.sendOperationError(e);
-  }
-}
-
-export async function validateToken(responder: Responder, token: string) {
-  if (!TokenManager.verifyJWT(token, responder, null)) {
-    responder.invalidAccess();
-  } else {
-
-    responder.sendOperationSuccess();
   }
 }

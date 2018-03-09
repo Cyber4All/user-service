@@ -1,11 +1,11 @@
 import * as jwt from 'jsonwebtoken';
-import { key, issuer } from '../environment/config';
+import { User } from '@cyber4all/clark-entity';
 
 /**
  * Takes a user object and generates a JWT for the user
  * @param user contains the user's id, username, firstname, lastname, and email
  */
-export function generateToken(user) {
+export function generateToken(user: User) {
   const payload = {
     username: user.username,
     name: user.name,
@@ -13,11 +13,11 @@ export function generateToken(user) {
     organization: user.organization,
   };
   const options = {
-    issuer,
+    issuer: process.env.ISSUER,
     expiresIn: 86400,
     audience: user.username
   };
-  const token = jwt.sign(payload, key, options);
+  const token = jwt.sign(payload, process.env.KEY, options);
   return token;
 }
 
@@ -27,9 +27,13 @@ export function generateToken(user) {
  * @param token the JWT as a string
  * @param callback the function to execute after verification
  */
-export function verifyJWT(token, res, callback): boolean {
+export function verifyJWT(
+  token: string,
+  res: any,
+  callback: Function
+): boolean {
   try {
-    const decoded = jwt.verify(token, key, {});
+    const decoded = jwt.verify(token, process.env.KEY, {});
 
     if (typeof callback === 'function') {
       callback(status, decoded);

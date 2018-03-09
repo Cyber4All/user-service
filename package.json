@@ -1,6 +1,6 @@
 {
   "name": "user-service",
-  "version": "1.0.0-alpha.3.0",
+  "version": "1.0.0-alpha.3.3",
   "description": "A microservice for handling user account actions in the CLARK platform.",
   "main": "app.js",
   "scripts": {
@@ -23,14 +23,15 @@
   },
   "homepage": "https://github.com/Cyber4All/user-service#readme",
   "devDependencies": {
+    "@types/bcrypt": "^1.0.0",
     "@types/cookie-parser": "^1.4.1",
     "@types/cors": "^2.8.3",
+    "@types/dotenv": "^4.0.2",
     "@types/express": "^4.11.0",
     "@types/express-jwt": "0.0.38",
+    "@types/jsonwebtoken": "^7.2.5",
     "@types/mongodb": "^2.2.13",
     "@types/node": "^9.3.0",
-    "@types/dotenv": "^4.0.2",
-    "@types/jsonwebtoken": "^7.2.5",
     "gulp": "^3.9.1",
     "gulp-nodemon": "^2.2.1",
     "gulp-typescript": "^4.0.0-alpha.1",
@@ -40,8 +41,8 @@
     "typescript": "^2.6.2"
   },
   "dependencies": {
-    "@cyber4all/clark-entity": "^1.1.71",
-    "@cyber4all/clark-schema": "^1.0.7",
+    "@cyber4all/clark-entity": "^2.1.0-beta.0.0",
+    "@cyber4all/clark-schema": "^2.0.0-beta.0.2",
     "@oriented/express": "^1.0.3",
     "@sendgrid/mail": "^6.2.1",
     "bcrypt": "^1.0.3",

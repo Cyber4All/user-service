@@ -1,26 +1,26 @@
-import * as express from "express";
+import * as express from 'express';
 type Router = express.Router;
 import {
   DataStore,
   Responder,
   Mailer,
   HashInterface
-} from "../interfaces/interfaces";
+} from '../interfaces/interfaces';
 import {
   login,
   register,
-  validateToken,
   logout
-} from "../interactors/AuthenticationInteractor";
-import { UserResponseFactory, OTACodeManager } from "./drivers";
+} from '../interactors/AuthenticationInteractor';
+import { UserResponseFactory, OTACodeManager } from './drivers';
 import {
   UserInteractor,
   MailerInteractor,
   OTACodeInteractor
-} from "../interactors/interactors";
-import { ACCOUNT_ACTIONS } from "../interfaces/Mailer.defaults";
-import { REDIRECT_ROUTES } from "../environment/routes";
-const version = require("../package.json").version;
+} from '../interactors/interactors';
+import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
+import { REDIRECT_ROUTES } from '../environment/routes';
+import { User } from '@cyber4all/clark-entity';
+const version = require('../package.json').version;
 
 export default class RouteHandler {
   constructor(
@@ -50,7 +50,7 @@ export default class RouteHandler {
   private setRoutes(router: Router) {
     // GET: returns welcome message and version number
     // No params necessary
-    router.get("/", (req, res) => {
+    router.get('/', (req, res) => {
       res.json({
         version,
         message: `Welcome to the Users API v${version}`
@@ -70,17 +70,18 @@ export default class RouteHandler {
     }
     */
     // Returns either message warning invalid info, or success
-    router.post("/users", async (req, res) => {
+    router.post('/users', async (req, res) => {
+      let user = User.instantiate(req.body);
       await register(
         this.dataStore,
         this.responseFactory.buildResponder(res),
         this.hasher,
-        req.body
+        user
       );
     });
 
     // Login
-    router.post("/users/tokens", async (req, res) => {
+    router.post('/users/tokens', async (req, res) => {
       await login(
         this.dataStore,
         this.responseFactory.buildResponder(res),
@@ -91,7 +92,7 @@ export default class RouteHandler {
     });
 
     router
-      .route("/users/tokens")
+      .route('/users/tokens')
       // Validate Token
       // Param: Valid token (for testing, get from users/tokens route)
       // if valid, returns OK
@@ -106,7 +107,7 @@ export default class RouteHandler {
     });
 
     router
-      .route("/users/ota-codes")
+      .route('/users/ota-codes')
       .post(async (req, res) => {
         try {
           let action = req.query.action;
@@ -135,7 +136,7 @@ export default class RouteHandler {
               responder.sendOperationSuccess();
               break;
             default:
-              responder.sendOperationError("Invalid action");
+              responder.sendOperationError('Invalid action');
           }
         } catch (e) {
           console.log(e);
@@ -160,7 +161,7 @@ export default class RouteHandler {
               responder.redirectTo(REDIRECT_ROUTES.RESET_PASSWORD(otaCode));
               break;
             default:
-              responder.sendOperationError("Action invalid");
+              responder.sendOperationError('Action invalid');
               break;
           }
         } catch (e) {
@@ -192,13 +193,13 @@ export default class RouteHandler {
               );
               break;
             default:
-              responder.sendOperationError("Invalid action.");
+              responder.sendOperationError('Invalid action.');
               break;
           }
         } catch (e) {
           this.responseFactory
             .buildResponder(res)
-            .sendOperationError("Invalid OTA Code.");
+            .sendOperationError('Invalid OTA Code.');
         }
       });
 
@@ -206,11 +207,11 @@ export default class RouteHandler {
     // When implemented...
     // provide token, which is then unauthorized, and return success message
     // Need to implement promise rejection catch - error message in console on failure.
-    router.delete("/users/:username", async (req, res) => {
+    router.delete('/users/:username', async (req, res) => {
       this.responseFactory
         .buildResponder(res)
-        .sendOperationError("Cannot delete user accounts at this time");
-      throw new Error("Cannot delete user accounts at this time");
+        .sendOperationError('Cannot delete user accounts at this time');
+      throw new Error('Cannot delete user accounts at this time');
     });
   }
 }

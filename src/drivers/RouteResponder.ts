@@ -1,10 +1,8 @@
-import { ExpressResponder } from '@oriented/express';
 import { Responder } from '../interfaces/interfaces';
 import { Response } from 'express';
 import { User } from '@cyber4all/clark-entity';
 
 export default class RouteResponder implements Responder {
-
   /**
    *
    * @param res
@@ -38,8 +36,9 @@ export default class RouteResponder implements Responder {
    * @param user
    */
   sendUser(user: User) {
-    delete user['_pwd'];
-    console.log(user);
+    const t = user.token;
+    delete user.token;
+    delete user.password;
     this.res.status(200).json(user);
   }
   /**
@@ -69,10 +68,22 @@ export default class RouteResponder implements Responder {
   }
 
   setCookie(key: string, value: string): Response {
-    return this.res.cookie(key, value, { maxAge: 900000, httpOnly: false });
+    let options = {
+      maxAge: 604800000,
+      httpOnly: false,
+      domain: process.env.COOKIE_DOMAIN,
+      secure: process.env.NODE_ENV !== 'development'
+    };
+
+    return this.res.cookie(key, value, options);
   }
 
   removeCookie(name: string): Response {
-    return this.res.clearCookie(name, { path: '/' });
+    let options = {
+      domain: process.env.COOKIE_DOMAIN,
+      path: '/'
+    };
+
+    return this.res.clearCookie(name, options);
   }
 }
