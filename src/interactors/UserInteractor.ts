@@ -36,4 +36,19 @@ export class UserInteractor {
       responder.sendOperationError(e);
     }
   }
+
+  public static async editInfo (
+    dataStore: DataStore,
+    responder: Responder,
+    username: string,
+    edits: {}
+  ) {
+    try {
+      let userID = await dataStore.findUser(username);
+      await dataStore.editUser(userID, edits );
+      responder.sendOperationSuccess();
+    } catch (e) {
+      responder.sendOperationError(e);
+    }
+  }
 }

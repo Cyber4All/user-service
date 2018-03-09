@@ -70,7 +70,8 @@ export default class RouteHandler {
     }
     */
     // Returns either message warning invalid info, or success
-    router.post('/users', async (req, res) => {
+    router.route('/users')
+    .post( async (req, res) => {
       let user = User.instantiate(req.body);
       await register(
         this.dataStore,
@@ -78,7 +79,13 @@ export default class RouteHandler {
         this.hasher,
         user
       );
-    });
+    }).patch ( async (req, res) => {
+      let edits = req.body;
+      await UserInteractor.editInfo(this.dataStore, this.responseFactory.buildResponder(res), req.user.username, edits);
+    })  
+
+    
+    
 
     // Login
     router.post('/users/tokens', async (req, res) => {
