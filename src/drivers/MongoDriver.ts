@@ -74,7 +74,7 @@ export class COLLECTIONS {
   };
   public static StandardOutcome: Collection = { name: 'outcomes' };
   public static LearningObjectCollection: Collection = { name: 'collections' };
-  public static OTACode: Collection = { name: 'otaCodes' };
+  public static OTACode: Collection = { name: 'ota-codes' };
 }
 
 const COLLECTIONS_MAP = new Map<string, Collection>();
