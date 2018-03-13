@@ -17,7 +17,7 @@ export const enforceTokenAccess = jwt({
   // Routes that don't require authorization
   path: [
     '/',
-    { url: '/users', methods: ['POST'] }, // register
+    { url: '/users', methods: ['POST', 'GET'] }, // register & search
     '/users/ota-codes', // all ota-code routes do their own verifcation outsides of JWT
     { url: '/users/tokens', methods: ['POST'] }
   ] // login

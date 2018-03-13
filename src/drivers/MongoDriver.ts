@@ -211,6 +211,19 @@ export default class MongoDriver implements DataStore {
       return Promise.reject(e);
     }
   }
+
+  async searchUsers(query: {}): Promise<User[]> {
+    try {
+      let userDocs = await this.db
+        .collection(COLLECTIONS.User.name)
+        .find<UserDocument>(query)
+        .toArray();
+      let users: User[] = userDocs.map(user => this.generateUser(user));
+      return users;
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
   /**
    * Fetch the user document associated with the given id.
    * @async
@@ -289,6 +302,17 @@ export default class MongoDriver implements DataStore {
   ////////////////////////////////////////////////
   // GENERIC HELPER METHODS - not in public API //
   ////////////////////////////////////////////////
+
+  private generateUser(userRecord: UserDocument): User {
+    let user = new User(
+      userRecord.username,
+      userRecord.name,
+      userRecord.email,
+      userRecord.organization,
+      undefined
+    );
+    return user;
+  }
 
   /**
    * Reject promise if any foreign keys in a record do not exist.

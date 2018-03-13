@@ -14,4 +14,5 @@ export interface DataStore {
   insertOTACode(otaCode: OTACode): Promise<void>;
   findOTACode(otaCode: string): Promise<string>;
   deleteOTACode(id: string): Promise<void>;
+  searchUsers(query: {}): Promise<User[]>;
 }

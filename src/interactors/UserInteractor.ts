@@ -8,6 +8,18 @@ import { User } from '@cyber4all/clark-entity';
 import { TokenManager } from '../drivers/drivers';
 
 export class UserInteractor {
+  public static async searchUsers(
+    dataStore: DataStore,
+    responder: Responder,
+    query: {}
+  ) {
+    try {
+      let users = await dataStore.searchUsers(query);
+      responder.sendUser(users);
+    } catch (e) {
+      responder.sendOperationError(`Problem searching users. Error: ${e}`);
+    }
+  }
   public static async verifyEmail(
     dataStore: DataStore,
     email: string

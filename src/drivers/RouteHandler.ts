@@ -72,6 +72,18 @@ export default class RouteHandler {
     // Returns either message warning invalid info, or success
     router
       .route('/users')
+      .get(async (req, res) => {
+        try {
+          let query = req.query;
+          await UserInteractor.searchUsers(
+            this.dataStore,
+            this.responseFactory.buildResponder(res),
+            query
+          );
+        } catch (e) {
+          this.responseFactory.buildResponder(res).sendOperationError(e);
+        }
+      })
       .post(async (req, res) => {
         let user = User.instantiate(req.body);
         await register(
