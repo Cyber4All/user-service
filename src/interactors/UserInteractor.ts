@@ -5,6 +5,7 @@ import {
   MailerInteractorInterface
 } from '../interfaces/interfaces';
 import { User } from '@cyber4all/clark-entity';
+import { TokenManager } from '../drivers/drivers';
 
 export class UserInteractor {
   public static async verifyEmail(
@@ -37,7 +38,7 @@ export class UserInteractor {
     }
   }
 
-  public static async editInfo (
+  public static async editInfo(
     dataStore: DataStore,
     responder: Responder,
     username: string,
@@ -45,8 +46,8 @@ export class UserInteractor {
   ) {
     try {
       let userID = await dataStore.findUser(username);
-      await dataStore.editUser(userID, edits);
-      responder.sendOperationSuccess();
+      let user = await dataStore.editUser(userID, edits);
+      responder.setCookie('presence', TokenManager.generateToken(user));
     } catch (e) {
       responder.sendOperationError(e);
     }

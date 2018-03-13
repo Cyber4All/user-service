@@ -70,21 +70,25 @@ export default class RouteHandler {
     }
     */
     // Returns either message warning invalid info, or success
-    router.route('/users')
-    .post( async (req, res) => {
-      let user = User.instantiate(req.body);
-      await register(
-        this.dataStore,
-        this.responseFactory.buildResponder(res),
-        this.hasher,
-        user
-      );
-    });
-
-    router.patch ('/users/:username', async (req, res) => {
-      await UserInteractor.editInfo(this.dataStore, this.responseFactory.buildResponder(res), req.params.username, req.body.user);
-    });
-    
+    router
+      .route('/users')
+      .post(async (req, res) => {
+        let user = User.instantiate(req.body);
+        await register(
+          this.dataStore,
+          this.responseFactory.buildResponder(res),
+          this.hasher,
+          user
+        );
+      })
+      .patch(async (req, res) => {
+        await UserInteractor.editInfo(
+          this.dataStore,
+          this.responseFactory.buildResponder(res),
+          req.user.username,
+          req.body.user
+        );
+      });
 
     // Login
     router.post('/users/tokens', async (req, res) => {

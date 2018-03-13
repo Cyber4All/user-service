@@ -234,7 +234,7 @@ export default class MongoDriver implements DataStore {
       return Promise.reject(e);
     }
   }
-  async editUser(id: string, object: {}): Promise<void> {
+  async editUser(id: string, object: {}): Promise<User> {
     try {
       await this.db.collection(COLLECTIONS.User.name).update(
         { _id: id },
@@ -242,6 +242,7 @@ export default class MongoDriver implements DataStore {
           $set: object
         }
       );
+      return await this.loadUser(id);
     } catch (e) {
       return Promise.reject(e);
     }

@@ -9,7 +9,7 @@ export interface DataStore {
   emailRegistered(email: string): Promise<boolean>;
   findUser(username: string): Promise<string>;
   loadUser(id: string): Promise<User>;
-  editUser(id: string, user: {}): Promise<void>;
+  editUser(id: string, user: {}): Promise<User>;
   deleteUser(id: string): Promise<void>;
   insertOTACode(otaCode: OTACode): Promise<void>;
   findOTACode(otaCode: string): Promise<string>;
