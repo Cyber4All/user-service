@@ -48,6 +48,7 @@ export class UserInteractor {
       let userID = await dataStore.findUser(username);
       let user = await dataStore.editUser(userID, edits);
       responder.setCookie('presence', TokenManager.generateToken(user));
+      responder.sendOperationSuccess();
     } catch (e) {
       responder.sendOperationError(e);
     }
