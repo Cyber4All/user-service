@@ -79,12 +79,11 @@ export default class RouteHandler {
         this.hasher,
         user
       );
-    }).patch ( async (req, res) => {
-      let edits = req.body;
-      await UserInteractor.editInfo(this.dataStore, this.responseFactory.buildResponder(res), req.user.username, edits);
-    })  
+    });
 
-    
+    router.patch ('/users/:username', async (req, res) => {
+      await UserInteractor.editInfo(this.dataStore, this.responseFactory.buildResponder(res), req.params.username, req.body.user);
+    });
     
 
     // Login

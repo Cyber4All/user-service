@@ -45,7 +45,7 @@ export class UserInteractor {
   ) {
     try {
       let userID = await dataStore.findUser(username);
-      await dataStore.editUser(userID, edits );
+      await dataStore.editUser(userID, edits);
       responder.sendOperationSuccess();
     } catch (e) {
       responder.sendOperationError(e);
