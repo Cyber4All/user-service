@@ -149,16 +149,16 @@ export default class MongoDriver implements DataStore {
    *
    * @returns {UserID} the database id of the new record
    */
-  async insertUser(user: any): Promise<string> {
+  async insertUser(user: User): Promise<string> {
     try {
       let emailRegistered = await this.emailRegistered(user.email);
       if (emailRegistered)
         return Promise.reject({
           error: 'Email is already in use.'
         });
-      user._id = new ObjectID().toHexString();
-      await this.insert(COLLECTIONS.User, user);
-      return user._id;
+      let userDoc = this.documentUser(user, true);
+      await this.insert(COLLECTIONS.User, userDoc);
+      return userDoc._id;
     } catch (e) {
       return Promise.reject(e);
     }
@@ -235,13 +235,7 @@ export default class MongoDriver implements DataStore {
   async loadUser(id: string): Promise<User> {
     try {
       let userRecord = await this.fetch<UserDocument>(COLLECTIONS.User, id);
-      let user = new User(
-        userRecord.username,
-        userRecord.name,
-        userRecord.email,
-        userRecord.organization,
-        userRecord.password
-      );
+      let user = this.generateUser(userRecord);
       return user;
     } catch (e) {
       return Promise.reject(e);
@@ -302,6 +296,20 @@ export default class MongoDriver implements DataStore {
   ////////////////////////////////////////////////
   // GENERIC HELPER METHODS - not in public API //
   ////////////////////////////////////////////////
+
+  private documentUser(user: User, isNew?: boolean): UserDocument {
+    let userDocument: UserDocument = {
+      _id: new ObjectID().toHexString(),
+      username: user.username,
+      name: user.name,
+      email: user.email,
+      organization: user.organization,
+      password: user.password,
+      objects: []
+    };
+    if (!isNew) delete userDocument._id;
+    return userDocument;
+  }
 
   private generateUser(userRecord: UserDocument): User {
     let user = new User(
@@ -464,66 +472,6 @@ export default class MongoDriver implements DataStore {
           ' field:\n\t' +
           e
       );
-    }
-  }
-
-  /**
-   * Reorder an item in a registry.
-   * @async
-   *
-   * @param {string} collection where to find the registry owner
-   * @param {RecordID} owner the registry owner
-   * @param {string} registry field name of the registry
-   * @param {RecordID} item which item to move
-   * @param {number} index the new index for item
-   */
-  private async reorder(
-    collection: Collection,
-    owner: string,
-    registry: string,
-    item: string,
-    index: number
-  ): Promise<void> {
-    try {
-      // check validity of values before making any changes
-      let record = await this.db
-        .collection(collection.name)
-        .findOne({ _id: owner });
-      if (!record)
-        return Promise.reject(
-          'Reorder failed: no record ' + owner + 'found in ' + collection.name
-        );
-      if (!record[registry].includes(item)) {
-        return Promise.reject(
-          'Reorder failed: record ' +
-            owner +
-            "'s " +
-            registry +
-            ' field has no element ' +
-            item
-        );
-      }
-      if (index < 0)
-        return Promise.reject('Reorder failed: index cannot be negative');
-      if (index >= record[registry].length) {
-        return Promise.reject(
-          'Reorder failed: index exceeds length of ' + registry + ' field'
-        );
-      }
-
-      // perform the necessary operations
-      await this.unregister(collection, owner, registry, item);
-
-      let pushdoc = {};
-      pushdoc[registry] = { $each: [item], $position: index };
-
-      await this.db
-        .collection(collection.name)
-        .updateOne({ _id: owner }, { $push: pushdoc });
-
-      return Promise.resolve();
-    } catch (e) {
-      return Promise.reject(e);
     }
   }
 
