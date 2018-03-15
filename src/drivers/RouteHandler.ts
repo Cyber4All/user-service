@@ -20,6 +20,7 @@ import {
 import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
 import { REDIRECT_ROUTES } from '../environment/routes';
 import { User } from '@cyber4all/clark-entity';
+import * as request from 'request';
 const version = require('../package.json').version;
 
 export default class RouteHandler {
@@ -234,6 +235,26 @@ export default class RouteHandler {
         .buildResponder(res)
         .sendOperationError('Cannot delete user accounts at this time');
       throw new Error('Cannot delete user accounts at this time');
+    });
+
+    router.get('/validate-captcha', async (req, res) => {
+      try {
+        let response = await request.post(
+          'https://www.google.com/recaptcha/api/siteverify',
+          {
+            qs: {
+              secret: process.env.CAPTCHA_SECRET,
+              response: req.query.token
+            },
+            json: true
+          }
+        );
+        this.responseFactory.buildResponder(res).sendUser(response);
+      } catch (e) {
+        this.responseFactory
+          .buildResponder(res)
+          .sendOperationError(`Could not validate captcha. Error: ${e}`);
+      }
     });
   }
 }
