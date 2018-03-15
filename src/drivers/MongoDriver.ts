@@ -204,7 +204,7 @@ export default class MongoDriver implements DataStore {
         .findOne<UserDocument>(query);
       if (!userRecord)
         return Promise.reject(
-          'No user with username or email' + username + ' exists.'
+          'No user with username or email ' + username + ' exists.'
         );
       return `${userRecord._id}`;
     } catch (e) {
@@ -317,7 +317,7 @@ export default class MongoDriver implements DataStore {
       userRecord.name,
       userRecord.email,
       userRecord.organization,
-      undefined
+      userRecord.password
     );
     return user;
   }

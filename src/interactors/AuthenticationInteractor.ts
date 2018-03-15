@@ -30,9 +30,9 @@ export async function login(
     let id = await dataStore.findUser(username);
     let user = await dataStore.loadUser(id);
     let authenticated = await hasher.verify(password, user.password);
+    delete user.password;
 
     if (authenticated) {
-
       responder.setCookie('presence', TokenManager.generateToken(user));
       responder.sendUser(user);
     } else {
