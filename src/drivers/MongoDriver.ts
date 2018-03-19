@@ -243,6 +243,7 @@ export default class MongoDriver implements DataStore {
   }
   async editUser(id: string, object: {}): Promise<User> {
     try {
+      if (object['name']) object['name'] = object['name'].trim();
       await this.db.collection(COLLECTIONS.User.name).update(
         { _id: id },
         {
@@ -301,7 +302,7 @@ export default class MongoDriver implements DataStore {
     let userDocument: UserDocument = {
       _id: new ObjectID().toHexString(),
       username: user.username,
-      name: user.name,
+      name: user.name.trim(),
       email: user.email,
       organization: user.organization,
       password: user.password,
