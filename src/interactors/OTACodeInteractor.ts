@@ -61,10 +61,7 @@ export class OTACodeInteractor {
     try {
       let emailValid = await dataStore.emailRegistered(email);
       if (emailValid) {
-        let otaCode = await OTACodeManager.generate(
-          { email: email },
-          ACCOUNT_ACTIONS.RESET_PASSWORD
-        );
+        let otaCode = await OTACodeManager.generate({ email: email }, action);
         await dataStore.insertOTACode(otaCode);
         return otaCode.code;
       }

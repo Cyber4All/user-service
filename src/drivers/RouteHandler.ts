@@ -93,6 +93,20 @@ export default class RouteHandler {
           this.hasher,
           user
         );
+        try {
+          let otaCode = await OTACodeInteractor.generateOTACode(
+            this.dataStore,
+            ACCOUNT_ACTIONS.VERIFY_EMAIL,
+            user.email
+          );
+          MailerInteractor.sendEmailVerification(
+            this.mailer,
+            user.email,
+            otaCode
+          );
+        } catch (e) {
+          console.log(e);
+        }
       })
       .patch(async (req, res) => {
         await UserInteractor.editInfo(
@@ -177,7 +191,7 @@ export default class RouteHandler {
                 this.dataStore,
                 decoded.data.email
               );
-              await MailerInteractor.sendWelcomeEmail(this.mailer, user);
+              // await MailerInteractor.sendWelcomeEmail(this.mailer, user);
               responder.redirectTo(REDIRECT_ROUTES.VERIFY_EMAIL);
               break;
             case ACCOUNT_ACTIONS.RESET_PASSWORD:
