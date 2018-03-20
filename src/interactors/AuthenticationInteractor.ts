@@ -33,8 +33,8 @@ export async function login(
     delete user.password;
 
     if (authenticated) {
-      user.token = TokenManager.generateToken(user);
-      responder.setCookie('presence', user.token);
+      let token = TokenManager.generateToken(user);
+      responder.setCookie('presence', token);
       responder.sendUser(user);
     } else {
       responder.invalidLogin();
@@ -70,9 +70,9 @@ export async function register(
     let pwdhash = await hasher.hash(user.password);
     user.password = pwdhash;
     let userID = await datastore.insertUser(user);
-    user.token = TokenManager.generateToken(user);
+    let token = TokenManager.generateToken(user);
     delete user.password;
-    responder.setCookie('presence', user.token);
+    responder.setCookie('presence', token);
     responder.sendUser(user);
   } catch (e) {
     console.log(e);
