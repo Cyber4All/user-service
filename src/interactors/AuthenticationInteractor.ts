@@ -33,7 +33,8 @@ export async function login(
     delete user.password;
 
     if (authenticated) {
-      responder.setCookie('presence', TokenManager.generateToken(user));
+      user.token = TokenManager.generateToken(user);
+      responder.setCookie('presence', user.token);
       responder.sendUser(user);
     } else {
       responder.invalidLogin();
@@ -72,7 +73,7 @@ export async function register(
     user.token = TokenManager.generateToken(user);
     delete user.password;
     responder.setCookie('presence', user.token);
-    responder.sendOperationSuccess();
+    responder.sendUser(user);
   } catch (e) {
     console.log(e);
     responder.sendOperationError(e);

@@ -306,7 +306,8 @@ export default class MongoDriver implements DataStore {
       email: user.email,
       organization: user.organization,
       password: user.password,
-      objects: []
+      objects: [],
+      emailVerified: user.emailVerified ? user.emailVerified : false
     };
     if (!isNew) delete userDocument._id;
     return userDocument;
@@ -320,6 +321,10 @@ export default class MongoDriver implements DataStore {
       userRecord.organization,
       userRecord.password
     );
+    // Append Email Verified Prop
+    user.emailVerified = userRecord.emailVerified
+      ? userRecord.emailVerified
+      : false;
     return user;
   }
 
