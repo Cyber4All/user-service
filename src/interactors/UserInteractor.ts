@@ -22,12 +22,14 @@ export class UserInteractor {
   }
   public static async verifyEmail(
     dataStore: DataStore,
+    responder: Responder,
     email: string
   ): Promise<User> {
     try {
       let userID = await dataStore.findUser(email);
       await dataStore.editUser(userID, { emailVerified: true });
       let user = await dataStore.loadUser(userID);
+      responder.setCookie('presence', TokenManager.generateToken(user));
       return user;
     } catch (e) {
       return Promise.reject(e);
