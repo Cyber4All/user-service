@@ -1,18 +1,13 @@
-branch-defaults:
-  master:
-    environment: User-Service-Production
 global:
   application_name: CLARK
   default_ec2_keyname: null
   default_platform: arn:aws:elasticbeanstalk:us-east-1::platform/Node.js running on
     64bit Amazon Linux/4.3.0
   default_region: us-east-1
-  include_git_submodules: true
   instance_profile: null
   platform_name: null
   platform_version: null
   profile: default
-  sc: git
   workspace_type: Application
 deploy:
   artifact: ./dist.zip

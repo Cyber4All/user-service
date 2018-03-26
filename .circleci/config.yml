@@ -1,0 +1,74 @@
+defaults: &defaults
+  working_directory: ~/user-service
+  docker:
+    - image: cyber4all/circleci-aws:latest
+
+version: 2
+jobs:
+  build:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: npm install
+      - run:
+          name: Build Application
+          command: npm run build
+      - persist_to_workspace: 
+          root: ./
+          paths: 
+              - ./dist
+              - ./package.json
+              - ./.elasticbeanstalk
+  test:
+    <<: *defaults
+    steps:
+      - attach_workspace : 
+          at: ~/user-service
+      - run: echo 'We need tests'
+      - run:
+          name: Check Directory
+          command: ls
+  deploy:
+    <<: *defaults
+    steps:
+      - checkout
+      - attach_workspace : 
+          at: ~/user-service
+      - run:
+          name: Setup AWS credentials
+          command: |
+            mkdir ~/.aws && printf "[profile default]\naws_access_key_id = ${AWS_ACCESS_KEY_ID}\naws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}" > ~/.aws/config
+      - run: 
+          name: Zip Package for Deployment
+          command: npm run zip
+      - run:
+          name: Deploy to Elastic Beanstalk 
+          command: eb deploy User-Service-Production --verbose
+workflows:
+  version: 2
+  build-and-test:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+  build-test-and-deploy:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: /master/
+      - test:
+          requires:
+            - build
+          filters:
+            branches:
+              only: /master/
+      - deploy:
+          requires:
+            - test
+          filters:
+            branches:
+              only: /master/
