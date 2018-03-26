@@ -27,9 +27,6 @@ jobs:
       - attach_workspace : 
           at: ~/user-service
       - run: echo 'We need tests'
-      - run:
-          name: Check Directory
-          command: ls
   deploy:
     <<: *defaults
     steps:
