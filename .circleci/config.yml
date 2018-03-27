@@ -30,7 +30,6 @@ jobs:
   deploy:
     <<: *defaults
     steps:
-      - checkout
       - attach_workspace : 
           at: ~/user-service
       - run:
@@ -38,11 +37,14 @@ jobs:
           command: |
             mkdir ~/.aws && printf "[profile default]\naws_access_key_id = ${AWS_ACCESS_KEY_ID}\naws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}" > ~/.aws/config
       - run: 
-          name: Zip Package for Deployment
-          command: npm run zip
+          name: Copy package.json
+          command: cp ./package.json ./dist
+      - run: 
+          name: Zip dist
+          command: cd ./dist; zip -r ../dist.zip . *; cd ..
       - run:
           name: Deploy to Elastic Beanstalk 
-          command: eb deploy User-Service-Production --verbose
+          command: eb deploy User-Service-Production --verbose --label User-Service-v$(node -p "require('./package.json').version")
 workflows:
   version: 2
   build-and-test:
