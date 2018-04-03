@@ -1,20 +1,16 @@
 {
   "name": "user-service",
   "version": "1.0.0-beta.0.2",
-  "description":
-    "A microservice for handling user account actions in the CLARK platform.",
+  "description": "A microservice for handling user account actions in the CLARK platform.",
   "main": "app.js",
   "scripts": {
     "start": "npm run gulp-tsc",
     "build": "node_modules/.bin/gulp tsc",
     "gulp-tsc": "node_modules/.bin/gulp start",
     "lint": "node_modules/.bin/tslint --project ./src/**",
-    "pack":
-      "npm run build && cp ./package.json ./dist && cd ./dist && zip -r ../dist.zip  ./* & cd ..",
-    "zip":
-      "cp ./package.json ./dist && cd ./dist && zip -r ../dist.zip  ./* & cd ..",
-    "deploy":
-      "eb deploy User-Service-Production --profile clark --label $(node -p \"require('./package.json').version\")",
+    "pack": "npm run build && cp ./package.json ./dist && cd ./dist && zip -r ../dist.zip  ./* & cd ..",
+    "zip": "cp ./package.json ./dist && cd ./dist && zip -r ../dist.zip  ./* & cd ..",
+    "deploy": "eb deploy User-Service-Production --profile clark --label $(node -p \"require('./package.json').version\")",
     "prettify": "node_modules/.bin/prettier --write ./src/**/* --single-quote"
   },
   "repository": {
@@ -28,7 +24,7 @@
   },
   "homepage": "https://github.com/Cyber4All/user-service#readme",
   "dependencies": {
-    "@cyber4all/clark-entity": "^2.1.0-beta.0.3",
+    "@cyber4all/clark-entity": "^2.1.0-beta.0.4",
     "@cyber4all/clark-schema": "^2.0.0-beta.0.3",
     "@cyber4all/clark-taxonomy": "^2.0.0",
     "@oriented/express": "^1.0.3",
