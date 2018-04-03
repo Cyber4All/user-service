@@ -189,6 +189,7 @@ export default class RouteHandler {
             case ACCOUNT_ACTIONS.VERIFY_EMAIL:
               let user = await UserInteractor.verifyEmail(
                 this.dataStore,
+                responder,
                 decoded.data.email
               );
               // await MailerInteractor.sendWelcomeEmail(this.mailer, user);

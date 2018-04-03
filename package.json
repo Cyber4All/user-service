@@ -1,6 +1,6 @@
 {
   "name": "user-service",
-  "version": "1.0.0-beta.0.1",
+  "version": "1.0.0-beta.0.3",
   "description": "A microservice for handling user account actions in the CLARK platform.",
   "main": "app.js",
   "scripts": {
@@ -9,6 +9,7 @@
     "gulp-tsc": "node_modules/.bin/gulp start",
     "lint": "node_modules/.bin/tslint --project ./src/**",
     "pack": "npm run build && cp ./package.json ./dist && cd ./dist && zip -r ../dist.zip  ./* & cd ..",
+    "zip": "cp ./package.json ./dist && cd ./dist && zip -r ../dist.zip  ./* & cd ..",
     "deploy": "eb deploy User-Service-Production --profile clark --label $(node -p \"require('./package.json').version\")",
     "prettify": "node_modules/.bin/prettier --write ./src/**/* --single-quote",
     "test": "node_modules/.bin/jest --verbose"
@@ -23,6 +24,23 @@
     "url": "https://github.com/Cyber4All/user-service/issues"
   },
   "homepage": "https://github.com/Cyber4All/user-service#readme",
+  "dependencies": {
+    "@cyber4all/clark-entity": "^2.1.0-beta.0.4",
+    "@cyber4all/clark-schema": "^2.0.0-beta.0.3",
+    "@cyber4all/clark-taxonomy": "^2.0.0",
+    "@oriented/express": "^1.0.3",
+    "@sendgrid/mail": "^6.2.1",
+    "bcrypt": "^1.0.3",
+    "cookie-parser": "^1.4.3",
+    "cors": "^2.8.4",
+    "dotenv": "^5.0.0",
+    "express-jwt": "^5.3.0",
+    "jsonwebtoken": "^8.1.1",
+    "mongodb": "^2.2.31",
+    "morgan": "^1.9.0",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2"
+  },
   "devDependencies": {
     "@types/bcrypt": "^1.0.0",
     "@types/cookie-parser": "^1.4.1",
@@ -43,23 +61,6 @@
     "tslint": "^5.9.1",
     "tslint-config-airbnb": "^5.7.0",
     "typescript": "^2.6.2"
-  },
-  "dependencies": {
-    "@cyber4all/clark-entity": "^2.1.0-beta.0.3",
-    "@cyber4all/clark-schema": "^2.0.0-beta.0.3",
-    "@cyber4all/clark-taxonomy": "^2.0.0",
-    "@oriented/express": "^1.0.3",
-    "@sendgrid/mail": "^6.2.1",
-    "bcrypt": "^1.0.3",
-    "cookie-parser": "^1.4.3",
-    "cors": "^2.8.4",
-    "dotenv": "^5.0.0",
-    "express-jwt": "^5.3.0",
-    "jsonwebtoken": "^8.1.1",
-    "mongodb": "^2.2.31",
-    "morgan": "^1.9.0",
-    "request": "^2.83.0",
-    "request-promise": "^4.2.2"
   },
   "jest": {
     "transform": {
