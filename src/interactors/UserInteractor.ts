@@ -14,7 +14,7 @@ export class UserInteractor {
     query: {}
   ) {
     try {
-      let users = await dataStore.searchUsers(query);
+      const users = await dataStore.searchUsers(query);
       responder.sendUser(users);
     } catch (e) {
       responder.sendOperationError(`Problem searching users. Error: ${e}`);
@@ -25,9 +25,9 @@ export class UserInteractor {
     email: string
   ): Promise<User> {
     try {
-      let userID = await dataStore.findUser(email);
+      const userID = await dataStore.findUser(email);
       await dataStore.editUser(userID, { emailVerified: true });
-      let user = await dataStore.loadUser(userID);
+      const user = await dataStore.loadUser(userID);
       return user;
     } catch (e) {
       return Promise.reject(e);
@@ -41,8 +41,8 @@ export class UserInteractor {
     password: string
   ) {
     try {
-      let pwdhash = await hasher.hash(password);
-      let userID = await dataStore.findUser(email);
+      const pwdhash = await hasher.hash(password);
+      const userID = await dataStore.findUser(email);
       await dataStore.editUser(userID, { pwdhash: pwdhash });
       responder.sendOperationSuccess();
     } catch (e) {
@@ -57,8 +57,8 @@ export class UserInteractor {
     edits: {}
   ) {
     try {
-      let userID = await dataStore.findUser(username);
-      let user = await dataStore.editUser(userID, edits);
+      const userID = await dataStore.findUser(username);
+      const user = await dataStore.editUser(userID, edits);
       responder.setCookie('presence', TokenManager.generateToken(user));
       responder.sendOperationSuccess();
     } catch (e) {

@@ -27,13 +27,13 @@ export async function login(
   password: string
 ) {
   try {
-    let id = await dataStore.findUser(username);
-    let user = await dataStore.loadUser(id);
-    let authenticated = await hasher.verify(password, user.password);
+    const id = await dataStore.findUser(username);
+    const user = await dataStore.loadUser(id);
+    const authenticated = await hasher.verify(password, user.password);
     delete user.password;
 
     if (authenticated) {
-      let token = TokenManager.generateToken(user);
+      const token = TokenManager.generateToken(user);
       responder.setCookie('presence', token);
       responder.sendUser(user);
     } else {
@@ -67,15 +67,35 @@ export async function register(
   user: User
 ) {
   try {
-    let pwdhash = await hasher.hash(user.password);
-    user.password = pwdhash;
-    let userID = await datastore.insertUser(user);
-    let token = TokenManager.generateToken(user);
-    delete user.password;
-    responder.setCookie('presence', token);
-    responder.sendUser(user);
+    if (isValidUsername(user.username)) {
+      const pwdhash = await hasher.hash(user.password);
+      user.password = pwdhash;
+      const userID = await datastore.insertUser(user);
+      const token = TokenManager.generateToken(user);
+      delete user.password;
+      responder.setCookie('presence', token);
+      responder.sendUser(user);
+    } else {
+      responder.sendOperationError('Invalid username provided.', 400);
+    }
   } catch (e) {
     console.log(e);
     responder.sendOperationError(e);
   }
+}
+
+/**
+ * Validates that a username meets the defined constraints.
+ * 
+ * Constraints:
+ * - 20 characters or less
+ * - 3 characters or more 
+ * @param username the username being validated
+ * @returns {boolean} whether or not the username is valid.
+ */
+export function isValidUsername(username: string): boolean {
+  return (
+    username.length <= 20 
+    && username.length >= 3
+  );
 }
