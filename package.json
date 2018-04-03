@@ -65,12 +65,10 @@
     "transform": {
       "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
-    "testRegex": ".*?(?=.spec).*?.(js|ts|jsx|tsx)",
+    "testRegex": ".*?(?=.spec).*?.(js|ts)",
     "moduleFileExtensions": [
       "ts",
-      "tsx",
-      "js",
-      "jsx"
+      "js"
     ]
   },
   "prettier": {
