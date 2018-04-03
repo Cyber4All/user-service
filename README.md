@@ -2,6 +2,11 @@
 
 A microservice for handling user account actions in the CLARK platform.
 
+## Testing
+This microservice uses [jest](https://facebook.github.io/jest/ "Jest's Homepage") for running it's tests. Unit tests should be written in a `spec.ts` file. For instance, when testing `HelloWorld.js` the corresponding tests should be written in `HelloWorld.spec.js` and placed in the same directory.
+
+Run all unit tests with `npm run test`
+
 ## Routes
 
 ### `POST /users` - Register a new account

@@ -11,7 +11,8 @@
     "pack": "npm run build && cp ./package.json ./dist && cd ./dist && zip -r ../dist.zip  ./* & cd ..",
     "zip": "cp ./package.json ./dist && cd ./dist && zip -r ../dist.zip  ./* & cd ..",
     "deploy": "eb deploy User-Service-Production --profile clark --label $(node -p \"require('./package.json').version\")",
-    "prettify": "node_modules/.bin/prettier --write ./src/**/* --single-quote"
+    "prettify": "node_modules/.bin/prettier --write ./src/**/* --single-quote",
+    "test": "node_modules/.bin/jest --verbose"
   },
   "repository": {
     "type": "git",
@@ -47,16 +48,29 @@
     "@types/dotenv": "^4.0.2",
     "@types/express": "^4.11.0",
     "@types/express-jwt": "0.0.38",
+    "@types/jest": "^22.2.2",
     "@types/jsonwebtoken": "^7.2.5",
     "@types/mongodb": "^2.2.13",
     "@types/node": "^9.3.0",
     "gulp": "^3.9.1",
     "gulp-nodemon": "^2.2.1",
     "gulp-typescript": "^4.0.0-alpha.1",
+    "jest": "^22.4.3",
     "prettier": "1.10.2",
+    "ts-jest": "^22.4.2",
     "tslint": "^5.9.1",
     "tslint-config-airbnb": "^5.7.0",
     "typescript": "^2.6.2"
+  },
+  "jest": {
+    "transform": {
+      "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": ".*?(?=.spec).*?.(js|ts)",
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ]
   },
   "prettier": {
     "singleQuote": true
