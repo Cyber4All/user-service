@@ -1,6 +1,6 @@
 {
   "name": "user-service",
-  "version": "1.0.0-beta.0.4",
+  "version": "1.0.0-beta.0.5",
   "description": "A microservice for handling user account actions in the CLARK platform.",
   "main": "app.js",
   "scripts": {
