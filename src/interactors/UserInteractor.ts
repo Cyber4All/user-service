@@ -45,7 +45,7 @@ export class UserInteractor {
     try {
       const pwdhash = await hasher.hash(password);
       const userID = await dataStore.findUser(email);
-      await dataStore.editUser(userID, { pwdhash: pwdhash });
+      await dataStore.editUser(userID, { password: pwdhash });
       responder.sendOperationSuccess();
     } catch (e) {
       responder.sendOperationError(e);
