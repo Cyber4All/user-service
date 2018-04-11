@@ -123,13 +123,17 @@ export default class MongoDriver implements DataStore {
    *
    * @param {string} dbIP the host and port on which mongodb is running
    */
-  async connect(dbURI: string): Promise<void> {
+  async connect(dbURI: string, retryAttempt?: number): Promise<void> {
     try {
       this.db = await MongoClient.connect(dbURI);
     } catch (e) {
-      return Promise.reject(
-        'Problem connecting to database at ' + dbURI + ':\n\t' + e
-      );
+      if (!retryAttempt) {
+        this.connect(dbURI, 1);
+      } else {
+        return Promise.reject(
+          'Problem connecting to database at ' + dbURI + ':\n\t' + e
+        );
+      }
     }
   }
   /**
