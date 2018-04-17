@@ -193,7 +193,7 @@ export default class RouteHandler {
                 decoded.data.email
               );
               // await MailerInteractor.sendWelcomeEmail(this.mailer, user);
-              responder.redirectTo(REDIRECT_ROUTES.VERIFY_EMAIL);
+              responder.sendUser({ username: user.username });
               break;
             case ACCOUNT_ACTIONS.RESET_PASSWORD:
               responder.redirectTo(REDIRECT_ROUTES.RESET_PASSWORD(otaCode));
