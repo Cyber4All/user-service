@@ -21,6 +21,7 @@ import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
 import { REDIRECT_ROUTES } from '../environment/routes';
 import { User } from '@cyber4all/clark-entity';
 import * as request from 'request';
+import { generateToken } from './TokenManager';
 const version = require('../package.json').version;
 
 export default class RouteHandler {
@@ -138,6 +139,25 @@ export default class RouteHandler {
       .get(async (req, res) => {
         this.responseFactory.buildResponder(res).sendUser(req['user']);
       });
+
+    // refresh token
+    router.get('/users/tokens/refresh', async(req, res) => {
+      const responder = this.responseFactory.buildResponder(res);
+      try {
+        const user = await UserInteractor.findUser(
+          this.dataStore, this.responseFactory.buildResponder(res), req.user.username);
+
+        if (user) {
+          const token = generateToken(user);
+          responder.setCookie('presence', token);
+          responder.sendUser(user);
+        } else {
+          responder.sendOperationError('Error: No user found');
+        }
+      } catch (error) {
+        responder.sendOperationError(`Error refreshing token ${error}`);
+      }
+    });
 
     router.delete('/users/:username/tokens', async (req, res) => {
       // TODO invalidate JWT here as well as clearing the login cookie
