@@ -42,8 +42,8 @@ export default class RouteHandler {
     mailer: Mailer,
     responseFactory: UserResponseFactory
   ) {
-    let e = new RouteHandler(dataStore, hasher, mailer, responseFactory);
-    let router: Router = express.Router();
+    const e = new RouteHandler(dataStore, hasher, mailer, responseFactory);
+    const router: Router = express.Router();
     e.setRoutes(router);
     return router;
   }
@@ -75,7 +75,7 @@ export default class RouteHandler {
       .route('/users')
       .get(async (req, res) => {
         try {
-          let query = req.query;
+          const query = req.query;
           await UserInteractor.searchUsers(
             this.dataStore,
             this.responseFactory.buildResponder(res),
@@ -86,15 +86,16 @@ export default class RouteHandler {
         }
       })
       .post(async (req, res) => {
-        let user = User.instantiate(req.body);
-        await register(
-          this.dataStore,
-          this.responseFactory.buildResponder(res),
-          this.hasher,
-          user
-        );
         try {
-          let otaCode = await OTACodeInteractor.generateOTACode(
+          const user = User.instantiate(req.body);
+          await register(
+            this.dataStore,
+            this.responseFactory.buildResponder(res),
+            this.hasher,
+            user
+          );
+
+          const otaCode = await OTACodeInteractor.generateOTACode(
             this.dataStore,
             ACCOUNT_ACTIONS.VERIFY_EMAIL,
             user.email
@@ -147,10 +148,10 @@ export default class RouteHandler {
       .route('/users/ota-codes')
       .post(async (req, res) => {
         try {
-          let action = req.query.action;
-          let email = req.body.email;
-          let responder = this.responseFactory.buildResponder(res);
-          let otaCode = await OTACodeInteractor.generateOTACode(
+          const action = req.query.action;
+          const email = req.body.email;
+          const responder = this.responseFactory.buildResponder(res);
+          const otaCode = await OTACodeInteractor.generateOTACode(
             this.dataStore,
             action,
             email
@@ -182,12 +183,15 @@ export default class RouteHandler {
       })
       .get(async (req, res) => {
         try {
-          let otaCode = req.query.otaCode;
-          let responder = this.responseFactory.buildResponder(res);
-          let decoded = await OTACodeInteractor.decode(this.dataStore, otaCode);
+          const otaCode = req.query.otaCode;
+          const responder = this.responseFactory.buildResponder(res);
+          const decoded = await OTACodeInteractor.decode(
+            this.dataStore,
+            otaCode
+          );
           switch (decoded.action as ACCOUNT_ACTIONS) {
             case ACCOUNT_ACTIONS.VERIFY_EMAIL:
-              let user = await UserInteractor.verifyEmail(
+              const user = await UserInteractor.verifyEmail(
                 this.dataStore,
                 responder,
                 decoded.data.email
@@ -209,11 +213,11 @@ export default class RouteHandler {
       })
       .patch(async (req, res) => {
         try {
-          let otaCode = req.query.otaCode;
-          let payload = req.body.payload;
-          let responder = this.responseFactory.buildResponder(res);
+          const otaCode = req.query.otaCode;
+          const payload = req.body.payload;
+          const responder = this.responseFactory.buildResponder(res);
 
-          let decoded = await OTACodeInteractor.applyOTACode(
+          const decoded = await OTACodeInteractor.applyOTACode(
             this.dataStore,
             otaCode
           );
@@ -254,7 +258,7 @@ export default class RouteHandler {
 
     router.get('/validate-captcha', async (req, res) => {
       try {
-        let response = await request.post(
+        const response = await request.post(
           'https://www.google.com/recaptcha/api/siteverify',
           {
             qs: {
