@@ -67,7 +67,10 @@ export async function register(
   user: User
 ) {
   try {
-    if (isValidUsername(user.username)) {
+    if (
+      isValidUsername(user.username) &&
+      !await datastore.identifierInUse(user.username)
+    ) {
       const pwdhash = await hasher.hash(user.password);
       user.password = pwdhash;
       const userID = await datastore.insertUser(user);
@@ -86,16 +89,13 @@ export async function register(
 
 /**
  * Validates that a username meets the defined constraints.
- * 
+ *
  * Constraints:
  * - 20 characters or less
- * - 3 characters or more 
+ * - 3 characters or more
  * @param username the username being validated
  * @returns {boolean} whether or not the username is valid.
  */
 export function isValidUsername(username: string): boolean {
-  return (
-    username.length <= 20 
-    && username.length >= 3
-  );
+  return username.length <= 20 && username.length >= 3;
 }
