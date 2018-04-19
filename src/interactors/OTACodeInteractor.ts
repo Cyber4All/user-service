@@ -19,11 +19,10 @@ export class OTACodeInteractor {
       const actions = Object.keys(ACCOUNT_ACTIONS).map(k => ACCOUNT_ACTIONS[k]);
 
       if (actions.includes(action)) {
-        let otaCode = await this.getOTACode(dataStore, email, action);
+        const otaCode = await this.getOTACode(dataStore, email, action);
         return otaCode;
-      } else {
-        return Promise.reject('Invalid action');
       }
+      return Promise.reject('Invalid action');
     } catch (e) {
       return Promise.reject(e);
     }
@@ -34,7 +33,7 @@ export class OTACodeInteractor {
     otaCode: string
   ): Promise<any> {
     try {
-      let decoded = await this.verifyOTACode(dataStore, otaCode);
+      const decoded = await this.verifyOTACode(dataStore, otaCode);
       return decoded;
     } catch (e) {
       return Promise.reject(e);
@@ -46,7 +45,7 @@ export class OTACodeInteractor {
     otaCode: string
   ): Promise<any> {
     try {
-      let decoded = await this.verifyOTACode(dataStore, otaCode, true);
+      const decoded = await this.verifyOTACode(dataStore, otaCode, true);
       return decoded;
     } catch (e) {
       return Promise.reject(e);
@@ -59,9 +58,9 @@ export class OTACodeInteractor {
     action: ACCOUNT_ACTIONS
   ): Promise<string> {
     try {
-      let emailValid = await dataStore.emailRegistered(email);
+      const emailValid = await dataStore.identifierInUse(email);
       if (emailValid) {
-        let otaCode = await OTACodeManager.generate({ email: email }, action);
+        const otaCode = await OTACodeManager.generate({ email }, action);
         await dataStore.insertOTACode(otaCode);
         return otaCode.code;
       }
@@ -76,8 +75,8 @@ export class OTACodeInteractor {
     remove?: boolean
   ): Promise<DecodedOTACode> {
     try {
-      let otaID = await dataStore.findOTACode(otaCode);
-      let decoded = await OTACodeManager.decode(otaCode, otaID);
+      const otaID = await dataStore.findOTACode(otaCode);
+      const decoded = await OTACodeManager.decode(otaCode, otaID);
       remove ? await dataStore.deleteOTACode(otaID) : 'DO NOT DELETE';
       return decoded;
     } catch (e) {

@@ -6,6 +6,7 @@ export interface Responder {
   invalidRegistration(): void;
   invalidAccess(): void;
   redirectTo(url: string): void;
-  setCookie(key: string, value: string): any;
-  removeCookie(key: string): any;
+  setCookie(key: string, value: string): void;
+  removeCookie(key: string): void;
+  sendObject(obj: object): void; 
 }

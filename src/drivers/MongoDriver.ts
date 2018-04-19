@@ -92,7 +92,7 @@ export default class MongoDriver implements DataStore {
   private db: Db;
 
   constructor() {
-    let dburi =
+    const dburi =
       process.env.NODE_ENV === 'production'
         ? process.env.CLARK_DB_URI.replace(
             /<DB_PASSWORD>/g,
@@ -146,6 +146,33 @@ export default class MongoDriver implements DataStore {
   }
 
   /**
+   * Check if an username or email is registered to a user in the database.
+   *
+   * @param {string} username the user's email
+   *
+   * @returns {boolean} true iff userid/pwd pair is valid
+   */
+  async identifierInUse(username: string): Promise<boolean> {
+    try {
+      const query: any = {};
+      if (isEmail(username)) {
+        query.email = username;
+      } else {
+        query.username = username;
+      }
+      const exists = await this.db
+        .collection(COLLECTIONS.User.name)
+        .findOne<UserDocument>(query, { fields: { _id: 1 } });
+      if (exists) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+
+  /**
    * Insert a user into the database.
    * @async
    *
@@ -155,33 +182,9 @@ export default class MongoDriver implements DataStore {
    */
   async insertUser(user: User): Promise<string> {
     try {
-      let emailRegistered = await this.emailRegistered(user.email);
-      if (emailRegistered)
-        return Promise.reject({
-          error: 'Email is already in use.'
-        });
-      let userDoc = this.documentUser(user, true);
+      const userDoc = this.documentUser(user, true);
       await this.insert(COLLECTIONS.User, userDoc);
       return userDoc._id;
-    } catch (e) {
-      return Promise.reject(e);
-    }
-  }
-
-  /**
-   * Check if an email is registered to a user in the database.
-   *
-   * @param {string} email the user's email
-   *
-   * @returns {boolean} true iff userid/pwd pair is valid
-   */
-  async emailRegistered(email: string): Promise<boolean> {
-    try {
-      let doc = await this.db
-        .collection(COLLECTIONS.User.name)
-        .findOne<UserDocument>({ email: email });
-      if (doc) return true;
-      return false;
     } catch (e) {
       return Promise.reject(e);
     }
@@ -197,19 +200,20 @@ export default class MongoDriver implements DataStore {
    */
   async findUser(username: string): Promise<string> {
     try {
-      let query = {};
+      const query: any = {};
       if (isEmail(username)) {
-        query['email'] = username;
+        query.email = username;
       } else {
-        query['username'] = username;
+        query.username = username;
       }
-      let userRecord = await this.db
+      const userRecord = await this.db
         .collection(COLLECTIONS.User.name)
         .findOne<UserDocument>(query);
-      if (!userRecord)
+      if (!userRecord) {
         return Promise.reject(
           'No user with username or email ' + username + ' exists.'
         );
+      }
       return `${userRecord._id}`;
     } catch (e) {
       return Promise.reject(e);
@@ -218,11 +222,11 @@ export default class MongoDriver implements DataStore {
 
   async searchUsers(query: {}): Promise<User[]> {
     try {
-      let userDocs = await this.db
+      const userDocs = await this.db
         .collection(COLLECTIONS.User.name)
         .find<UserDocument>(query)
         .toArray();
-      let users: User[] = userDocs.map(user => this.generateUser(user));
+      const users: User[] = userDocs.map(user => this.generateUser(user));
       return users;
     } catch (e) {
       return Promise.reject(e);
@@ -238,8 +242,8 @@ export default class MongoDriver implements DataStore {
    */
   async loadUser(id: string): Promise<User> {
     try {
-      let userRecord = await this.fetch<UserDocument>(COLLECTIONS.User, id);
-      let user = this.generateUser(userRecord);
+      const userRecord = await this.fetch<UserDocument>(COLLECTIONS.User, id);
+      const user = this.generateUser(userRecord);
       return user;
     } catch (e) {
       return Promise.reject(e);
@@ -279,9 +283,9 @@ export default class MongoDriver implements DataStore {
 
   async findOTACode(code: string): Promise<string> {
     try {
-      let otaCodeRecord = await this.db
+      const otaCodeRecord = await this.db
         .collection(COLLECTIONS.OTACode.name)
-        .findOne<OTACode>({ code: code });
+        .findOne<OTACode>({ code });
       return otaCodeRecord
         ? otaCodeRecord.id
         : Promise.reject('No record found');
@@ -292,7 +296,7 @@ export default class MongoDriver implements DataStore {
 
   async deleteOTACode(id: string): Promise<void> {
     try {
-      await this.db.collection(COLLECTIONS.OTACode.name).deleteOne({ id: id });
+      await this.db.collection(COLLECTIONS.OTACode.name).deleteOne({ id });
     } catch (e) {
       return Promise.reject(e);
     }
@@ -303,7 +307,7 @@ export default class MongoDriver implements DataStore {
   ////////////////////////////////////////////////
 
   private documentUser(user: User, isNew?: boolean): UserDocument {
-    let userDocument: UserDocument = {
+    const userDocument: UserDocument = {
       _id: new ObjectID().toHexString(),
       username: user.username,
       name: user.name.trim(),
@@ -318,7 +322,7 @@ export default class MongoDriver implements DataStore {
   }
 
   private generateUser(userRecord: UserDocument): User {
-    let user = new User(
+    const user = new User(
       userRecord.username,
       userRecord.name,
       userRecord.email,
@@ -347,16 +351,16 @@ export default class MongoDriver implements DataStore {
     foreigns: Foriegn[]
   ): Promise<void> {
     try {
-      if (foreigns)
-        for (let foreign of foreigns) {
-          let data = foreign.data;
+      if (foreigns) {
+        for (const foreign of foreigns) {
+          const data = foreign.data;
           // get id's to check, as an array
           let keys = record[foreign.name];
           if (!(keys instanceof Array)) keys = [keys];
           // fetch foreign document and reject if it doesn't exist
-          for (let key of keys) {
-            let collection = COLLECTIONS_MAP.get(data.target);
-            let count = await this.db
+          for (const key of keys) {
+            const collection = COLLECTIONS_MAP.get(data.target);
+            const count = await this.db
               .collection(collection.name)
               .count({ _id: key });
             if (count === 0) {
@@ -372,6 +376,8 @@ export default class MongoDriver implements DataStore {
             }
           }
         }
+      }
+
       return Promise.resolve();
     } catch (e) {
       return Promise.reject('Problem validating key constraint :\n\t' + e);
@@ -395,23 +401,19 @@ export default class MongoDriver implements DataStore {
   ): Promise<void> {
     try {
       // check validity of values before making any changes
-      let record = await this.db
+      const record = await this.db
         .collection(collection.name)
         .findOne({ _id: owner });
-      if (!record)
+      if (!record) {
         return Promise.reject(
           'Registration failed: no owner ' +
             owner +
             'found in ' +
             collection.name
         );
-      // NOTE: below line is no good because schemaFor(outcomes) is arbitrary
-      // let mapping = await this.db.collection(foreignData(schemaFor(collection), registry).target).findOne({ _id: item });
-      // TODO: switch register and unregister and probably all thse to use schema instead of collection, so the next line works
-      // let mapping = await this.db.collection(foreignData(schema, registry).target).findOne({ _id: item });
-      // if (!mapping) return Promise.reject('Registration failed: no mapping ' + mapping + 'found in ' + collection);
+      }
 
-      let pushdoc = {};
+      const pushdoc = {};
       pushdoc[registry] = item;
 
       await this.db
@@ -447,25 +449,27 @@ export default class MongoDriver implements DataStore {
   ): Promise<void> {
     try {
       // check validity of values before making any changes
-      let record = await this.db
+      const record = await this.db
         .collection(collection.name)
         .findOne({ _id: owner });
-      if (!record)
+      if (!record) {
         return Promise.reject(
           'Unregistration failed: no record ' + owner + 'found in ' + collection
         );
+      }
+
       if (!record[registry].includes(item)) {
         return Promise.reject(
           'Unregistration failed: record ' +
             owner +
-            "'s " +
+            's ' +
             registry +
             ' field has no element ' +
             item
         );
       }
 
-      let pulldoc = {};
+      const pulldoc = {};
       pulldoc[registry] = item;
 
       await this.db
@@ -496,22 +500,24 @@ export default class MongoDriver implements DataStore {
    */
   private async insert<T>(collection: Collection, record: T): Promise<string> {
     try {
-      let foreigns = collection.foreigns;
+      const foreigns = collection.foreigns;
       if (foreigns) {
         // check validity of all foreign keys
         await this.validateForeignKeys(record, foreigns);
       }
 
       // perform the actual insert
-      let insert_ = await this.db.collection(collection.name).insertOne(record);
-      let id = insert_.insertedId;
+      const insert = await this.db
+        .collection(collection.name)
+        .insertOne(record);
+      const id = insert.insertedId;
 
       // register the new record as needed
-      if (foreigns)
-        for (let foreign of foreigns) {
-          let data = foreign.data;
+      if (foreigns) {
+        for (const foreign of foreigns) {
+          const data = foreign.data;
           if (!data.child && data.registry) {
-            let collection = COLLECTIONS_MAP.get(data.target);
+            const collection = COLLECTIONS_MAP.get(data.target);
             await this.register(
               collection,
               record[foreign.name],
@@ -520,6 +526,8 @@ export default class MongoDriver implements DataStore {
             );
           }
         }
+      }
+
       return Promise.resolve(`${id}`);
     } catch (e) {
       return Promise.reject(
@@ -570,23 +578,23 @@ export default class MongoDriver implements DataStore {
   private async remove<T>(collection: Collection, id: string): Promise<void> {
     try {
       // fetch data to be deleted ... for the last time :(
-      let record = await this.db
+      const record = await this.db
         .collection(collection.name)
         .findOne<T>({ _id: id });
 
       // remove all children recursively, and unregister from parents
-      let foreigns = collection.foreigns;
-      if (foreigns)
-        for (let foreign of foreigns) {
-          let data = foreign.data;
+      const foreigns = collection.foreigns;
+      if (foreigns) {
+        for (const foreign of foreigns) {
+          const data = foreign.data;
 
           if (data.child) {
             // get children to remove, as an array
             let keys = record[foreign.name];
             if (!(keys instanceof Array)) keys = [keys];
             // remove each child
-            for (let key of keys) {
-              let collection = COLLECTIONS_MAP.get(data.target);
+            for (const key of keys) {
+              const collection = COLLECTIONS_MAP.get(data.target);
               await this.remove(collection, key);
             }
           }
@@ -596,12 +604,13 @@ export default class MongoDriver implements DataStore {
             let keys = record[foreign.name];
             if (!(keys instanceof Array)) keys = [keys];
             // unregister from each key
-            for (let key of keys) {
-              let collection = COLLECTIONS_MAP.get(data.target);
+            for (const key of keys) {
+              const collection = COLLECTIONS_MAP.get(data.target);
               await this.unregister(collection, key, data.registry, id);
             }
           }
         }
+      }
 
       // perform actual deletion
       await this.db.collection(collection.name).deleteOne({ _id: id });
@@ -618,16 +627,18 @@ export default class MongoDriver implements DataStore {
    * @param {string} id the document to fetch
    */
   private async fetch<T>(collection: Collection, id: string): Promise<T> {
-    let record = await this.db
+    const record = await this.db
       .collection(collection.name)
       .findOne<T>({ _id: id });
-    if (!record)
+    if (!record) {
       return Promise.reject(
         'Problem fetching a ' +
           collection +
           ':\n\tInvalid database id ' +
           JSON.stringify(id)
       );
+    }
+
     return Promise.resolve(record);
   }
 }

@@ -4,9 +4,8 @@ import { OTACode } from '../drivers/OTACodeManager';
 export interface DataStore {
   connect(dbURI: string): Promise<void>;
   disconnect(): void;
-  // Properly type to match schema
+  identifierInUse(username: string): Promise<boolean>;
   insertUser(user: User): Promise<string>;
-  emailRegistered(email: string): Promise<boolean>;
   findUser(username: string): Promise<string>;
   loadUser(id: string): Promise<User>;
   editUser(id: string, user: {}): Promise<User>;

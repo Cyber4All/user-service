@@ -87,15 +87,14 @@ export default class RouteHandler {
         }
       })
       .post(async (req, res) => {
+        const user = User.instantiate(req.body);
+        await register(
+          this.dataStore,
+          this.responseFactory.buildResponder(res),
+          this.hasher,
+          user
+        );
         try {
-          const user = User.instantiate(req.body);
-          await register(
-            this.dataStore,
-            this.responseFactory.buildResponder(res),
-            this.hasher,
-            user
-          );
-
           const otaCode = await OTACodeInteractor.generateOTACode(
             this.dataStore,
             ACCOUNT_ACTIONS.VERIFY_EMAIL,
@@ -140,12 +139,27 @@ export default class RouteHandler {
         this.responseFactory.buildResponder(res).sendUser(req['user']);
       });
 
+    router.route('/users/identifiers/active').get(async (req, res) => {
+      try {
+        await UserInteractor.identifierInUse(
+          this.dataStore,
+          this.responseFactory.buildResponder(res),
+          req.query.username
+        );
+      } catch (e) {
+        console.log(e);
+        this.responseFactory.buildResponder(res).sendOperationError(e);
+      }
+    });
     // refresh token
-    router.get('/users/tokens/refresh', async(req, res) => {
+    router.get('/users/tokens/refresh', async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
         const user = await UserInteractor.findUser(
-          this.dataStore, this.responseFactory.buildResponder(res), req.user.username);
+          this.dataStore,
+          this.responseFactory.buildResponder(res),
+          req.user.username
+        );
 
         if (user) {
           const token = generateToken(user);
@@ -217,7 +231,7 @@ export default class RouteHandler {
                 decoded.data.email
               );
               // await MailerInteractor.sendWelcomeEmail(this.mailer, user);
-              responder.sendUser({ username: user.username });
+              responder.sendObject({ username: user.username });
               break;
             case ACCOUNT_ACTIONS.RESET_PASSWORD:
               responder.redirectTo(REDIRECT_ROUTES.RESET_PASSWORD(otaCode));

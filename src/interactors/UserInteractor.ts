@@ -80,4 +80,17 @@ export class UserInteractor {
       responder.sendOperationError(e);
     }
   }
+
+  public static async identifierInUse(
+    dataStore: DataStore,
+    responder: Responder,
+    username: string
+  ):Promise<void> {
+    try {
+      const inUse = await dataStore.identifierInUse(username);
+      responder.sendObject({inUse}); 
+    } catch (e) {
+      responder.sendOperationError(e);
+    }
+  }
 }

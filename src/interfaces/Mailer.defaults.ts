@@ -8,7 +8,7 @@ export enum SUBJECTS {
 }
 export enum ACCOUNT_ACTIONS {
   VERIFY_EMAIL = 'verifyEmail',
-  RESET_PASSWORD = 'resetPassword'
+  RESET_PASSWORD = 'resetPassword',
 }
 export enum TEMPLATES {
   VERIFY_EMAIL = 'verify email',
