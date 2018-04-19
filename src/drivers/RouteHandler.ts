@@ -43,8 +43,8 @@ export default class RouteHandler {
     mailer: Mailer,
     responseFactory: UserResponseFactory
   ) {
-    let e = new RouteHandler(dataStore, hasher, mailer, responseFactory);
-    let router: Router = express.Router();
+    const e = new RouteHandler(dataStore, hasher, mailer, responseFactory);
+    const router: Router = express.Router();
     e.setRoutes(router);
     return router;
   }
@@ -76,7 +76,7 @@ export default class RouteHandler {
       .route('/users')
       .get(async (req, res) => {
         try {
-          let query = req.query;
+          const query = req.query;
           await UserInteractor.searchUsers(
             this.dataStore,
             this.responseFactory.buildResponder(res),
@@ -87,7 +87,7 @@ export default class RouteHandler {
         }
       })
       .post(async (req, res) => {
-        let user = User.instantiate(req.body);
+        const user = User.instantiate(req.body);
         await register(
           this.dataStore,
           this.responseFactory.buildResponder(res),
@@ -95,7 +95,7 @@ export default class RouteHandler {
           user
         );
         try {
-          let otaCode = await OTACodeInteractor.generateOTACode(
+          const otaCode = await OTACodeInteractor.generateOTACode(
             this.dataStore,
             ACCOUNT_ACTIONS.VERIFY_EMAIL,
             user.email
@@ -139,26 +139,27 @@ export default class RouteHandler {
         this.responseFactory.buildResponder(res).sendUser(req['user']);
       });
 
-    router
-      .route('/users/identifiers/active')
-      .get(async (req, res) => {
-        try { 
-          await UserInteractor.identifierInUse(
-            this.dataStore,
-            this.responseFactory.buildResponder(res),
-            req.query.username
-          )
-        }catch (e) {
-          console.log(e);
-          this.responseFactory.buildResponder(res).sendOperationError(e);
-        }
-      });
+    router.route('/users/identifiers/active').get(async (req, res) => {
+      try {
+        await UserInteractor.identifierInUse(
+          this.dataStore,
+          this.responseFactory.buildResponder(res),
+          req.query.username
+        );
+      } catch (e) {
+        console.log(e);
+        this.responseFactory.buildResponder(res).sendOperationError(e);
+      }
+    });
     // refresh token
-    router.get('/users/tokens/refresh', async(req, res) => {
+    router.get('/users/tokens/refresh', async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
         const user = await UserInteractor.findUser(
-          this.dataStore, this.responseFactory.buildResponder(res), req.user.username);
+          this.dataStore,
+          this.responseFactory.buildResponder(res),
+          req.user.username
+        );
 
         if (user) {
           const token = generateToken(user);
@@ -181,10 +182,10 @@ export default class RouteHandler {
       .route('/users/ota-codes')
       .post(async (req, res) => {
         try {
-          let action = req.query.action;
-          let email = req.body.email;
-          let responder = this.responseFactory.buildResponder(res);
-          let otaCode = await OTACodeInteractor.generateOTACode(
+          const action = req.query.action;
+          const email = req.body.email;
+          const responder = this.responseFactory.buildResponder(res);
+          const otaCode = await OTACodeInteractor.generateOTACode(
             this.dataStore,
             action,
             email
@@ -216,18 +217,21 @@ export default class RouteHandler {
       })
       .get(async (req, res) => {
         try {
-          let otaCode = req.query.otaCode;
-          let responder = this.responseFactory.buildResponder(res);
-          let decoded = await OTACodeInteractor.decode(this.dataStore, otaCode);
+          const otaCode = req.query.otaCode;
+          const responder = this.responseFactory.buildResponder(res);
+          const decoded = await OTACodeInteractor.decode(
+            this.dataStore,
+            otaCode
+          );
           switch (decoded.action as ACCOUNT_ACTIONS) {
             case ACCOUNT_ACTIONS.VERIFY_EMAIL:
-              let user = await UserInteractor.verifyEmail(
+              const user = await UserInteractor.verifyEmail(
                 this.dataStore,
                 responder,
                 decoded.data.email
               );
               // await MailerInteractor.sendWelcomeEmail(this.mailer, user);
-              responder.redirectTo(REDIRECT_ROUTES.VERIFY_EMAIL);
+              responder.sendObject({ username: user.username });
               break;
             case ACCOUNT_ACTIONS.RESET_PASSWORD:
               responder.redirectTo(REDIRECT_ROUTES.RESET_PASSWORD(otaCode));
@@ -243,11 +247,11 @@ export default class RouteHandler {
       })
       .patch(async (req, res) => {
         try {
-          let otaCode = req.query.otaCode;
-          let payload = req.body.payload;
-          let responder = this.responseFactory.buildResponder(res);
+          const otaCode = req.query.otaCode;
+          const payload = req.body.payload;
+          const responder = this.responseFactory.buildResponder(res);
 
-          let decoded = await OTACodeInteractor.applyOTACode(
+          const decoded = await OTACodeInteractor.applyOTACode(
             this.dataStore,
             otaCode
           );
@@ -263,7 +267,7 @@ export default class RouteHandler {
                 decoded.data.email,
                 payload
               );
-              break; 
+              break;
             default:
               responder.sendOperationError('Invalid action.');
               break;
@@ -288,7 +292,7 @@ export default class RouteHandler {
 
     router.get('/validate-captcha', async (req, res) => {
       try {
-        let response = await request.post(
+        const response = await request.post(
           'https://www.google.com/recaptcha/api/siteverify',
           {
             qs: {
@@ -305,7 +309,5 @@ export default class RouteHandler {
           .sendOperationError(`Could not validate captcha. Error: ${e}`);
       }
     });
-
-    
   }
 }
