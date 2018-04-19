@@ -20,6 +20,19 @@ export class UserInteractor {
       responder.sendOperationError(`Problem searching users. Error: ${e}`);
     }
   }
+
+  public static async findUser(
+    dataStore: DataStore, responder: Responder, username: string): Promise<User> {
+    try {
+      const userID = await dataStore.findUser(username);
+      const user = await dataStore.loadUser(userID);
+      return user;
+    } catch (error) {
+      responder.sendOperationError(`Problem finding specified user. Error: ${error}`);
+      return undefined;
+    }
+  }
+
   public static async verifyEmail(
     dataStore: DataStore,
     responder: Responder,
