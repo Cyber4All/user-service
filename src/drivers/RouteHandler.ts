@@ -139,7 +139,6 @@ export default class RouteHandler {
         this.responseFactory.buildResponder(res).sendUser(req['user']);
       });
 
-<<<<<<< HEAD
     router
       .route('/users/identifiers/active')
       .get(async (req, res) => {
@@ -154,7 +153,6 @@ export default class RouteHandler {
           this.responseFactory.buildResponder(res).sendOperationError(e);
         }
       });
-=======
     // refresh token
     router.get('/users/tokens/refresh', async(req, res) => {
       const responder = this.responseFactory.buildResponder(res);
@@ -173,7 +171,6 @@ export default class RouteHandler {
         responder.sendOperationError(`Error refreshing token ${error}`);
       }
     });
->>>>>>> 8f3f6f253279f257945a0925f3b8e3faa5f6afed
 
     router.delete('/users/:username/tokens', async (req, res) => {
       // TODO invalidate JWT here as well as clearing the login cookie
