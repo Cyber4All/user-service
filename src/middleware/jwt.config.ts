@@ -14,4 +14,4 @@ export const enforceTokenAccess = jwt({
            return req.cookies.presence;
          }
        }).unless({ // Routes that don't require authorization
-         path: ['/', '/validate-captcha', { url: '/users', methods: ['POST', 'GET'] }, '/users/ota-codes', { url: '/users/tokens', methods: ['POST'] }, 'validate-captcha'] }); // register & search // all ota-code routes do their own verifcation outsides of JWT // login
+         path: ['/', '/validate-captcha', { url: '/users', methods: ['POST', 'GET'] }, '/users/ota-codes', { url: '/users/tokens', methods: ['POST'] }, 'validate-captcha', '/users/identifiers/active'] }); // register & search // all ota-code routes do their own verifcation outsides of JWT // login

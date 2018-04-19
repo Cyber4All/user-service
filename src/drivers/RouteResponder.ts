@@ -41,6 +41,10 @@ export default class RouteResponder implements Responder {
     delete user.password;
     this.res.status(200).json(user);
   }
+
+  sendObject(obj: object) {
+    this.res.json(obj); 
+  }
   /**
 
    *

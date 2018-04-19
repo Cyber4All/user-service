@@ -42,8 +42,8 @@ export default class RouteHandler {
     mailer: Mailer,
     responseFactory: UserResponseFactory
   ) {
-    const e = new RouteHandler(dataStore, hasher, mailer, responseFactory);
-    const router: Router = express.Router();
+    let e = new RouteHandler(dataStore, hasher, mailer, responseFactory);
+    let router: Router = express.Router();
     e.setRoutes(router);
     return router;
   }
@@ -75,7 +75,7 @@ export default class RouteHandler {
       .route('/users')
       .get(async (req, res) => {
         try {
-          const query = req.query;
+          let query = req.query;
           await UserInteractor.searchUsers(
             this.dataStore,
             this.responseFactory.buildResponder(res),
@@ -86,16 +86,15 @@ export default class RouteHandler {
         }
       })
       .post(async (req, res) => {
+        let user = User.instantiate(req.body);
+        await register(
+          this.dataStore,
+          this.responseFactory.buildResponder(res),
+          this.hasher,
+          user
+        );
         try {
-          const user = User.instantiate(req.body);
-          await register(
-            this.dataStore,
-            this.responseFactory.buildResponder(res),
-            this.hasher,
-            user
-          );
-
-          const otaCode = await OTACodeInteractor.generateOTACode(
+          let otaCode = await OTACodeInteractor.generateOTACode(
             this.dataStore,
             ACCOUNT_ACTIONS.VERIFY_EMAIL,
             user.email
@@ -139,6 +138,21 @@ export default class RouteHandler {
         this.responseFactory.buildResponder(res).sendUser(req['user']);
       });
 
+    router
+      .route('/users/identifiers/active')
+      .get(async (req, res) => {
+        try { 
+          await UserInteractor.identifierInUse(
+            this.dataStore,
+            this.responseFactory.buildResponder(res),
+            req.query.username
+          )
+        }catch (e) {
+          console.log(e);
+          this.responseFactory.buildResponder(res).sendOperationError(e);
+        }
+      });
+
     router.delete('/users/:username/tokens', async (req, res) => {
       // TODO invalidate JWT here as well as clearing the login cookie
       logout(this.dataStore, this.responseFactory.buildResponder(res));
@@ -148,10 +162,10 @@ export default class RouteHandler {
       .route('/users/ota-codes')
       .post(async (req, res) => {
         try {
-          const action = req.query.action;
-          const email = req.body.email;
-          const responder = this.responseFactory.buildResponder(res);
-          const otaCode = await OTACodeInteractor.generateOTACode(
+          let action = req.query.action;
+          let email = req.body.email;
+          let responder = this.responseFactory.buildResponder(res);
+          let otaCode = await OTACodeInteractor.generateOTACode(
             this.dataStore,
             action,
             email
@@ -183,21 +197,18 @@ export default class RouteHandler {
       })
       .get(async (req, res) => {
         try {
-          const otaCode = req.query.otaCode;
-          const responder = this.responseFactory.buildResponder(res);
-          const decoded = await OTACodeInteractor.decode(
-            this.dataStore,
-            otaCode
-          );
+          let otaCode = req.query.otaCode;
+          let responder = this.responseFactory.buildResponder(res);
+          let decoded = await OTACodeInteractor.decode(this.dataStore, otaCode);
           switch (decoded.action as ACCOUNT_ACTIONS) {
             case ACCOUNT_ACTIONS.VERIFY_EMAIL:
-              const user = await UserInteractor.verifyEmail(
+              let user = await UserInteractor.verifyEmail(
                 this.dataStore,
                 responder,
                 decoded.data.email
               );
               // await MailerInteractor.sendWelcomeEmail(this.mailer, user);
-              responder.sendUser({ username: user.username });
+              responder.redirectTo(REDIRECT_ROUTES.VERIFY_EMAIL);
               break;
             case ACCOUNT_ACTIONS.RESET_PASSWORD:
               responder.redirectTo(REDIRECT_ROUTES.RESET_PASSWORD(otaCode));
@@ -213,11 +224,11 @@ export default class RouteHandler {
       })
       .patch(async (req, res) => {
         try {
-          const otaCode = req.query.otaCode;
-          const payload = req.body.payload;
-          const responder = this.responseFactory.buildResponder(res);
+          let otaCode = req.query.otaCode;
+          let payload = req.body.payload;
+          let responder = this.responseFactory.buildResponder(res);
 
-          const decoded = await OTACodeInteractor.applyOTACode(
+          let decoded = await OTACodeInteractor.applyOTACode(
             this.dataStore,
             otaCode
           );
@@ -233,7 +244,7 @@ export default class RouteHandler {
                 decoded.data.email,
                 payload
               );
-              break;
+              break; 
             default:
               responder.sendOperationError('Invalid action.');
               break;
@@ -258,7 +269,7 @@ export default class RouteHandler {
 
     router.get('/validate-captcha', async (req, res) => {
       try {
-        const response = await request.post(
+        let response = await request.post(
           'https://www.google.com/recaptcha/api/siteverify',
           {
             qs: {
@@ -275,5 +286,7 @@ export default class RouteHandler {
           .sendOperationError(`Could not validate captcha. Error: ${e}`);
       }
     });
+
+    
   }
 }
