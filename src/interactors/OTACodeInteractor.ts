@@ -60,7 +60,15 @@ export class OTACodeInteractor {
     try {
       const emailValid = await dataStore.identifierInUse(email);
       if (emailValid) {
-        const otaCode = await OTACodeManager.generate({ email }, action);
+        let expiration;
+        if (action === ACCOUNT_ACTIONS.VERIFY_EMAIL) {
+          expiration = '2h';
+        }
+        const otaCode = await OTACodeManager.generate(
+          { email },
+          action,
+          expiration
+        );
         await dataStore.insertOTACode(otaCode);
         return otaCode.code;
       }
@@ -77,11 +85,16 @@ export class OTACodeInteractor {
     try {
       const otaID = await dataStore.findOTACode(otaCode);
       const decoded = await OTACodeManager.decode(otaCode, otaID);
-      remove ? await dataStore.deleteOTACode(otaID) : 'DO NOT DELETE';
+      if (remove) {
+        await dataStore.deleteOTACode(otaID);
+      }
       return decoded;
     } catch (e) {
-      console.log(e);
-      return Promise.reject(e);
+      let error = 'Invalid OTA code';
+      if (e.message && /expired/gi.test(e.message)) {
+        error = 'Link expired';
+      }
+      return Promise.reject(error);
     }
   }
 }

@@ -31,12 +31,12 @@ export function generate(
   action: ACCOUNT_ACTIONS,
   expiresIn?: string
 ): Promise<OTACode> {
-  let otaID = new ObjectID().toHexString();
+  const otaID = new ObjectID().toHexString();
   return new Promise<OTACode>((resolve, reject) => {
     jwt.sign(
       {
-        data: payload,
-        action: action
+        action,
+        data: payload
       },
       process.env.OTA_CODE_SECRET,
       {
@@ -45,11 +45,11 @@ export function generate(
         jwtid: otaID
       },
       (err, token) => {
-        token = token.replace(
+        const code = token.replace(
           process.env.TOKEN_REPLACER,
           process.env.OTA_CODE_REPLACEMENT
         );
-        err ? reject(err) : resolve({ id: otaID, code: token });
+        err ? reject(err) : resolve({ code, id: otaID });
       }
     );
   });
@@ -68,13 +68,13 @@ export function decode(
   otaCode: string,
   otaID: string
 ): Promise<DecodedOTACode> {
-  otaCode = otaCode.replace(
+  const code = otaCode.replace(
     process.env.OTA_CODE_REPLACER,
     process.env.TOKEN_REPLACMENT
   );
   return new Promise((resolve, reject) => {
     jwt.verify(
-      otaCode,
+      code,
       process.env.OTA_CODE_SECRET,
       {
         issuer: process.env.OTA_CODE_ISSUER,
