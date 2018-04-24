@@ -308,16 +308,23 @@ export default class MongoDriver implements DataStore {
 
   private documentUser(user: User, isNew?: boolean): UserDocument {
     const userDocument: UserDocument = {
-      _id: new ObjectID().toHexString(),
       username: user.username,
       name: user.name.trim(),
       email: user.email,
       organization: user.organization,
       password: user.password,
       objects: [],
-      emailVerified: user.emailVerified ? user.emailVerified : false
+      emailVerified: user.emailVerified
     };
-    if (!isNew) delete userDocument._id;
+    if (!isNew) {
+      delete userDocument._id;
+    }
+    if (isNew) {
+      userDocument._id = new ObjectID().toHexString();
+      userDocument.emailVerified = false;
+      //  TODO: Add property to UserDocument
+      userDocument['createdAt'] = Date.now().toString();
+    }
     return userDocument;
   }
 
@@ -333,6 +340,8 @@ export default class MongoDriver implements DataStore {
     user.emailVerified = userRecord.emailVerified
       ? userRecord.emailVerified
       : false;
+    // TODO: Add property to UserDocument
+    user.createdAt = userRecord['createdAt'];
     return user;
   }
 
