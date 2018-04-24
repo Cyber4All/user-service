@@ -33,6 +33,7 @@ export async function login(
       id = await dataStore.findUser(username);
     } catch (e) {
       responder.invalidLogin();
+      return;
     }
 
     const user = await dataStore.loadUser(id);
