@@ -43,7 +43,7 @@ export default class RouteResponder implements Responder {
   }
 
   sendObject(obj: object) {
-    this.res.json(obj); 
+    this.res.json(obj);
   }
   /**
 

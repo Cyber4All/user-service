@@ -27,7 +27,15 @@ export async function login(
   password: string
 ) {
   try {
-    const id = await dataStore.findUser(username);
+    let id;
+
+    try {
+      id = await dataStore.findUser(username);
+    } catch (e) {
+      responder.invalidLogin();
+      return;
+    }
+
     const user = await dataStore.loadUser(id);
     const authenticated = await hasher.verify(password, user.password);
     delete user.password;
