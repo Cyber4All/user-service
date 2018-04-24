@@ -43,14 +43,14 @@ export default class RouteResponder implements Responder {
   }
 
   sendObject(obj: object) {
-    this.res.json(obj); 
+    this.res.json(obj);
   }
   /**
 
    *
    */
   invalidLogin() {
-    this.res.status(400).json({ message: 'Invalid Username or Password' });
+    this.res.status(400).json('Invalid Username or Password');
   }
 
   /**
