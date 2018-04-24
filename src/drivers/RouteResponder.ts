@@ -50,7 +50,7 @@ export default class RouteResponder implements Responder {
    *
    */
   invalidLogin() {
-    this.res.status(400).json({ message: 'Invalid Username or Password' });
+    this.res.status(400).send('Invalid Username or Password');
   }
 
   /**
