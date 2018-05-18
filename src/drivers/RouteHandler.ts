@@ -203,9 +203,10 @@ export default class RouteHandler {
               await MailerInteractor.sendPasswordReset(
                 this.mailer,
                 email,
-                otaCode
+                otaCode,
+                this.dataStore,
+                responder
               );
-              responder.sendOperationSuccess();
               break;
             default:
               responder.sendOperationError('Invalid action');
