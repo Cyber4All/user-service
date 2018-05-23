@@ -10,26 +10,26 @@ import { TokenManager } from '../drivers/drivers';
 export class UserInteractor {
   public static async searchUsers(
     dataStore: DataStore,
-    responder: Responder,
     query: {}
-  ) {
+  ): Promise<User[]> {
     try {
       const users = await dataStore.searchUsers(query);
-      responder.sendUser(users);
+      return users;
     } catch (e) {
-      responder.sendOperationError(`Problem searching users. Error: ${e}`);
+      return Promise.reject(`Problem searching users. Error: ${e}`);
     }
   }
 
   public static async findUser(
-    dataStore: DataStore, responder: Responder, username: string): Promise<User> {
+    dataStore: DataStore,
+    username: string
+  ): Promise<User> {
     try {
       const userID = await dataStore.findUser(username);
       const user = await dataStore.loadUser(userID);
       return user;
     } catch (error) {
-      responder.sendOperationError(`Problem finding specified user. Error: ${error}`);
-      return undefined;
+      return Promise.reject(`Problem finding specified user. Error: ${error}`);
     }
   }
 
@@ -45,23 +45,23 @@ export class UserInteractor {
       responder.setCookie('presence', TokenManager.generateToken(user));
       return user;
     } catch (e) {
-      return Promise.reject(e);
+      return Promise.reject(`Problem verifing email. Error: ${e}`);
     }
   }
   public static async updatePassword(
     dataStore: DataStore,
-    responder: Responder,
     hasher: HashInterface,
     email: string,
     password: string
-  ) {
+  ): Promise<User> {
     try {
       const pwdhash = await hasher.hash(password);
       const userID = await dataStore.findUser(email);
-      await dataStore.editUser(userID, { password: pwdhash });
-      responder.sendOperationSuccess();
+      const user = await dataStore.editUser(userID, { password: pwdhash });
+      delete user.password;
+      return user;
     } catch (e) {
-      responder.sendOperationError(e);
+      return Promise.reject(`Problem updating password. Erro:${e}`);
     }
   }
 
@@ -70,7 +70,7 @@ export class UserInteractor {
     responder: Responder,
     username: string,
     edits: {}
-  ) {
+  ): Promise<void> {
     try {
       const userID = await dataStore.findUser(username);
       const user = await dataStore.editUser(userID, edits);
@@ -83,14 +83,13 @@ export class UserInteractor {
 
   public static async identifierInUse(
     dataStore: DataStore,
-    responder: Responder,
     username: string
-  ):Promise<void> {
+  ): Promise<{ inUse: boolean }> {
     try {
       const inUse = await dataStore.identifierInUse(username);
-      responder.sendObject({inUse}); 
+      return { inUse };
     } catch (e) {
-      responder.sendOperationError(e);
+      return Promise.reject(e);
     }
   }
 }
