@@ -72,6 +72,7 @@ export class OTACodeInteractor {
         await dataStore.insertOTACode(otaCode);
         return otaCode.code;
       }
+      return Promise.reject('Invalid email');
     } catch (e) {
       return Promise.reject(e);
     }
