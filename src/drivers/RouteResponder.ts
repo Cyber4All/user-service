@@ -13,6 +13,7 @@ export default class RouteResponder implements Responder {
    *
    */
   sendOperationSuccess() {
+    console.log('success');
     this.res.sendStatus(200);
   }
 
@@ -44,6 +45,10 @@ export default class RouteResponder implements Responder {
 
   sendObject(obj: object) {
     this.res.json(obj);
+  }
+
+  sendPasswordMatch(isMatch: boolean) {
+    this.res.send(isMatch);
   }
   /**
 

@@ -9,7 +9,8 @@ import {
 import {
   login,
   register,
-  logout
+  logout,
+  passwordMatch
 } from '../interactors/AuthenticationInteractor';
 import { UserResponseFactory, OTACodeManager } from './drivers';
 import {
@@ -110,17 +111,39 @@ export default class RouteHandler {
         }
       })
       .patch(async (req, res) => {
-        await UserInteractor.editInfo(
-          this.dataStore,
-          this.responseFactory.buildResponder(res),
-          req.user.username,
-          req.body.user
-        );
+        console.log(req.body.user.bio);
+        if (req.body.user) {
+          await UserInteractor.editInfo(
+            this.dataStore,
+            this.responseFactory.buildResponder(res),
+            req.user.username,
+            req.body.user
+          );
+        } else if (req.body.editPassword) {
+          await UserInteractor.updatePassword(
+            this.dataStore,
+            this.responseFactory.buildResponder(res),
+            this.hasher,
+            req.body.editPassword.email,
+            req.body.editPassword.password
+          );
+        }
       });
 
     // Login
     router.post('/users/tokens', async (req, res) => {
       await login(
+        this.dataStore,
+        this.responseFactory.buildResponder(res),
+        this.hasher,
+        req.body.username,
+        req.body.password
+      );
+    });
+
+    // Check Password
+    router.post('/users/password', async (req, res) => {
+      await passwordMatch(
         this.dataStore,
         this.responseFactory.buildResponder(res),
         this.hasher,
