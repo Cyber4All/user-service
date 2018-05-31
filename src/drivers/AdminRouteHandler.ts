@@ -50,5 +50,15 @@ export default class AdminRouteHandler {
         responder.sendOperationError(e);
       }
     });
+    router.delete('/users/:id', async (req, res) => {
+      const responder = this.responseFactory.buildResponder(res);
+      try {
+        const id = req.params.id;
+        await AdminUserInteractor.deleteUser(this.dataStore, id);
+        responder.sendOperationSuccess();
+      } catch (e) {
+        responder.sendOperationError(e);
+      }
+    });
   }
 }

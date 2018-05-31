@@ -14,7 +14,11 @@ export class UserInteractor {
     query: UserQuery
   ): Promise<User[]> {
     try {
-      const users = await dataStore.searchUsers(query);
+      let users = await dataStore.searchUsers(query);
+      users = users.map(user => {
+        user.password = undefined;
+        return user;
+      });
       return users;
     } catch (e) {
       return Promise.reject(`Problem searching users. Error: ${e}`);
@@ -28,6 +32,7 @@ export class UserInteractor {
     try {
       const userID = await dataStore.findUser(username);
       const user = await dataStore.loadUser(userID);
+      user.password = undefined;
       return user;
     } catch (error) {
       return Promise.reject(`Problem finding specified user. Error: ${error}`);
@@ -43,10 +48,11 @@ export class UserInteractor {
       const userID = await dataStore.findUser(email);
       await dataStore.editUser(userID, { emailVerified: true });
       const user = await dataStore.loadUser(userID);
+      user.password = undefined;
       responder.setCookie('presence', TokenManager.generateToken(user));
       return user;
     } catch (e) {
-      return Promise.reject(`Problem verifing email. Error: ${e}`);
+      return Promise.reject(`Problem verifying email. Error: ${e}`);
     }
   }
   public static async updatePassword(
@@ -59,10 +65,10 @@ export class UserInteractor {
       const pwdhash = await hasher.hash(password);
       const userID = await dataStore.findUser(email);
       const user = await dataStore.editUser(userID, { password: pwdhash });
-      delete user.password;
+      user.password = undefined;
       return user;
     } catch (e) {
-      return Promise.reject(`Problem updating password. Erro:${e}`);
+      return Promise.reject(`Problem updating password. Error:${e}`);
     }
   }
 
@@ -75,6 +81,7 @@ export class UserInteractor {
     try {
       const userID = await dataStore.findUser(username);
       const user = await dataStore.editUser(userID, edits);
+      user.password = undefined;
       responder.setCookie('presence', TokenManager.generateToken(user));
       responder.sendOperationSuccess();
     } catch (e) {

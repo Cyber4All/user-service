@@ -209,7 +209,7 @@ export default class MongoDriver implements DataStore {
       }
       const userRecord = await this.db
         .collection(COLLECTIONS.User.name)
-        .findOne<UserDocument>(query);
+        .findOne<UserDocument>(query, { _id: 1 });
       if (!userRecord) {
         return Promise.reject(
           'No user with username or email ' + username + ' exists.'
