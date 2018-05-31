@@ -122,15 +122,7 @@ export default class RouteHandler {
               req.body.user
             );
             responder.sendOperationSuccess();
-          // } else if (req.body.editPassword) {
-          //   await UserInteractor.updatePassword(
-          //     this.dataStore,
-          //     this.hasher,
-          //     req.body.editPassword.username,
-          //     req.body.editPassword.password
-          //   );
-          //   responder.sendOperationSuccess();
-          } 
+          }
         } catch (e) {
           responder.sendOperationError(e);
         }
