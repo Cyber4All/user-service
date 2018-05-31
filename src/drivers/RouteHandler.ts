@@ -110,12 +110,17 @@ export default class RouteHandler {
         }
       })
       .patch(async (req, res) => {
-        await UserInteractor.editInfo(
-          this.dataStore,
-          this.responseFactory.buildResponder(res),
-          req.user.username,
-          req.body.user
-        );
+        const responder = this.responseFactory.buildResponder(res);
+        try {
+          await UserInteractor.editInfo(
+            this.dataStore,
+            responder,
+            req.user.username,
+            req.body.user
+          );
+        } catch (e) {
+          responder.sendOperationError(e);
+        }
       });
 
     // Login
@@ -247,10 +252,10 @@ export default class RouteHandler {
         }
       })
       .patch(async (req, res) => {
+        const responder = this.responseFactory.buildResponder(res);
         try {
           const otaCode = req.query.otaCode;
           const payload = req.body.payload;
-          const responder = this.responseFactory.buildResponder(res);
 
           const decoded = await OTACodeInteractor.applyOTACode(
             this.dataStore,
@@ -263,7 +268,6 @@ export default class RouteHandler {
             case ACCOUNT_ACTIONS.RESET_PASSWORD:
               await UserInteractor.updatePassword(
                 this.dataStore,
-                this.responseFactory.buildResponder(res),
                 this.hasher,
                 decoded.data.email,
                 payload
@@ -274,9 +278,7 @@ export default class RouteHandler {
               break;
           }
         } catch (e) {
-          this.responseFactory
-            .buildResponder(res)
-            .sendOperationError('Invalid OTA Code.');
+          responder.sendOperationError(e);
         }
       });
 
