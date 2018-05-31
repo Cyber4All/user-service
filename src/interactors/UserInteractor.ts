@@ -6,11 +6,12 @@ import {
 } from '../interfaces/interfaces';
 import { User } from '@cyber4all/clark-entity';
 import { TokenManager } from '../drivers/drivers';
+import { UserQuery } from '../interfaces/Query';
 
 export class UserInteractor {
   public static async searchUsers(
     dataStore: DataStore,
-    query: {}
+    query: UserQuery
   ): Promise<User[]> {
     try {
       const users = await dataStore.searchUsers(query);
