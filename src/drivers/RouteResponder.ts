@@ -13,7 +13,6 @@ export default class RouteResponder implements Responder {
    *
    */
   sendOperationSuccess() {
-    console.log('success');
     this.res.sendStatus(200);
   }
 

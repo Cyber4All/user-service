@@ -114,7 +114,7 @@ export async function passwordMatch(
 ) {
   try {
     let id;
-
+    console.log(username);
     // User is already logged in, should never return invalid login
     try {
       id = await dataStore.findUser(username);
@@ -122,7 +122,6 @@ export async function passwordMatch(
       responder.invalidLogin();
       return;
     }
-
     const user = await dataStore.loadUser(id);
     const authenticated = await hasher.verify(password, user.password);
     delete user.password;

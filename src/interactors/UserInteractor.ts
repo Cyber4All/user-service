@@ -77,7 +77,6 @@ export class UserInteractor {
     edits: {}
   ): Promise<void> {
     try {
-      console.log(edits);
       const userEdits = {
         name: edits.name,
         email: edits.email,

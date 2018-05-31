@@ -139,14 +139,14 @@ export default class RouteHandler {
       );
     });
 
-    // Check Password
-    router.post('/users/password', async (req, res) => {
+    router.route('/users/password').get (async (req, res) => {
+      console.log(req.query.password);
       await passwordMatch(
         this.dataStore,
         this.responseFactory.buildResponder(res),
         this.hasher,
-        req.body.username,
-        req.body.password
+        req.user.username,
+        req.query.password
       );
     });
 
