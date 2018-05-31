@@ -140,7 +140,6 @@ export default class RouteHandler {
     });
 
     router.route('/users/password').get (async (req, res) => {
-      console.log(req.query.password);
       await passwordMatch(
         this.dataStore,
         this.responseFactory.buildResponder(res),
