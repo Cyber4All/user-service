@@ -111,7 +111,6 @@ export default class RouteHandler {
         }
       })
       .patch(async (req, res) => {
-        console.log(req.body.user.bio);
         if (req.body.user) {
           await UserInteractor.editInfo(
             this.dataStore,
@@ -124,7 +123,7 @@ export default class RouteHandler {
             this.dataStore,
             this.responseFactory.buildResponder(res),
             this.hasher,
-            req.body.editPassword.email,
+            req.body.editPassword.username,
             req.body.editPassword.password
           );
         }
