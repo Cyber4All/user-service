@@ -48,7 +48,6 @@ export default class RouteResponder implements Responder {
   }
 
   sendPasswordMatch(isMatch: boolean) {
-    console.log(isMatch);
     this.res.status(200).json(isMatch);
   }
   /**
