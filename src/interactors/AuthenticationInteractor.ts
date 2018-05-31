@@ -96,6 +96,47 @@ export async function register(
 }
 
 /**
+ * Attempts to find the user via username and 
+ * and checks to see if the provided password is correct.
+ *
+ * @export
+ * @param {DataStore} dataStore
+ * @param {Responder} responder
+ * @param {string} username
+ * @param {string} password
+ */
+export async function passwordMatch(
+  dataStore: DataStore,
+  responder: Responder,
+  hasher: HashInterface,
+  username: string,
+  password: string
+) {
+  try {
+    let id;
+    // User is already logged in, should never return invalid login
+    try {
+      id = await dataStore.findUser(username);
+    } catch (e) {
+      responder.invalidLogin();
+      return;
+    }
+    const user = await dataStore.loadUser(id);
+    const authenticated = await hasher.verify(password, user.password);
+    delete user.password;
+
+    if (authenticated) {
+      responder.sendPasswordMatch(true);
+    } else {
+      responder.sendPasswordMatch(false);
+    }
+  } catch (e) {
+    console.log(e);
+    responder.sendOperationError(e);
+  }
+}
+
+/**
  * Validates that a username meets the defined constraints.
  *
  * Constraints:
