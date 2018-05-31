@@ -22,13 +22,18 @@ export class UserInteractor {
   }
 
   public static async findUser(
-    dataStore: DataStore, responder: Responder, username: string): Promise<User> {
+    dataStore: DataStore,
+    responder: Responder,
+    username: string
+  ): Promise<User> {
     try {
       const userID = await dataStore.findUser(username);
       const user = await dataStore.loadUser(userID);
       return user;
     } catch (error) {
-      responder.sendOperationError(`Problem finding specified user. Error: ${error}`);
+      responder.sendOperationError(
+        `Problem finding specified user. Error: ${error}`
+      );
       return undefined;
     }
   }
@@ -50,18 +55,17 @@ export class UserInteractor {
   }
   public static async updatePassword(
     dataStore: DataStore,
-    responder: Responder,
     hasher: HashInterface,
     email: string,
     password: string
-  ) {
+  ): Promise<void> {
     try {
       const pwdhash = await hasher.hash(password);
       const userID = await dataStore.findUser(email);
       await dataStore.editUser(userID, { password: pwdhash });
-      responder.sendOperationSuccess();
+      return Promise.resolve();
     } catch (e) {
-      responder.sendOperationError(e);
+      return Promise.reject(e);
     }
   }
 
@@ -70,14 +74,14 @@ export class UserInteractor {
     responder: Responder,
     username: string,
     edits: {}
-  ) {
+  ): Promise<void> {
     try {
       const userID = await dataStore.findUser(username);
       const user = await dataStore.editUser(userID, edits);
       responder.setCookie('presence', TokenManager.generateToken(user));
-      responder.sendOperationSuccess();
+      return Promise.resolve();
     } catch (e) {
-      responder.sendOperationError(e);
+      return Promise.reject(e);
     }
   }
 
@@ -85,10 +89,10 @@ export class UserInteractor {
     dataStore: DataStore,
     responder: Responder,
     username: string
-  ):Promise<void> {
+  ): Promise<void> {
     try {
       const inUse = await dataStore.identifierInUse(username);
-      responder.sendObject({inUse}); 
+      responder.sendObject({ inUse });
     } catch (e) {
       responder.sendOperationError(e);
     }

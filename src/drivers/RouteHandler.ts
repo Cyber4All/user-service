@@ -111,21 +111,27 @@ export default class RouteHandler {
         }
       })
       .patch(async (req, res) => {
-        if (req.body.user) {
-          await UserInteractor.editInfo(
-            this.dataStore,
-            this.responseFactory.buildResponder(res),
-            req.user.username,
-            req.body.user
-          );
-        } else if (req.body.editPassword) {
-          await UserInteractor.updatePassword(
-            this.dataStore,
-            this.responseFactory.buildResponder(res),
-            this.hasher,
-            req.body.editPassword.username,
-            req.body.editPassword.password
-          );
+        const responder = this.responseFactory.buildResponder(res);
+        try {
+          if (req.body.user) {
+            await UserInteractor.editInfo(
+              this.dataStore,
+              responder,
+              req.user.username,
+              req.body.user
+            );
+            responder.sendOperationSuccess();
+          } else if (req.body.editPassword) {
+            await UserInteractor.updatePassword(
+              this.dataStore,
+              this.hasher,
+              req.body.editPassword.username,
+              req.body.editPassword.password
+            );
+            responder.sendOperationSuccess();
+          } 
+        } catch (e) {
+          responder.sendOperationError(e);
         }
       });
 
@@ -269,10 +275,10 @@ export default class RouteHandler {
         }
       })
       .patch(async (req, res) => {
+        const responder = this.responseFactory.buildResponder(res);
         try {
           const otaCode = req.query.otaCode;
           const payload = req.body.payload;
-          const responder = this.responseFactory.buildResponder(res);
 
           const decoded = await OTACodeInteractor.applyOTACode(
             this.dataStore,
@@ -285,7 +291,6 @@ export default class RouteHandler {
             case ACCOUNT_ACTIONS.RESET_PASSWORD:
               await UserInteractor.updatePassword(
                 this.dataStore,
-                this.responseFactory.buildResponder(res),
                 this.hasher,
                 decoded.data.email,
                 payload
@@ -296,9 +301,7 @@ export default class RouteHandler {
               break;
           }
         } catch (e) {
-          this.responseFactory
-            .buildResponder(res)
-            .sendOperationError('Invalid OTA Code.');
+          responder.sendOperationError(e);
         }
       });
 
