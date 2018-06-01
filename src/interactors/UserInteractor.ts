@@ -17,6 +17,7 @@ export class UserInteractor {
       const response = await dataStore.searchUsers(query);
       const users = response.users.map(user => {
         user.password = undefined;
+        delete user.accessGroups;
         return user;
       });
       return users;
@@ -33,6 +34,7 @@ export class UserInteractor {
       const userID = await dataStore.findUser(username);
       const user = await dataStore.loadUser(userID);
       user.password = undefined;
+      delete user.accessGroups;
       return user;
     } catch (error) {
       return Promise.reject(`Problem finding specified user. Error: ${error}`);
@@ -66,6 +68,8 @@ export class UserInteractor {
       const userID = await dataStore.findUser(email);
       const user = await dataStore.editUser(userID, { password: pwdhash });
       user.password = undefined;
+      delete user.accessGroups;
+
       return user;
     } catch (e) {
       return Promise.reject(`Problem updating password. Error:${e}`);

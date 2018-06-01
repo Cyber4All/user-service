@@ -409,6 +409,8 @@ export default class MongoDriver implements DataStore {
       : false;
     // TODO: Add property to UserDocument
     user.createdAt = userRecord['createdAt'];
+    user.accessGroups = userRecord['accessGroups'];
+
     return user;
   }
 
