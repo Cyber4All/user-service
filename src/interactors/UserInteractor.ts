@@ -14,8 +14,8 @@ export class UserInteractor {
     query: UserQuery
   ): Promise<User[]> {
     try {
-      let users = await dataStore.searchUsers(query);
-      users = users.map(user => {
+      const response = await dataStore.searchUsers(query);
+      const users = response.users.map(user => {
         user.password = undefined;
         return user;
       });

@@ -1,6 +1,7 @@
 import { UserInteractor } from './interactors';
 import { DataStore } from '../interfaces/DataStore';
 import { User } from '@cyber4all/clark-entity';
+import { UserQuery } from '../interfaces/Query';
 
 export class AdminUserInteractor {
   private static userInteractor = UserInteractor;
@@ -15,16 +16,18 @@ export class AdminUserInteractor {
    */
   public static async fetchUsers(
     dataStore: DataStore,
-    query: any
-  ): Promise<User[]> {
+    query: UserQuery
+  ): Promise<{ users: User[]; total: number }> {
     try {
-      const users = await this.userInteractor.searchUsers(dataStore, query);
-      return Promise.all(
-        users.map(async user => {
+      const response = await dataStore.searchUsers(query);
+      const users = await Promise.all(
+        response.users.map(async user => {
           user.id = await dataStore.findUser(user.username);
+          user.password = undefined;
           return user;
         })
       );
+      return { users, total: response.total };
     } catch (e) {
       return Promise.reject(`Problem fetching users. Error: ${e}`);
     }

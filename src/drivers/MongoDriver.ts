@@ -221,7 +221,9 @@ export default class MongoDriver implements DataStore {
     }
   }
 
-  async searchUsers(query: UserQuery): Promise<User[]> {
+  async searchUsers(
+    query: UserQuery
+  ): Promise<{ users: User[]; total: number }> {
     try {
       query.page = +query.page;
       if (query.page !== undefined && query.page <= 0) {
@@ -240,6 +242,8 @@ export default class MongoDriver implements DataStore {
         .find<UserDocument>(mongoQuery, { score: { $meta: 'textScore' } })
         .sort({ score: { $meta: 'textScore' } });
 
+      const total = await objectCursor.count();
+
       objectCursor =
         skip !== undefined
           ? objectCursor.skip(skip).limit(limit)
@@ -252,7 +256,7 @@ export default class MongoDriver implements DataStore {
       const userDocs = await objectCursor.toArray();
 
       const users: User[] = userDocs.map(user => this.generateUser(user));
-      return users;
+      return { users, total };
     } catch (e) {
       return Promise.reject(e);
     }
