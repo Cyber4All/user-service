@@ -374,7 +374,7 @@ export default class MongoDriver implements DataStore {
       username: user.username,
       name: user.name.trim(),
       email: user.email,
-      organization: user.organization,
+      organization: user.organization.toLowerCase(),
       password: user.password,
       objects: [],
       emailVerified: user.emailVerified
