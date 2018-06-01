@@ -3,17 +3,33 @@ import * as MAIL_DEFAULTS from '../interfaces/Mailer.defaults';
 import { User } from '@cyber4all/clark-entity';
 
 const RESPONSE_TEXT = {
-  EMAIL_NOT_REGISTERED_WITH_ACCOUNT: 'The provided email address is not associated with an account'
-}
+  EMAIL_NOT_REGISTERED_WITH_ACCOUNT:
+    'The provided email address is not associated with an account'
+};
 
 export class MailerInteractor {
+  public static async sendBasicEmail(
+    mailer: Mailer,
+    params: { subject: string; email: string; message: string }
+  ): Promise<void> {
+    try {
+      return mailer.sendSingle(
+        params.email,
+        MAIL_DEFAULTS.FROM.NO_REPLY,
+        params.subject,
+        params.message
+      );
+    } catch (e) {
+      return Promise.reject(`Problem sending email. Error: ${e}`);
+    }
+  }
   public static async sendEmailVerification(
     mailer: Mailer,
     email: string,
     otaCode: string
   ) {
     try {
-      return await mailer.sendSingleTemplate(
+      return mailer.sendSingleTemplate(
         email,
         MAIL_DEFAULTS.FROM.NO_REPLY,
         MAIL_DEFAULTS.SUBJECTS.VERIFY_EMAIL,
@@ -29,7 +45,7 @@ export class MailerInteractor {
 
   public static async sendWelcomeEmail(mailer: Mailer, user: User) {
     try {
-      return await mailer.sendSingleTemplate(
+      return mailer.sendSingleTemplate(
         user.email,
         MAIL_DEFAULTS.FROM.NO_REPLY,
         MAIL_DEFAULTS.SUBJECTS.WELCOME_EMAIL,
@@ -55,21 +71,33 @@ export class MailerInteractor {
         await this.sendPasswordResetEmail({ mailer, email, otaCode });
         responder.sendOperationSuccess();
       } else {
-        responder.sendOperationError(RESPONSE_TEXT.EMAIL_NOT_REGISTERED_WITH_ACCOUNT, 404);
+        responder.sendOperationError(
+          RESPONSE_TEXT.EMAIL_NOT_REGISTERED_WITH_ACCOUNT,
+          404
+        );
       }
     } catch (e) {
       return Promise.reject(e);
     }
   }
 
-  private static async isValidEmail(email: string, dataStore: DataStore): Promise<boolean> {
+  private static async isValidEmail(
+    email: string,
+    dataStore: DataStore
+  ): Promise<boolean> {
     const users = await dataStore.searchUsers({ email });
     return users.length > 0;
   }
 
-  private static async sendPasswordResetEmail(
-    { mailer, email, otaCode }: { mailer: Mailer, email: string, otaCode: string }
-  ) {
+  private static async sendPasswordResetEmail({
+    mailer,
+    email,
+    otaCode
+  }: {
+    mailer: Mailer;
+    email: string;
+    otaCode: string;
+  }) {
     await mailer.sendSingleTemplate(
       email,
       MAIL_DEFAULTS.FROM.NO_REPLY,

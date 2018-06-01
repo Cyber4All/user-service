@@ -1,4 +1,4 @@
-import sgMail = require('@sendgrid/mail');
+import mail = require('@sendgrid/mail');
 import * as dotenv from 'dotenv';
 import { Mailer } from '../interfaces/interfaces';
 import * as MAIL_DEFAULTS from '../interfaces/Mailer.defaults';
@@ -10,7 +10,7 @@ export enum SENDGRID_TEMPLATES {
   RESET_PASSWORD = 'ef42659c-df2a-4c29-a8bc-cc99054cd3fa'
 }
 export class SendgridDriver implements Mailer {
-  private mailer = sgMail;
+  private mailer = mail;
   private TEMPLATES = new Map<MAIL_DEFAULTS.TEMPLATES, string>();
 
   constructor() {
@@ -43,17 +43,17 @@ export class SendgridDriver implements Mailer {
     replyTo?: string,
     headers?: {}
   ): Promise<any> {
-    let email = {
-      to: to,
-      from: from,
-      subject: subject
+    const email = {
+      to,
+      from,
+      subject,
+      text,
+      html,
+      cc,
+      bcc,
+      replyTo,
+      headers
     };
-    text ? (email['text'] = text) : 'NO TEXT';
-    html ? (email['html'] = text) : 'NO HTML';
-    cc ? (email['cc'] = text) : 'NO CC';
-    bcc ? (email['bcc'] = text) : 'NO BCC';
-    replyTo ? (email['replyTo'] = text) : 'NO REPLY TO';
-    headers ? (email['headers'] = text) : 'NO HEADERS';
 
     return this.mailer.send(email);
   }
@@ -69,17 +69,17 @@ export class SendgridDriver implements Mailer {
     replyTo?: string,
     headers?: {}
   ): Promise<any> {
-    let email = {
-      to: to,
-      from: from,
-      subject: subject
+    const email = {
+      to,
+      from,
+      subject,
+      text,
+      html,
+      cc,
+      bcc,
+      replyTo,
+      headers
     };
-    text ? (email['text'] = text) : 'NO TEXT';
-    html ? (email['html'] = text) : 'NO HTML';
-    cc ? (email['cc'] = text) : 'NO CC';
-    bcc ? (email['bcc'] = text) : 'NO BCC';
-    replyTo ? (email['replyTo'] = text) : 'NO REPLY TO';
-    headers ? (email['headers'] = text) : 'NO HEADERS';
 
     return this.mailer.sendMultiple(email);
   }
@@ -97,20 +97,17 @@ export class SendgridDriver implements Mailer {
     replyTo?: string,
     headers?: {}
   ): Promise<any> {
-    let email = {
-      to: to,
-      from: from,
-      subject: subject,
-      templateId: this.getTemplate(templateType),
-      substitutions: templateVars
+    const email = {
+      to,
+      from,
+      subject,
+      text,
+      html,
+      cc,
+      bcc,
+      replyTo,
+      headers
     };
-    text ? (email['text'] = text) : 'NO TEXT';
-    html ? (email['html'] = text) : 'NO HTML';
-    cc ? (email['cc'] = text) : 'NO CC';
-    bcc ? (email['bcc'] = text) : 'NO BCC';
-    replyTo ? (email['replyTo'] = text) : 'NO REPLY TO';
-    headers ? (email['headers'] = text) : 'NO HEADERS';
-
     return this.mailer.send(email);
   }
   sendMultipleTemplate(
@@ -130,8 +127,10 @@ export class SendgridDriver implements Mailer {
   }
 
   private getTemplate(template: MAIL_DEFAULTS.TEMPLATES): string {
-    let id = this.TEMPLATES.get(template);
-    if (id) return id;
+    const id = this.TEMPLATES.get(template);
+    if (id) {
+      return id;
+    }
     throw new Error(`No existing template for: ${template}`);
   }
 }
