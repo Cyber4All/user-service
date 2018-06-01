@@ -223,10 +223,11 @@ export default class MongoDriver implements DataStore {
 
   async searchUsers(query: UserQuery): Promise<User[]> {
     try {
+      query.page = +query.page;
       if (query.page !== undefined && query.page <= 0) {
         query.page = 1;
       }
-      const limit = query.limit;
+      const limit = +query.limit;
       const skip =
         query.page && query.limit ? (query.page - 1) * query.limit : undefined;
       const orderBy = query.orderBy;
