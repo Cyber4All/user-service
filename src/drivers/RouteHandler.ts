@@ -128,6 +128,23 @@ export default class RouteHandler {
         }
       });
 
+    // Get user information 
+    router
+      .route('/users/update')
+      .get(async (req, res) => {
+        try {
+          const query = req.query.username;
+          const user = await UserInteractor.findUser(
+            this.dataStore,
+            this.responseFactory.buildResponder(res),
+            query
+          );
+          this.responseFactory.buildResponder(res).sendUser(user);
+        } catch (e) {
+          this.responseFactory.buildResponder(res).sendOperationError(e);
+        }
+      });
+
     // Login
     router.post('/users/tokens', async (req, res) => {
       await login(
