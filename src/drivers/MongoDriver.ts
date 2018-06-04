@@ -314,7 +314,8 @@ export default class MongoDriver implements DataStore {
       organization: user.organization.toLowerCase(),
       password: user.password,
       objects: [],
-      emailVerified: user.emailVerified
+      emailVerified: user.emailVerified,
+      bio: user.bio
     };
     if (!isNew) {
       delete userDocument._id;
@@ -322,6 +323,7 @@ export default class MongoDriver implements DataStore {
     if (isNew) {
       userDocument._id = new ObjectID().toHexString();
       userDocument.emailVerified = false;
+      userDocument.bio = '';
       //  TODO: Add property to UserDocument
       userDocument['createdAt'] = Date.now().toString();
     }
@@ -340,6 +342,8 @@ export default class MongoDriver implements DataStore {
     user.emailVerified = userRecord.emailVerified
       ? userRecord.emailVerified
       : false;
+    // Append Email Verified Prop
+    user.bio = userRecord.bio;
     // TODO: Add property to UserDocument
     user.createdAt = userRecord['createdAt'];
     return user;
