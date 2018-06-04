@@ -126,22 +126,29 @@ export default class RouteHandler {
         }
       });
 
-    // Get user information 
-    router
-      .route('/users/update')
-      .get(async (req, res) => {
-        try {
-          const query = req.query.username;
-          const user = await UserInteractor.findUser(
-            this.dataStore,
-            this.responseFactory.buildResponder(res),
-            query
-          );
-          this.responseFactory.buildResponder(res).sendUser(user);
-        } catch (e) {
-          this.responseFactory.buildResponder(res).sendOperationError(e);
-        }
-      });
+    router.get('/users/:username', async (req, res) => {
+      const responder = this.responseFactory.buildResponder(res);
+      try {
+        const user = await UserInteractor.findUser(
+          this.dataStore,
+          req.params.username
+        );
+        responder.sendUser(user);
+      } catch (e) {
+        responder.sendOperationError(e);
+      }
+    });
+
+    // Get user information
+    router.get('/users/update', async (req, res) => {
+      try {
+        const query = req.query.username;
+        const user = await UserInteractor.findUser(this.dataStore, query);
+        this.responseFactory.buildResponder(res).sendUser(user);
+      } catch (e) {
+        this.responseFactory.buildResponder(res).sendOperationError(e);
+      }
+    });
 
     // Login
     router.post('/users/tokens', async (req, res) => {
@@ -154,7 +161,7 @@ export default class RouteHandler {
       );
     });
 
-    router.route('/users/password').get (async (req, res) => {
+    router.route('/users/password').get(async (req, res) => {
       await passwordMatch(
         this.dataStore,
         this.responseFactory.buildResponder(res),
