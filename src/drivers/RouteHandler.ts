@@ -126,19 +126,6 @@ export default class RouteHandler {
         }
       });
 
-    router.get('/users/:username', async (req, res) => {
-      const responder = this.responseFactory.buildResponder(res);
-      try {
-        const user = await UserInteractor.findUser(
-          this.dataStore,
-          req.params.username
-        );
-        responder.sendUser(user);
-      } catch (e) {
-        responder.sendOperationError(e);
-      }
-    });
-
     // Get user information
     router.get('/users/update', async (req, res) => {
       try {
@@ -180,6 +167,19 @@ export default class RouteHandler {
       .get(async (req, res) => {
         this.responseFactory.buildResponder(res).sendUser(req['user']);
       });
+
+    router.get('/users/:username', async (req, res) => {
+      const responder = this.responseFactory.buildResponder(res);
+      try {
+        const user = await UserInteractor.findUser(
+          this.dataStore,
+          req.params.username
+        );
+        responder.sendUser(user);
+      } catch (e) {
+        responder.sendOperationError(e);
+      }
+    });
 
     router.route('/users/identifiers/active').get(async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
