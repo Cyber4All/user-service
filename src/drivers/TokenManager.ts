@@ -11,7 +11,8 @@ export function generateToken(user: User) {
     name: user.name,
     email: user.email,
     organization: user.organization,
-    emailVerified: user.emailVerified
+    emailVerified: user.emailVerified,
+    accessGroups: user.accessGroups
   };
   const options = {
     issuer: process.env.ISSUER,

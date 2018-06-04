@@ -6,6 +6,8 @@ import { UserResponseFactory } from './drivers/UserResponseFactory';
 import * as cookieParser from 'cookie-parser';
 import * as cors from 'cors';
 import { enforceTokenAccess } from './middleware/jwt.config';
+import AdminRouteHandler from './drivers/AdminRouteHandler';
+import { enforceAdminAccess } from './middleware/admin-access';
 
 const mongoDriver = new MongoDriver();
 const sendgridDriver = new SendgridDriver();
@@ -32,6 +34,16 @@ app.use(
     sendgridDriver,
     responseFactory
   )
+);
+
+// Set Admin middleware
+
+// Set Admin Routes
+app.use(enforceAdminAccess);
+
+app.use(
+  '/admin',
+  AdminRouteHandler.buildRouter(mongoDriver, sendgridDriver, responseFactory)
 );
 
 app.set('trust proxy', true);

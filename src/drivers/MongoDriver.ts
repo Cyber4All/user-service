@@ -6,20 +6,21 @@ import { DataStore } from '../interfaces/interfaces';
 import { User } from '@cyber4all/clark-entity';
 import * as dotenv from 'dotenv';
 import { OTACode } from './OTACodeManager';
+import { UserQuery } from '../interfaces/Query';
 dotenv.config();
 
 export interface Collection {
   name: string;
-  foreigns?: Foriegn[];
+  foreigns?: Foreign[];
   uniques?: string[];
   text?: string[];
 }
-export interface Foriegn {
+export interface Foreign {
   name: string;
-  data: ForiegnData;
+  data: ForeignData;
 }
 
-export interface ForiegnData {
+export interface ForeignData {
   target: string;
   child: boolean;
   registry?: string;
@@ -208,7 +209,7 @@ export default class MongoDriver implements DataStore {
       }
       const userRecord = await this.db
         .collection(COLLECTIONS.User.name)
-        .findOne<UserDocument>(query);
+        .findOne<UserDocument>(query, { _id: 1 });
       if (!userRecord) {
         return Promise.reject(
           'No user with username or email ' + username + ' exists.'
@@ -220,17 +221,83 @@ export default class MongoDriver implements DataStore {
     }
   }
 
-  async searchUsers(query: {}): Promise<User[]> {
+  async searchUsers(
+    query: UserQuery
+  ): Promise<{ users: User[]; total: number }> {
     try {
-      const userDocs = await this.db
+      query.page = +query.page;
+      if (query.page !== undefined && query.page <= 0) {
+        query.page = 1;
+      }
+      const limit = +query.limit;
+      const skip =
+        query.page && query.limit ? (query.page - 1) * query.limit : undefined;
+      const orderBy = query.orderBy;
+      const sortType = +query.sortType;
+
+      const mongoQuery = this.buildUserQuery(query);
+
+      let objectCursor = await this.db
         .collection(COLLECTIONS.User.name)
-        .find<UserDocument>(query)
-        .toArray();
+        .find<UserDocument>(mongoQuery, { score: { $meta: 'textScore' } })
+        .sort({ score: { $meta: 'textScore' } });
+
+      const total = await objectCursor.count();
+
+      objectCursor =
+        skip !== undefined
+          ? objectCursor.skip(skip).limit(limit)
+          : limit ? objectCursor.limit(limit) : objectCursor;
+
+      objectCursor = orderBy
+        ? objectCursor.sort(orderBy, sortType ? sortType : 1)
+        : objectCursor;
+
+      const userDocs = await objectCursor.toArray();
+
       const users: User[] = userDocs.map(user => this.generateUser(user));
-      return users;
+      return { users, total };
     } catch (e) {
       return Promise.reject(e);
     }
+  }
+
+  private buildUserQuery(query: UserQuery): any {
+    delete query.page;
+    delete query.limit;
+    delete query.orderBy;
+    delete query.sortType;
+
+    const mongoQuery = {
+      $or: [
+        {
+          $text: {
+            $search: query.username
+              ? query.username
+              : query.name
+                ? query.name
+                : query.email
+                  ? query.email
+                  : query.organization ? query.organization : query.text
+          }
+        }
+      ]
+    };
+
+    if (!mongoQuery.$or[0].$text.$search && !query.text) {
+      return {};
+    }
+
+    if (query.text) {
+      (<any[]>mongoQuery.$or).push(
+        { username: { $regex: new RegExp(query.text, 'ig') } },
+        { name: { $regex: new RegExp(query.text, 'ig') } },
+        { email: { $regex: new RegExp(query.text, 'ig') } },
+        { organization: { $regex: new RegExp(query.text, 'ig') } }
+      );
+    }
+
+    return mongoQuery;
   }
   /**
    * Fetch the user document associated with the given id.
@@ -346,6 +413,8 @@ export default class MongoDriver implements DataStore {
     user.bio = userRecord.bio;
     // TODO: Add property to UserDocument
     user.createdAt = userRecord['createdAt'];
+    user.accessGroups = userRecord['accessGroups'];
+
     return user;
   }
 
@@ -361,7 +430,7 @@ export default class MongoDriver implements DataStore {
    */
   private async validateForeignKeys<T>(
     record: T,
-    foreigns: Foriegn[]
+    foreigns: Foreign[]
   ): Promise<void> {
     try {
       if (foreigns) {

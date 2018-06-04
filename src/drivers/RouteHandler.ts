@@ -76,15 +76,13 @@ export default class RouteHandler {
     router
       .route('/users')
       .get(async (req, res) => {
+        const responder = this.responseFactory.buildResponder(res);
         try {
           const query = req.query;
-          await UserInteractor.searchUsers(
-            this.dataStore,
-            this.responseFactory.buildResponder(res),
-            query
-          );
+          const users = await UserInteractor.searchUsers(this.dataStore, query);
+          responder.sendObject(users);
         } catch (e) {
-          this.responseFactory.buildResponder(res).sendOperationError(e);
+          responder.sendOperationError(e);
         }
       })
       .post(async (req, res) => {
@@ -177,15 +175,15 @@ export default class RouteHandler {
       });
 
     router.route('/users/identifiers/active').get(async (req, res) => {
+      const responder = this.responseFactory.buildResponder(res);
       try {
-        await UserInteractor.identifierInUse(
+        const inUse = await UserInteractor.identifierInUse(
           this.dataStore,
-          this.responseFactory.buildResponder(res),
           req.query.username
         );
+        responder.sendObject(inUse);
       } catch (e) {
-        console.log(e);
-        this.responseFactory.buildResponder(res).sendOperationError(e);
+        responder.sendOperationError(e);
       }
     });
     // refresh token
@@ -194,7 +192,6 @@ export default class RouteHandler {
       try {
         const user = await UserInteractor.findUser(
           this.dataStore,
-          this.responseFactory.buildResponder(res),
           req.user.username
         );
 
@@ -304,6 +301,7 @@ export default class RouteHandler {
                 decoded.data.email,
                 payload
               );
+              responder.sendOperationSuccess();
               break;
             default:
               responder.sendOperationError('Invalid action.');

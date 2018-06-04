@@ -6,35 +6,38 @@ import {
 } from '../interfaces/interfaces';
 import { User } from '@cyber4all/clark-entity';
 import { TokenManager } from '../drivers/drivers';
+import { UserQuery } from '../interfaces/Query';
 
 export class UserInteractor {
   public static async searchUsers(
     dataStore: DataStore,
-    responder: Responder,
-    query: {}
-  ) {
+    query: UserQuery
+  ): Promise<User[]> {
     try {
-      const users = await dataStore.searchUsers(query);
-      responder.sendUser(users);
+      const response = await dataStore.searchUsers(query);
+      const users = response.users.map(user => {
+        user.password = undefined;
+        delete user.accessGroups;
+        return user;
+      });
+      return users;
     } catch (e) {
-      responder.sendOperationError(`Problem searching users. Error: ${e}`);
+      return Promise.reject(`Problem searching users. Error: ${e}`);
     }
   }
 
   public static async findUser(
     dataStore: DataStore,
-    responder: Responder,
     username: string
   ): Promise<User> {
     try {
       const userID = await dataStore.findUser(username);
       const user = await dataStore.loadUser(userID);
-      return user; 
+      user.password = undefined;
+      delete user.accessGroups;
+      return user;
     } catch (error) {
-      responder.sendOperationError(
-        `Problem finding specified user. Error: ${error}`
-      );
-      return undefined;
+      return Promise.reject(`Problem finding specified user. Error: ${error}`);
     }
   }
 
@@ -47,10 +50,11 @@ export class UserInteractor {
       const userID = await dataStore.findUser(email);
       await dataStore.editUser(userID, { emailVerified: true });
       const user = await dataStore.loadUser(userID);
+      user.password = undefined;
       responder.setCookie('presence', TokenManager.generateToken(user));
       return user;
     } catch (e) {
-      return Promise.reject(e);
+      return Promise.reject(`Problem verifying email. Error: ${e}`);
     }
   }
   public static async updatePassword(
@@ -58,14 +62,17 @@ export class UserInteractor {
     hasher: HashInterface,
     email: string,
     password: string
-  ): Promise<void> {
+  ): Promise<User> {
     try {
       const pwdhash = await hasher.hash(password);
       const userID = await dataStore.findUser(email);
-      await dataStore.editUser(userID, { password: pwdhash });
-      return Promise.resolve();
+      const user = await dataStore.editUser(userID, { password: pwdhash });
+      user.password = undefined;
+      delete user.accessGroups;
+
+      return user;
     } catch (e) {
-      return Promise.reject(e);
+      return Promise.reject(`Problem updating password. Error:${e}`);
     }
   }
 
@@ -93,6 +100,7 @@ export class UserInteractor {
           edits.password
         );
       }
+      user.password = undefined;
       responder.setCookie('presence', TokenManager.generateToken(user));
       return Promise.resolve();
     } catch (e) {
@@ -102,14 +110,13 @@ export class UserInteractor {
 
   public static async identifierInUse(
     dataStore: DataStore,
-    responder: Responder,
     username: string
-  ): Promise<void> {
+  ): Promise<{ inUse: boolean }> {
     try {
       const inUse = await dataStore.identifierInUse(username);
-      responder.sendObject({ inUse });
+      return { inUse };
     } catch (e) {
-      responder.sendOperationError(e);
+      return Promise.reject(e);
     }
   }
 }

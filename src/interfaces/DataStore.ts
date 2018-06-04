@@ -1,5 +1,6 @@
 import { User } from '@cyber4all/clark-entity';
 import { OTACode } from '../drivers/OTACodeManager';
+import { UserQuery } from './Query';
 
 export interface DataStore {
   connect(dbURI: string): Promise<void>;
@@ -13,5 +14,5 @@ export interface DataStore {
   insertOTACode(otaCode: OTACode): Promise<void>;
   findOTACode(otaCode: string): Promise<string>;
   deleteOTACode(id: string): Promise<void>;
-  searchUsers(query: {}): Promise<User[]>;
+  searchUsers(query: UserQuery): Promise<{ users: User[]; total: number }>;
 }
