@@ -79,12 +79,27 @@ export class UserInteractor {
   public static async editInfo(
     dataStore: DataStore,
     responder: Responder,
+    hasher: HashInterface,
     username: string,
     edits: {}
   ): Promise<void> {
     try {
+      const userEdits = {
+        name: edits.name,
+        email: edits.email,
+        organization: edits.organization,
+        bio: edits.bio
+      }
       const userID = await dataStore.findUser(username);
-      const user = await dataStore.editUser(userID, edits);
+      const user = await dataStore.editUser(userID, userEdits);
+      if (edits.password !== '') {
+        this.updatePassword (
+          dataStore,
+          hasher,
+          username,
+          edits.password
+        );
+      }
       user.password = undefined;
       responder.setCookie('presence', TokenManager.generateToken(user));
       return Promise.resolve();
