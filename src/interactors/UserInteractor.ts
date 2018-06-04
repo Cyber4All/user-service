@@ -29,8 +29,6 @@ export class UserInteractor {
     try {
       const userID = await dataStore.findUser(username);
       const user = await dataStore.loadUser(userID);
-      console.log('interactor');
-      console.log(user);
       return user; 
     } catch (error) {
       responder.sendOperationError(
