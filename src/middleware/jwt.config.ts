@@ -20,8 +20,9 @@ export const enforceTokenAccess = jwt({
     '/validate-captcha',
     { url: '/users', methods: ['POST', 'GET'] },
     '/users/ota-codes',
+    { url: /\/users\/[0-z,.,-]+/i, methods: ['GET'] },
     { url: '/users/tokens', methods: ['POST'] },
     'validate-captcha',
     '/users/identifiers/active'
   ]
-}); // register & search // all ota-code routes do their own verifcation outsides of JWT // login
+}); // register & search // all ota-code routes do their own verification outsides of JWT // login
