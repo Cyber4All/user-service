@@ -106,7 +106,9 @@ export class SendgridDriver implements Mailer {
       cc,
       bcc,
       replyTo,
-      headers
+      headers,
+      templateId: this.getTemplate(templateType),
+      substitutions: templateVars
     };
     return this.mailer.send(email);
   }
