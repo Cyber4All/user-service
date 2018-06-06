@@ -126,42 +126,44 @@ export default class RouteHandler {
         }
       });
 
-    // Get user information 
-    router
-      .route('/users/update')
-      .get(async (req, res) => {
-        try {
-          const query = req.query.username;
-          const user = await UserInteractor.findUser(
-            this.dataStore,
-            this.responseFactory.buildResponder(res),
-            query
-          );
-          this.responseFactory.buildResponder(res).sendUser(user);
-        } catch (e) {
-          this.responseFactory.buildResponder(res).sendOperationError(e);
-        }
-      });
+    // Get user information
+    router.get('/users/update', async (req, res) => {
+      try {
+        const query = req.query.username;
+        const user = await UserInteractor.findUser(this.dataStore, query);
+        this.responseFactory.buildResponder(res).sendUser(user);
+      } catch (e) {
+        this.responseFactory.buildResponder(res).sendOperationError(e);
+      }
+    });
 
     // Login
     router.post('/users/tokens', async (req, res) => {
-      await login(
-        this.dataStore,
-        this.responseFactory.buildResponder(res),
-        this.hasher,
-        req.body.username,
-        req.body.password
-      );
+      try {
+        await login(
+          this.dataStore,
+          this.responseFactory.buildResponder(res),
+          this.hasher,
+          req.body.username,
+          req.body.password
+        );
+      } catch (e) {
+        console.log(e);
+      }
     });
 
-    router.route('/users/password').get (async (req, res) => {
-      await passwordMatch(
-        this.dataStore,
-        this.responseFactory.buildResponder(res),
-        this.hasher,
-        req.user.username,
-        req.query.password
-      );
+    router.route('/users/password').get(async (req, res) => {
+      try {
+        await passwordMatch(
+          this.dataStore,
+          this.responseFactory.buildResponder(res),
+          this.hasher,
+          req.user.username,
+          req.query.password
+        );
+      } catch (e) {
+        console.log(e);
+      }
     });
 
     router
@@ -171,8 +173,26 @@ export default class RouteHandler {
       // if valid, returns OK
       // else, returns "INVALID TOKEN"
       .get(async (req, res) => {
-        this.responseFactory.buildResponder(res).sendUser(req['user']);
+        const responder = this.responseFactory.buildResponder(res);
+        try {
+          responder.sendUser(req['user']);
+        } catch (e) {
+          responder.sendOperationError('Invalid token');
+        }
       });
+
+    router.get('/users/:username/profile', async (req, res) => {
+      const responder = this.responseFactory.buildResponder(res);
+      try {
+        const user = await UserInteractor.findUser(
+          this.dataStore,
+          req.params.username
+        );
+        responder.sendUser(user);
+      } catch (e) {
+        responder.sendOperationError(e);
+      }
+    });
 
     router.route('/users/identifiers/active').get(async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
