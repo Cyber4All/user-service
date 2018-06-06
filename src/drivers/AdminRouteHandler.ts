@@ -38,6 +38,8 @@ export default class AdminRouteHandler {
         message: `Welcome to the Users Admin API v${version}`
       });
     });
+
+    // User Routes
     router.get('/users', async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
@@ -61,6 +63,8 @@ export default class AdminRouteHandler {
         responder.sendOperationError(e);
       }
     });
+
+    // Mailer Routes
     router.post('/mail', async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
@@ -77,5 +81,37 @@ export default class AdminRouteHandler {
         responder.sendOperationError(e);
       }
     });
+    router
+      .route('/mail/templates')
+      .get(async (req, res) => {
+        const responder = this.responseFactory.buildResponder(res);
+        try {
+          const templates = MailerInteractor.getTemplates();
+          responder.sendObject(templates);
+        } catch (e) {
+          responder.sendOperationError(e);
+        }
+      })
+      .post(async (req, res) => {
+        const responder = this.responseFactory.buildResponder(res);
+        try {
+          const subject = req.body.subject;
+          const email = req.body.email;
+          const template = req.body.template.name;
+          const templateVars = req.body.template.templateVariables;
+          await MailerInteractor.sendTemplateEmail(
+            this.mailer,
+            {
+              subject,
+              email
+            },
+            template,
+            templateVars
+          );
+          responder.sendOperationSuccess();
+        } catch (e) {
+          responder.sendOperationError(e);
+        }
+      });
   }
 }
