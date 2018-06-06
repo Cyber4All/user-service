@@ -20,7 +20,7 @@ export const enforceTokenAccess = jwt({
     '/validate-captcha',
     { url: '/users', methods: ['POST', 'GET'] },
     '/users/ota-codes',
-    { url: /\/users\/[0-z,.,-]+/i, methods: ['GET'] },
+    { url: /\/users\/[0-z,.,-]+\/profile/i, methods: ['GET'] },
     { url: '/users/tokens', methods: ['POST'] },
     'validate-captcha',
     '/users/identifiers/active'

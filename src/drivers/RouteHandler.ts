@@ -139,23 +139,31 @@ export default class RouteHandler {
 
     // Login
     router.post('/users/tokens', async (req, res) => {
-      await login(
-        this.dataStore,
-        this.responseFactory.buildResponder(res),
-        this.hasher,
-        req.body.username,
-        req.body.password
-      );
+      try {
+        await login(
+          this.dataStore,
+          this.responseFactory.buildResponder(res),
+          this.hasher,
+          req.body.username,
+          req.body.password
+        );
+      } catch (e) {
+        console.log(e);
+      }
     });
 
     router.route('/users/password').get(async (req, res) => {
-      await passwordMatch(
-        this.dataStore,
-        this.responseFactory.buildResponder(res),
-        this.hasher,
-        req.user.username,
-        req.query.password
-      );
+      try {
+        await passwordMatch(
+          this.dataStore,
+          this.responseFactory.buildResponder(res),
+          this.hasher,
+          req.user.username,
+          req.query.password
+        );
+      } catch (e) {
+        console.log(e);
+      }
     });
 
     router
@@ -165,10 +173,15 @@ export default class RouteHandler {
       // if valid, returns OK
       // else, returns "INVALID TOKEN"
       .get(async (req, res) => {
-        this.responseFactory.buildResponder(res).sendUser(req['user']);
+        const responder = this.responseFactory.buildResponder(res);
+        try {
+          responder.sendUser(req['user']);
+        } catch (e) {
+          responder.sendOperationError('Invalid token');
+        }
       });
 
-    router.get('/users/:username', async (req, res) => {
+    router.get('/users/:username/profile', async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
         const user = await UserInteractor.findUser(
