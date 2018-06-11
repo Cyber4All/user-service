@@ -31,13 +31,17 @@
     "@oriented/express": "^1.0.3",
     "@sendgrid/mail": "^6.2.1",
     "bcrypt": "^2.0.0",
+    "chai": "^4.1.2",
+    "chai-http": "^4.0.0",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
     "dotenv": "^5.0.0",
     "express-jwt": "^5.3.0",
     "jsonwebtoken": "^8.1.1",
+    "mocha": "^5.2.0",
     "mongodb": "^2.2.31",
     "morgan": "^1.9.0",
+    "nyc": "^12.0.2",
     "request": "^2.83.0",
     "request-promise": "^4.2.2"
   },
@@ -66,7 +70,7 @@
     "transform": {
       "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
-    "testRegex": ".*?(?=.spec).*?.(js|ts)",
+    "testRegex": ".*?(?=.spec).*?.(js)",
     "moduleFileExtensions": [
       "ts",
       "js"
