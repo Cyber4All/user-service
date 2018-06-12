@@ -57,6 +57,7 @@ export class UserInteractor {
       return Promise.reject(`Problem verifying email. Error: ${e}`);
     }
   }
+  
   public static async updatePassword(
     dataStore: DataStore,
     hasher: HashInterface,
