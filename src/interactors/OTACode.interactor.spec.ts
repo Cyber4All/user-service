@@ -24,17 +24,38 @@ describe('generateOTACode', () => {
       const email = 'nvisal1@students.towson.edu';
       return OTACodeInteractor.generateOTACode
       (driver, ACCOUNT_ACTIONS.VERIFY_EMAIL, email).then(val => {
-        expect(val, 'Did not return OTACode').to.exist; 
+        expect(val, 'Did not return OTACode').to.be.a('string'); 
         done();
       }).catch((error) => {
         console.log(error);
+        expect.fail();
         done();
       });
     }).catch((error) => {
       console.log(error);
+      expect.fail();
       done();
     });
   });
+    // Test 2: Provide unexpected input 
+    it('should return an error - empty email was given', done => {
+        driver.connect(dburi).then(val => {
+          const email = '';
+          return OTACodeInteractor.generateOTACode
+          (driver, ACCOUNT_ACTIONS.VERIFY_EMAIL, email).then(val => {
+            expect.fail(); 
+            done();
+          }).catch((error) => {
+            console.log(error);
+            expect(error).to.be.a('string');
+            done();
+          });
+        }).catch((error) => {
+          console.log(error);
+          expect.fail();
+          done();
+        });
+      });
 });
 
 // ** decode **
@@ -48,18 +69,39 @@ describe('decode', () => {
       const email = 'nvisal1@students.towson.edu';
       OTACodeInteractor.generateOTACode(driver, ACCOUNT_ACTIONS.VERIFY_EMAIL, email).then(val => {
         return OTACodeInteractor.decode(driver, val).then(val => {
-          expect(val, 'Did not return decoded').to.exist; 
+          expect(val, 'Did not return decoded').to.be.a('object'); 
           done();
         });
       }).catch((error) => {
         console.log(error);
+        expect.fail();
         done();
       });
     }).catch((error) => {
       console.log(error);
+      expect.fail();
       done();
     });
   });
+    // Test 2: Provide unexpected input 
+    it('should return an error - empty email was given!', done => {
+        driver.connect(dburi).then(val => {
+          const email = '';
+          OTACodeInteractor.generateOTACode(driver, ACCOUNT_ACTIONS.VERIFY_EMAIL, email).then(val => {
+            return OTACodeInteractor.decode(driver, val).then(val => {
+              expect.fail();
+              done();
+            });
+          }).catch((error) => {
+            expect(error, 'Did not return decoded').to.be.a('string'); 
+            done();
+          });
+        }).catch((error) => {
+          console.log(error);
+          expect.fail();
+          done();
+        });
+      });
 });
 
 // ** applyOTACode **
@@ -73,16 +115,22 @@ describe('applyOTACode', () => {
       const email = 'nvisal1@students.towson.edu';
       OTACodeInteractor.generateOTACode(driver, ACCOUNT_ACTIONS.VERIFY_EMAIL, email).then(val => {
         return OTACodeInteractor.applyOTACode(driver, val).then(val => {
-          expect(val, 'Did not return decoded').to.exist; 
+          expect(val, 'Did not return decoded').to.be.a('object'); 
+          done();
+        }).catch((error) => {
+          console.log(error);
+          expect.fail();
           done();
         });
       }).catch((error) => {
         console.log(error);
+        expect.fail();
         done();
       });
     }).catch((error) => {
       console.log(error);
+      expect.fail();
       done();
     });
   });
-});
+  

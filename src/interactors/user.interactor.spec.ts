@@ -33,14 +33,17 @@ describe('searchUsers', () => {
     driver.connect(dburi).then(val => {
       const query = { username: 'nvisal1' };
       return UserInteractor.searchUsers(driver, query).then(val => {
-        expect(val, 'users is not an array!').to.exist; 
+        console.log('searchUsers test 1 was successful!');
+        expect(val, 'users is not an array!').to.exist;
         done();
       }).catch((error) => {
         console.log(error);
+        expect.fail();
         done();
       });
     }).catch((error) => {
       console.log(error);
+      expect.fail();
       done();
     });
   });
@@ -48,10 +51,13 @@ describe('searchUsers', () => {
   it('should return an error message', done => {
     const query = { username: 'nvisal1' };
     // Here we are passing an incorrect parameter for DataStore
-    return UserInteractor.searchUsers(driver, query).then(val => {
+    return UserInteractor.searchUsers(this.driver, query).then(val => {
+      console.log('searchUsers test 2 was unsuccessful');
+      console.log(val);
+      expect.fail();
       done();
     }).catch((error) => {
-      console.log(error);
+      console.log('searchUsers test 2 was successful!');
       expect(error, 'Expected error!').to.be.a('string');
       done();
     });
@@ -68,25 +74,31 @@ describe('findUser', () => {
     driver.connect(dburi).then(val => {
       const username = 'nvisal1';
       return UserInteractor.findUser(driver, username).then(val => {
-        expect(val, 'Expected user was not returned!').to.include('nvisal1'); 
-        this.driver.disconnect();
+        expect(val.username, 'Expected user was not returned!').to.equal('nvisal1'); 
+        console.log('findUser test 1 was successful');
         done();
       }).catch((error) => {
+        console.log('findUser test 1 was unsuccessful');
         console.log(error);
+        expect.fail();
         done();
       });
     }).catch((error) => {
+      console.log('findUser test 1 was unsuccessful');  
       console.log(error);
+      expect.fail();
       done();
     });
   });
   it('should return an error message', done => {
     const username = 'nvisal1';
     // Here we are passing an incorrect parameter for DataStore
-    return UserInteractor.findUser(driver, username).then(val => {
-      console.log(val);
+    return UserInteractor.findUser(this.driver, username).then(val => {
+      console.log('findUser test 2 was unsuccessful'); 
+      expect.fail();
       done();
     }).catch((error) => {
+      console.log('findUser test 2 was successful'); 
       expect(error, 'Expected user was not returned!').to.be.a('string');
       done();
     });
@@ -148,19 +160,39 @@ describe('findUser', () => {
 // failure - returns Promise.reject
 describe('identifierInUse', () => {
     // Test 1: Provide expected input 
-  it('should return a boolean inUse', done => {
+  it('should return a boolean inUse - true', done => {
     driver.connect(dburi).then(val => {
       const username = 'nvisal1';
       return UserInteractor.identifierInUse(driver, username).then(val => {
         expect(val.inUse, 'Expected isUse variable was not true').be.true; 
-        driver.disconnect();
+        console.log('identifierInUse test 1 was successful');
         done();
       }).catch((error) => {
-        console.log(error);
+        console.log('identifierInUse test 1 was unsuccessful');
+        expect.fail();
         done();
       });
     }).catch((error) => {
-      console.log(error);
+      console.log('identifierInUse test 1 was unsuccessful');
+      expect.fail();
+      done();
+    });
+  });
+  it('should return a boolean inUse - false', done => {
+    driver.connect(dburi).then(val => {
+      const username = '';
+      return UserInteractor.identifierInUse(driver, username).then(val => {
+        expect(val.inUse, 'Expected isUse variable was not true').be.false; 
+        console.log('identifierInUse test 2 was successful');
+        done();
+      }).catch((error) => {
+        console.log('identifierInUse test 2 was unsuccessful');
+        expect.fail();
+        done();
+      });
+    }).catch((error) => {
+      console.log('identifierInUse test 2 was unsuccessful');
+      expect.fail();
       done();
     });
   });
