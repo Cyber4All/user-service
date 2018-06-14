@@ -72,7 +72,6 @@ export async function register(
     ) {
       const pwdhash = await hasher.hash(user.password);
       user.password = pwdhash;
-      const userID = await datastore.insertUser(user);
       const token = TokenManager.generateToken(user);
       delete user.password;
       return { user, token };
@@ -103,7 +102,6 @@ export async function passwordMatch(
 ) {
   try {
     let id;
-    // User is already logged in, should never return invalid login
     try {
       id = await dataStore.findUser(username);
     } catch (e) {
