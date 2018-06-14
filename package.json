@@ -12,7 +12,7 @@
     "zip": "cp ./package.json ./dist && cd ./dist && zip -r ../dist.zip  ./* & cd ..",
     "deploy": "eb deploy User-Service-Production --profile clark --label $(node -p \"require('./package.json').version\")",
     "prettify": "node_modules/.bin/prettier --write ./src/**/* --single-quote",
-    "test": "node_modules/.bin/jest --verbose"
+    "test": "node_modules/.bin/jest --verbose  --coverage"
   },
   "repository": {
     "type": "git",

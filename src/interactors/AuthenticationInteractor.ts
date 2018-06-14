@@ -43,19 +43,18 @@ export async function login(
     if (authenticated) {
       const token = TokenManager.generateToken(user);
       responder.setCookie('presence', token);
-      responder.sendUser(user);
-    } else {
-      responder.invalidLogin();
-    }
+      return user;
+    } 
+    return authenticated;
   } catch (e) {
     console.log(e);
-    responder.sendOperationError(e);
+    return Promise.reject(`Problem while trying to login. Error:${e}`);
   }
 }
 
 export async function logout(dataStore: DataStore, responder: Responder) {
   responder.removeCookie('presence');
-  responder.sendOperationSuccess();
+  return true;
 }
 
 /**
@@ -85,13 +84,13 @@ export async function register(
       const token = TokenManager.generateToken(user);
       delete user.password;
       responder.setCookie('presence', token);
-      responder.sendUser(user);
-    } else {
-      responder.sendOperationError('Invalid username provided.', 400);
-    }
+      return user;
+    } 
+    return Promise.reject(`Invalid username provided`);
+    // responder.sendOperationError('Invalid username provided.', 400);
   } catch (e) {
     console.log(e);
-    responder.sendOperationError(e);
+    return Promise.reject(`Invalid username provided. Error:${e}`);
   }
 }
 
@@ -126,13 +125,12 @@ export async function passwordMatch(
     delete user.password;
 
     if (authenticated) {
-      responder.sendPasswordMatch(true);
-    } else {
-      responder.sendPasswordMatch(false);
-    }
+      return true;
+    } 
+    return false;
   } catch (e) {
     console.log(e);
-    responder.sendOperationError(e);
+    return Promise.reject(`Could not perform password match. Error:${e}`);
   }
 }
 

@@ -5,11 +5,13 @@ import {
     Responder,
     HashInterface
   } from '../interfaces/interfaces';
+// import BcryptDriver from '../drivers/BcryptDriver';
 import MongoDriver from '../drivers/MongoDriver';
 import RouteResponder  from '../drivers/RouteResponder';
 
 const expect = require('chai').expect;
 const driver = new MongoDriver; // DataStore 
+// const hasher = new BcryptDriver(3); // Hasher
 const responder = new RouteResponder; // Responder
 const dburi = process.env.CLARK_DB_URI_DEV.replace(
     /<DB_PASSWORD>/g,
@@ -109,50 +111,49 @@ describe('findUser', () => {
 // params (dataStore: DataStore, responder: Responder, email: String)
 // success - returns a user 
 // failure - returns Promise.reject(`Problem verifying email. Error: ${e}`);
-// describe('verifyEmail', () => {
-//     // Test 1: Provide expected input 
-//   it('should return a user', done => {
-//     driver.connect(dburi).then(val => {
-//       const email = 'nvisal1';
-//       return UserInteractor.verifyEmail(driver, responder, email).then(val => {
-//         expect(val, 'Expected user was not returned!').to.include('nvisal1'); 
-//         this.driver.disconnect();
-//         done();
-//       }).catch((error) => {
-//         console.log(error);
-//         done();
-//       });
-//     }).catch((error) => {
-//       console.log(error);
-//       done();
-//     });
-//   });
-// }); 
+describe('verifyEmail', () => {
+    // Test 1: Provide expected input 
+  it('should return a user', done => {
+    driver.connect(dburi).then(val => {
+      const email = 'nvisal1';
+      return UserInteractor.verifyEmail(driver, responder, email).then(val => {
+        expect(val, 'Expected user was not returned!').to.include('nvisal1'); 
+        this.driver.disconnect();
+        done();
+      }).catch((error) => {
+        console.log(error);
+        done();
+      });
+    }).catch((error) => {
+      console.log(error);
+      done();
+    });
+  });
+}); 
 
-// // ** updatePassword **
-// // params (dataStore: DataStore, hasher: HashInterface, email: String, password: String)
-// // success - returns a user 
-// // failure - returns Promise.reject(`Problem updating password. Error:${e}`);
-// describe('updatePassword', () => {
-//     // Test 1: Provide expected input 
-//   it('should return a user', done => {
-//     driver.connect(dburi).then(val => {
-//       const email = 'nvisal1';
-//       const password = '';
-//       return UserInteractor.updatePassword(driver, hasher, email, password).then(val => {
-//         expect(val, 'Expected user was not returned!').to.include('nvisal1'); 
-//         this.driver.disconnect();
-//         done();
-//       }).catch((error) => {
-//         console.log(error);
-//         done();
-//       });
-//     }).catch((error) => {
-//       console.log(error);
-//       done();
-//     });
-//   });
-// }); 
+// ** updatePassword **
+// params (dataStore: DataStore, hasher: HashInterface, email: String, password: String)
+// success - returns a user 
+// failure - returns Promise.reject(`Problem updating password. Error:${e}`);
+describe('updatePassword', () => {
+    // Test 1: Provide expected input 
+  it('should return a user', done => {
+    driver.connect(dburi).then(val => {
+      const email = 'nvisal1';
+      const password = '122595';
+      return UserInteractor.updatePassword(driver, hasher, email, password).then(val => {
+        expect(val, 'Expected user was not returned!').to.exist; 
+        done();
+      }).catch((error) => {
+        console.log(error);
+        done();
+      });
+    }).catch((error) => {
+      console.log(error);
+      done();
+    });
+  });
+}); 
 
 // ** identifierInUse **
 // params (dataStore: DataStore, username: String)

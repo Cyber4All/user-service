@@ -85,27 +85,34 @@ export default class RouteHandler {
           responder.sendOperationError(e);
         }
       })
+      // register
       .post(async (req, res) => {
+        const responder = this.responseFactory.buildResponder(res);
         const user = User.instantiate(req.body);
-        await register(
-          this.dataStore,
-          this.responseFactory.buildResponder(res),
-          this.hasher,
-          user
-        );
         try {
-          const otaCode = await OTACodeInteractor.generateOTACode(
+          const registeredUser = await register(
             this.dataStore,
-            ACCOUNT_ACTIONS.VERIFY_EMAIL,
-            user.email
+            this.responseFactory.buildResponder(res),
+            this.hasher,
+            user
           );
-          MailerInteractor.sendEmailVerification(
-            this.mailer,
-            user.email,
-            otaCode
-          );
+          try {
+            const otaCode = await OTACodeInteractor.generateOTACode(
+              this.dataStore,
+              ACCOUNT_ACTIONS.VERIFY_EMAIL,
+              user.email
+            );
+            MailerInteractor.sendEmailVerification(
+              this.mailer,
+              user.email,
+              otaCode
+            );
+            responder.sendUser(registeredUser);
+          } catch (e) {
+            console.log(e);
+          }
         } catch (e) {
-          console.log(e);
+          responder.sendOperationError(e);
         }
       })
       .patch(async (req, res) => {
@@ -139,30 +146,38 @@ export default class RouteHandler {
 
     // Login
     router.post('/users/tokens', async (req, res) => {
+      const responder = this.responseFactory.buildResponder(res);
       try {
-        await login(
+        const user = await login(
           this.dataStore,
-          this.responseFactory.buildResponder(res),
+          responder,
           this.hasher,
           req.body.username,
           req.body.password
         );
+        if (user === false) {
+          responder.invalidLogin();
+        } 
+        responder.sendUser(user);
       } catch (e) {
-        console.log(e);
+        responder.sendOperationError(e);
       }
     });
-
+    // password match
     router.route('/users/password').get(async (req, res) => {
+      const responder = this.responseFactory.buildResponder(res);
       try {
-        await passwordMatch(
+        const status = await passwordMatch(
           this.dataStore,
           this.responseFactory.buildResponder(res),
           this.hasher,
           req.user.username,
           req.query.password
         );
+        responder.sendPasswordMatch(status);
       } catch (e) {
         console.log(e);
+        responder.sendOperationError(e);
       }
     });
 
@@ -227,9 +242,12 @@ export default class RouteHandler {
       }
     });
 
+    // logout
     router.delete('/users/:username/tokens', async (req, res) => {
+      const responder = this.responseFactory.buildResponder(res);
       // TODO invalidate JWT here as well as clearing the login cookie
-      logout(this.dataStore, this.responseFactory.buildResponder(res));
+      await logout(this.dataStore, this.responseFactory.buildResponder(res));
+      responder.sendOperationSuccess();
     });
 
     router
