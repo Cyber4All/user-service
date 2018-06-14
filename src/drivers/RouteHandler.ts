@@ -246,8 +246,6 @@ export default class RouteHandler {
     // logout
     router.delete('/users/:username/tokens', async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
-      // // TODO invalidate JWT here as well as clearing the login cookie
-      // await logout(this.dataStore, this.responseFactory.buildResponder(res));
       responder.removeCookie('presence');
       responder.sendOperationSuccess();
     });

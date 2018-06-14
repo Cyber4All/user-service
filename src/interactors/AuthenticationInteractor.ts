@@ -50,10 +50,6 @@ export async function login(
   }
 }
 
-// export async function logout(dataStore: DataStore, responder: Responder) {
-//   return true;
-// }
-
 /**
  * Attempt user registraction via datastore and issues JWT access token
  * If username is unique sends user with access token
@@ -66,7 +62,6 @@ export async function login(
  */
 export async function register(
   datastore: DataStore,
-  responder: Responder,
   hasher: HashInterface,
   user: User
 ) {
@@ -80,7 +75,7 @@ export async function register(
       const userID = await datastore.insertUser(user);
       const token = TokenManager.generateToken(user);
       delete user.password;
-      return {user, token};
+      return { user, token };
     } 
     return Promise.reject(`Invalid username provided`);
     // responder.sendOperationError('Invalid username provided.', 400);
