@@ -92,7 +92,6 @@ export default class RouteHandler {
         try {
           const registeredUser = await register(
             this.dataStore,
-            this.responseFactory.buildResponder(res),
             this.hasher,
             user
           );
@@ -107,7 +106,8 @@ export default class RouteHandler {
               user.email,
               otaCode
             );
-            responder.sendUser(registeredUser);
+            responder.setCookie('presence', registeredUser['token']);
+            responder.sendUser(registeredUser['user']);
           } catch (e) {
             console.log(e);
           }
