@@ -9,7 +9,6 @@ import {
 import {
   login,
   register,
-  logout,
   passwordMatch
 } from '../interactors/AuthenticationInteractor';
 import { UserResponseFactory, OTACodeManager } from './drivers';
@@ -170,7 +169,6 @@ export default class RouteHandler {
       try {
         const status = await passwordMatch(
           this.dataStore,
-          this.responseFactory.buildResponder(res),
           this.hasher,
           req.user.username,
           req.query.password

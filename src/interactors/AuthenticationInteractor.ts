@@ -97,7 +97,6 @@ export async function register(
  */
 export async function passwordMatch(
   dataStore: DataStore,
-  responder: Responder,
   hasher: HashInterface,
   username: string,
   password: string
@@ -108,8 +107,7 @@ export async function passwordMatch(
     try {
       id = await dataStore.findUser(username);
     } catch (e) {
-      responder.invalidLogin();
-      return;
+      return Promise.reject(`Could not perform password match. Error:${e}`);
     }
     const user = await dataStore.loadUser(id);
     const authenticated = await hasher.verify(password, user.password);
