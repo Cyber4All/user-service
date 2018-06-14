@@ -50,10 +50,9 @@ export async function login(
   }
 }
 
-export async function logout(dataStore: DataStore, responder: Responder) {
-  responder.removeCookie('presence');
-  return true;
-}
+// export async function logout(dataStore: DataStore, responder: Responder) {
+//   return true;
+// }
 
 /**
  * Attempt user registraction via datastore and issues JWT access token
