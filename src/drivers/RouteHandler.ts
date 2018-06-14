@@ -150,15 +150,16 @@ export default class RouteHandler {
       try {
         const user = await login(
           this.dataStore,
-          responder,
           this.hasher,
           req.body.username,
           req.body.password
         );
         if (user === false) {
           responder.invalidLogin();
-        } 
-        responder.sendUser(user);
+        } else {
+          responder.setCookie('presence', user['token']);
+          responder.sendUser(user['user']);
+        }
       } catch (e) {
         responder.sendOperationError(e);
       }

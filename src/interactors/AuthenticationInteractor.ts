@@ -21,29 +21,27 @@ import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
  */
 export async function login(
   dataStore: DataStore,
-  responder: Responder,
   hasher: HashInterface,
   username: string,
   password: string
 ) {
   try {
     let id;
-
+    let authenticated = false;
     try {
       id = await dataStore.findUser(username);
     } catch (e) {
-      responder.invalidLogin();
-      return;
+      return authenticated;
     }
 
     const user = await dataStore.loadUser(id);
-    const authenticated = await hasher.verify(password, user.password);
+    authenticated = await hasher.verify(password, user.password);
     delete user.password;
 
     if (authenticated) {
       const token = TokenManager.generateToken(user);
-      responder.setCookie('presence', token);
-      return user;
+      // responder.setCookie('presence', token);
+      return { user, token };
     } 
     return authenticated;
   } catch (e) {
@@ -83,8 +81,7 @@ export async function register(
       const userID = await datastore.insertUser(user);
       const token = TokenManager.generateToken(user);
       delete user.password;
-      responder.setCookie('presence', token);
-      return user;
+      return {user, token};
     } 
     return Promise.reject(`Invalid username provided`);
     // responder.sendOperationError('Invalid username provided.', 400);
