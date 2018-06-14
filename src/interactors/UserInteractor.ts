@@ -43,16 +43,16 @@ export class UserInteractor {
 
   public static async verifyEmail(
     dataStore: DataStore,
-    responder: Responder,
     email: string
-  ): Promise<User> {
+  ) {
     try {
       const userID = await dataStore.findUser(email);
       await dataStore.editUser(userID, { emailVerified: true });
       const user = await dataStore.loadUser(userID);
       user.password = undefined;
-      responder.setCookie('presence', TokenManager.generateToken(user));
-      return user;
+      const token = TokenManager.generateToken(user);
+      // responder.setCookie('presence', token);
+      return { user, token };
     } catch (e) {
       return Promise.reject(`Problem verifying email. Error: ${e}`);
     }
@@ -86,19 +86,19 @@ export class UserInteractor {
   ): Promise<void> {
     try {
       const userEdits = {
-        name: edits.name,
-        email: edits.email,
-        organization: edits.organization,
-        bio: edits.bio
+        name: edits['name'],
+        email: edits['email'],
+        organization: edits['organization'],
+        bio: edits['bio']
       }
       const userID = await dataStore.findUser(username);
       const user = await dataStore.editUser(userID, userEdits);
-      if (edits.password !== '') {
+      if (edits['password'] !== '') {
         this.updatePassword (
           dataStore,
           hasher,
           username,
-          edits.password
+          edits['password']
         );
       }
       user.password = undefined;

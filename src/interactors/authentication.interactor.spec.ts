@@ -1,4 +1,4 @@
-import { login, logout, register, passwordMatch, isValidUsername } 
+import { login, register, passwordMatch, isValidUsername } 
 from './AuthenticationInteractor';
 import { BcryptDriver } from '../drivers/BcryptDriver';
 import MongoDriver from '../drivers/MongoDriver';
@@ -29,11 +29,9 @@ describe('AuthenticationInteractor', () => {
       const username  = 'nvisal1'; 
       const password  = '122595';
       login(driver, hasher, username, password).then(val => {
-        console.log(val);
         expect(val).to.be.a('object');
         done();
       }).catch ((error) => {
-        console.log(error);
         expect.fail();
         done();
       });
@@ -42,11 +40,9 @@ describe('AuthenticationInteractor', () => {
       const username  = 'nvisal1'; 
       const password  = '';
       login(driver, hasher, username, password).then(val => {
-        console.log(val);
         expect.fail();
         done();
       }).catch ((error) => {
-        console.log(error);
         expect(error).to.be.a('object');
         done();
       });
@@ -55,11 +51,9 @@ describe('AuthenticationInteractor', () => {
       const username  = ''; 
       const password  = '122595';
       login(driver, hasher, username, password).then(val => {
-        console.log(val);
         expect.fail();
         done();
       }).catch ((error) => {
-        console.log(error);
         expect(error).to.be.a('object');
         done();
       });
@@ -68,11 +62,9 @@ describe('AuthenticationInteractor', () => {
       const username  = ''; 
       const password  = '';
       login(driver, hasher, username, password).then(val => {
-        console.log(val);
         expect.fail();
         done();
       }).catch ((error) => {
-        console.log(error);
         expect(error).to.be.a('object');
         done();
       });
@@ -146,11 +138,9 @@ describe('AuthenticationInteractor', () => {
       const username  = 'nvisal1'; 
       const password  = '122595';
       passwordMatch(driver, hasher, username, password).then(val => {
-        console.log(val);
         expect(val).to.be.true;
         done();
       }).catch ((error) => {
-        console.log(error);
         expect.fail();
         done();
       });
@@ -159,11 +149,9 @@ describe('AuthenticationInteractor', () => {
       const username  = ''; 
       const password  = '122595';
       passwordMatch(driver, hasher, username, password).then(val => {
-        console.log(val);
         expect.fail();
         done();
       }).catch ((error) => {
-        console.log(error);
         expect(error).to.be.a('string');
         done();
       });
@@ -172,11 +160,9 @@ describe('AuthenticationInteractor', () => {
       const username  = 'nvisal1'; 
       const password  = '';
       passwordMatch(driver, hasher, username, password).then(val => {
-        console.log(val);
         expect(val).to.be.false;
         done();
       }).catch ((error) => {
-        console.log(error);
         expect.fail();
         done();
       });

@@ -298,11 +298,11 @@ export default class RouteHandler {
             case ACCOUNT_ACTIONS.VERIFY_EMAIL:
               const user = await UserInteractor.verifyEmail(
                 this.dataStore,
-                responder,
                 decoded.data.email
               );
               // await MailerInteractor.sendWelcomeEmail(this.mailer, user);
-              responder.sendObject({ username: user.username });
+              responder.setCookie('presence', user['token']);
+              responder.sendObject({ username: user.user.username });
               break;
             case ACCOUNT_ACTIONS.RESET_PASSWORD:
               responder.redirectTo(REDIRECT_ROUTES.RESET_PASSWORD(otaCode));

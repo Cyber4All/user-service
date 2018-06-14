@@ -20,14 +20,14 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">65.31% </span>
+        <span class="strong">66.21% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>96/147</span>
+        <span class='fraction'>96/145</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">68.37% </span>
+        <span class="strong">69.07% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>67/98</span>
+        <span class='fraction'>67/97</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">81.82% </span>
@@ -35,9 +35,9 @@
         <span class='fraction'>18/22</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">69.44% </span>
+        <span class="strong">70.75% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>75/108</span>
+        <span class='fraction'>75/106</span>
       </div>
     </div>
     <p class="quiet">
@@ -242,10 +242,7 @@
 <a name='L194'></a><a href='#L194'>194</a>
 <a name='L195'></a><a href='#L195'>195</a>
 <a name='L196'></a><a href='#L196'>196</a>
-<a name='L197'></a><a href='#L197'>197</a>
-<a name='L198'></a><a href='#L198'>198</a>
-<a name='L199'></a><a href='#L199'>199</a>
-<a name='L200'></a><a href='#L200'>200</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L197'></a><a href='#L197'>197</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">12x</span>
@@ -364,9 +361,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -547,11 +541,11 @@ exports.login = login;
  */
 function <span class="fstat-no" title="function not covered" >register(</span>datastore, hasher, user) {
 <span class="cstat-no" title="statement not covered" >    return __awaiter(this, void 0, void 0, <span class="fstat-no" title="function not covered" >fu</span>nction () {</span>
-        var _a, pwdhash, userID, token, e_3;
+        var _a, pwdhash, token, e_3;
 <span class="cstat-no" title="statement not covered" >        return __generator(this, <span class="fstat-no" title="function not covered" >fu</span>nction (_b) {</span>
 <span class="cstat-no" title="statement not covered" >            switch (_b.label) {</span>
                 case 0:
-<span class="cstat-no" title="statement not covered" >                    _b.trys.push([0, 6, , 7]);</span>
+<span class="cstat-no" title="statement not covered" >                    _b.trys.push([0, 5, , 6]);</span>
 <span class="cstat-no" title="statement not covered" >                    _a = isValidUsername(user.username);</span>
 <span class="cstat-no" title="statement not covered" >                    if (!_a) <span class="cstat-no" title="statement not covered" >return [3 /*break*/, 2];</span></span>
 <span class="cstat-no" title="statement not covered" >                    return [4 /*yield*/, datastore.identifierInUse(user.username)];</span>
@@ -559,23 +553,20 @@ function <span class="fstat-no" title="function not covered" >register(</span>da
 <span class="cstat-no" title="statement not covered" >                    _a = !(_b.sent());</span>
 <span class="cstat-no" title="statement not covered" >                    _b.label = 2;</span>
                 case 2:
-<span class="cstat-no" title="statement not covered" >                    if (!_a) <span class="cstat-no" title="statement not covered" >return [3 /*break*/, 5];</span></span>
+<span class="cstat-no" title="statement not covered" >                    if (!_a) <span class="cstat-no" title="statement not covered" >return [3 /*break*/, 4];</span></span>
 <span class="cstat-no" title="statement not covered" >                    return [4 /*yield*/, hasher.hash(user.password)];</span>
                 case 3:
 <span class="cstat-no" title="statement not covered" >                    pwdhash = _b.sent();</span>
 <span class="cstat-no" title="statement not covered" >                    user.password = pwdhash;</span>
-<span class="cstat-no" title="statement not covered" >                    return [4 /*yield*/, datastore.insertUser(user)];</span>
-                case 4:
-<span class="cstat-no" title="statement not covered" >                    userID = _b.sent();</span>
 <span class="cstat-no" title="statement not covered" >                    token = drivers_1.TokenManager.generateToken(user);</span>
 <span class="cstat-no" title="statement not covered" >                    delete user.password;</span>
 <span class="cstat-no" title="statement not covered" >                    return [2 /*return*/, { user: user, token: token }];</span>
-                case 5: <span class="cstat-no" title="statement not covered" >return [2 /*return*/, Promise.reject("Invalid username provided")];</span>
-                case 6:
+                case 4: <span class="cstat-no" title="statement not covered" >return [2 /*return*/, Promise.reject("Invalid username provided")];</span>
+                case 5:
 <span class="cstat-no" title="statement not covered" >                    e_3 = _b.sent();</span>
 <span class="cstat-no" title="statement not covered" >                    console.log(e_3);</span>
 <span class="cstat-no" title="statement not covered" >                    return [2 /*return*/, Promise.reject("Invalid username provided. Error:" + e_3)];</span>
-                case 7: <span class="cstat-no" title="statement not covered" >return [2 /*return*/];</span>
+                case 6: <span class="cstat-no" title="statement not covered" >return [2 /*return*/];</span>
             }
         });
     });
@@ -649,7 +640,7 @@ exports.isValidUsername = isValidUsername;
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Jun 14 2018 14:20:49 GMT-0400 (EDT)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Jun 14 2018 14:54:44 GMT-0400 (EDT)
 </div>
 </div>
 <script src="../prettify.js"></script>

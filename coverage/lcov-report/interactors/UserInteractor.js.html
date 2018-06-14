@@ -20,9 +20,9 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">7.98% </span>
+        <span class="strong">7.93% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>13/163</span>
+        <span class='fraction'>13/164</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">6.38% </span>
@@ -35,9 +35,9 @@
         <span class='fraction'>1/33</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">10.32% </span>
+        <span class="strong">10.24% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>13/126</span>
+        <span class='fraction'>13/127</span>
       </div>
     </div>
     <p class="quiet">
@@ -244,7 +244,8 @@
 <a name='L196'></a><a href='#L196'>196</a>
 <a name='L197'></a><a href='#L197'>197</a>
 <a name='L198'></a><a href='#L198'>198</a>
-<a name='L199'></a><a href='#L199'>199</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -348,6 +349,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -533,7 +535,7 @@ var UserInteractor = /** @class */ (function () {
     };
     UserInteractor.verifyEmail = <span class="fstat-no" title="function not covered" >fu</span>nction (dataStore, responder, email) {
 <span class="cstat-no" title="statement not covered" >        return __awaiter(this, void 0, void 0, <span class="fstat-no" title="function not covered" >fu</span>nction () {</span>
-            var userID, user, e_2;
+            var userID, user, token, e_2;
 <span class="cstat-no" title="statement not covered" >            return __generator(this, <span class="fstat-no" title="function not covered" >fu</span>nction (_a) {</span>
 <span class="cstat-no" title="statement not covered" >                switch (_a.label) {</span>
                     case 0:
@@ -548,7 +550,8 @@ var UserInteractor = /** @class */ (function () {
                     case 3:
 <span class="cstat-no" title="statement not covered" >                        user = _a.sent();</span>
 <span class="cstat-no" title="statement not covered" >                        user.password = undefined;</span>
-<span class="cstat-no" title="statement not covered" >                        responder.setCookie('presence', drivers_1.TokenManager.generateToken(user));</span>
+<span class="cstat-no" title="statement not covered" >                        token = drivers_1.TokenManager.generateToken(user);</span>
+<span class="cstat-no" title="statement not covered" >                        responder.setCookie('presence', token);</span>
 <span class="cstat-no" title="statement not covered" >                        return [2 /*return*/, user];</span>
                     case 4:
 <span class="cstat-no" title="statement not covered" >                        e_2 = _a.sent();</span>
@@ -593,10 +596,10 @@ var UserInteractor = /** @class */ (function () {
                     case 0:
 <span class="cstat-no" title="statement not covered" >                        _a.trys.push([0, 3, , 4]);</span>
 <span class="cstat-no" title="statement not covered" >                        userEdits = {</span>
-                            name: edits.name,
-                            email: edits.email,
-                            organization: edits.organization,
-                            bio: edits.bio
+                            name: edits['name'],
+                            email: edits['email'],
+                            organization: edits['organization'],
+                            bio: edits['bio']
                         };
 <span class="cstat-no" title="statement not covered" >                        return [4 /*yield*/, dataStore.findUser(username)];</span>
                     case 1:
@@ -604,8 +607,8 @@ var UserInteractor = /** @class */ (function () {
 <span class="cstat-no" title="statement not covered" >                        return [4 /*yield*/, dataStore.editUser(userID, userEdits)];</span>
                     case 2:
 <span class="cstat-no" title="statement not covered" >                        user = _a.sent();</span>
-<span class="cstat-no" title="statement not covered" >                        if (edits.password !== '') {</span>
-<span class="cstat-no" title="statement not covered" >                            this.updatePassword(dataStore, hasher, username, edits.password);</span>
+<span class="cstat-no" title="statement not covered" >                        if (edits['password'] !== '') {</span>
+<span class="cstat-no" title="statement not covered" >                            this.updatePassword(dataStore, hasher, username, edits['password']);</span>
                         }
 <span class="cstat-no" title="statement not covered" >                        user.password = undefined;</span>
 <span class="cstat-no" title="statement not covered" >                        responder.setCookie('presence', drivers_1.TokenManager.generateToken(user));</span>
@@ -646,7 +649,7 @@ exports.UserInteractor = UserInteractor;
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Jun 14 2018 14:20:49 GMT-0400 (EDT)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Jun 14 2018 14:54:44 GMT-0400 (EDT)
 </div>
 </div>
 <script src="../prettify.js"></script>
