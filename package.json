@@ -52,6 +52,7 @@
     "@types/jsonwebtoken": "^7.2.5",
     "@types/mongodb": "^2.2.13",
     "@types/node": "^9.3.0",
+    "danger": "^3.7.18",
     "gulp": "^3.9.1",
     "gulp-nodemon": "^2.2.1",
     "gulp-typescript": "^4.0.0-alpha.1",

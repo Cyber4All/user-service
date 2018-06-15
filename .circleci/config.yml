@@ -22,11 +22,8 @@ jobs:
               - ./package.json
               - ./.elasticbeanstalk
   test:
-    <<: *defaults
-    steps:
-      - attach_workspace : 
-          at: ~/user-service
-      - run: echo 'We need tests'
+    override:
+      - yarn danger ci
   deploy:
     <<: *defaults
     steps:
