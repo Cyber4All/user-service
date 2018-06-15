@@ -2,7 +2,7 @@ import {warn, danger} from "danger"
 
 const newFiles = danger.git.created_files;
 
-const EXTENSION = '.js';
+const EXTENSION = '.ts';
 const filesWithoutTests = [];
 
 // Rule 1: New files must come with tests.
