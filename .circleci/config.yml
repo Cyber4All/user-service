@@ -26,7 +26,7 @@ jobs:
     steps:
       - attach_workspace : 
           at: ~/user-service
-      - run: yarn danger ci
+      - run: node_modules/.bin/danger ci
   deploy:
     <<: *defaults
     steps:
