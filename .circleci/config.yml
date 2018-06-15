@@ -24,9 +24,10 @@ jobs:
   test:
     <<: *defaults
     steps:
+      - checkout
       - attach_workspace : 
           at: ~/user-service
-      - run: node_modules/.bin/danger ci
+      - run: ./node_modules/.bin/danger ci
   deploy:
     <<: *defaults
     steps:
