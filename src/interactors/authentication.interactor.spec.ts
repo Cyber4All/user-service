@@ -8,12 +8,13 @@ const expect = require('chai').expect;
 
 beforeAll(done => {
   // Before running any tests, connect to database
-  const dburi = process.env.CLARK_DB_URI_DEV.replace(
-    /<DB_PASSWORD>/g,
-    process.env.CLARK_DB_PWD
-  )
-  .replace(/<DB_PORT>/g, process.env.CLARK_DB_PORT)
-  .replace(/<DB_NAME>/g, process.env.CLARK_DB_NAME);
+  const dburi = process.env.CLARK_DB_URI_TEST;
+  // const dburi = process.env.CLARK_DB_URI_DEV.replace(
+  //   /<DB_PASSWORD>/g,
+  //   process.env.CLARK_DB_PWD
+  // )
+  // .replace(/<DB_PORT>/g, process.env.CLARK_DB_PORT)
+  // .replace(/<DB_NAME>/g, process.env.CLARK_DB_NAME);
   driver.connect(dburi).then(val => {
     console.log('connected to database');
     done();
