@@ -25,7 +25,6 @@ beforeAll(done => {
 });
 
 describe('searchUsers', () => {
-    // Test 1: Provide expected input 
   it('should return an array of users', done => {
     const query = { username: 'nvisal1' };
     return UserInteractor.searchUsers(driver, query).then(val => {
@@ -36,7 +35,32 @@ describe('searchUsers', () => {
       done();
     });
   });
-   // Test 2: Provide empty dataStore and expect error message
+  it('should return an array of users - password should be undefined when returned!', done => {
+    const query = { username: 'nvisal1' };
+    return UserInteractor.searchUsers(driver, query).then(val => {
+      console.log(val);
+      expect(val[0].password, 'users is not an array!').to.be.an('undefined');
+      done();
+    }).catch((error) => {
+      expect.fail();
+      done();
+    });
+  });
+  it('should return an array of users - accessGroups should be gone when returned!', done => {
+    const query = { username: 'nvisal1' };
+    return UserInteractor.searchUsers(driver, query).then(val => {
+      console.log(val[0].accessGroups);
+      if (val[0].hasOwnProperty('accessGroups')) {
+        expect.fail();
+        done();
+      }
+      // expect(val[0].accessGroups, 'users is not an array!').to.be.empty;
+      done();
+    }).catch((error) => {
+      expect.fail();
+      done();
+    });
+  });
   it('should return an error message', done => {
     const query = { username: 'nvisal1' };
     // Here we are passing an incorrect parameter for DataStore
@@ -50,10 +74,6 @@ describe('searchUsers', () => {
   });
 });
 
-// ** findUser **
-// params (dataStore: DataStore, username: String)
-// success - returns a user 
-// failure - returns Promise.reject(`Problem finding specified user. Error: ${error}`);
 describe('findUser', () => {
     // Test 1: Provide expected input 
   it('should return a user', done => {
@@ -79,10 +99,6 @@ describe('findUser', () => {
   });
 });
 
-// ** verifyEmail **
-// params (dataStore: DataStore, responder: Responder, email: String)
-// success - returns a user 
-// failure - returns Promise.reject(`Problem verifying email. Error: ${e}`);
 describe('verifyEmail', () => {
     // Test 1: Provide expected input 
   it('should return a user', done => {
@@ -98,10 +114,6 @@ describe('verifyEmail', () => {
   });
 }); 
 
-// ** updatePassword **
-// params (dataStore: DataStore, hasher: HashInterface, email: String, password: String)
-// success - returns a user 
-// failure - returns Promise.reject(`Problem updating password. Error:${e}`);
 describe('updatePassword', () => {
     // Test 1: Provide expected input 
   it('should return a user', done => {
@@ -118,10 +130,6 @@ describe('updatePassword', () => {
   });
 }); 
 
-// ** identifierInUse **
-// params (dataStore: DataStore, username: String)
-// success - returns a user 
-// failure - returns Promise.reject
 describe('identifierInUse', () => {
     // Test 1: Provide expected input 
   it('should return a boolean inUse - true', done => {

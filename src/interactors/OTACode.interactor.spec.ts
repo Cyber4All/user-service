@@ -22,10 +22,6 @@ beforeAll(done => {
   });
 });
 
-// ** generateOTACode **
-// params (dataStore: DataStore, action: ACCOUNT_ACTIONS, email: String)
-// success - returns an otaCode: String
-// failure - returns Promise.reject('Invalid action'); || Promise.reject(e)
 describe('generateOTACode', () => {
     // Test 1: Provide expected input 
   it('should return an OTACode', done => {
@@ -53,12 +49,7 @@ describe('generateOTACode', () => {
   });
 });
 
-// ** decode **
-// params (dataStore: DataStore, otaCode: String)
-// success - returns decoded;
-// failure - returns Promise.reject(e);
 describe('decode', () => {
-    // Test 1: Provide expected input 
   it('should return decoded', done => {
     const email = 'nvisal1@students.towson.edu';
     OTACodeInteractor.generateOTACode(driver, ACCOUNT_ACTIONS.VERIFY_EMAIL, email).then(val => {
@@ -71,7 +62,6 @@ describe('decode', () => {
       done();
     });
   });
-    // Test 2: Provide unexpected input 
   it('should return an error - empty email was given!', done => {
     const email = '';
     OTACodeInteractor.generateOTACode(driver, ACCOUNT_ACTIONS.VERIFY_EMAIL, email).then(val => {
@@ -86,12 +76,7 @@ describe('decode', () => {
   });
 });
 
-// ** applyOTACode **
-// params (dataStore: DataStore, otaCode: String)
-// success - returns otaCode.code;
-// failure - returns Promise.reject(e); || Promise.reject('Invalid email');
 describe('applyOTACode', () => {
-   // Test 1: Provide expected input 
   it('should return decoded', done => {
     const email = 'nvisal1@students.towson.edu';
     OTACodeInteractor.generateOTACode(driver, ACCOUNT_ACTIONS.VERIFY_EMAIL, email).then(val => {
