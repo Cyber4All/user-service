@@ -23,7 +23,6 @@ beforeAll(done => {
 });
 
 describe('generateOTACode', () => {
-    // Test 1: Provide expected input 
   it('should return an OTACode', done => {
     const email = 'nvisal1@students.towson.edu';
     return OTACodeInteractor.generateOTACode
@@ -35,17 +34,16 @@ describe('generateOTACode', () => {
         done();
       });
   });
-    // Test 2: Provide unexpected input 
   it('should return an error - empty email was given', done => {
     const email = '';
     return OTACodeInteractor.generateOTACode
-          (driver, ACCOUNT_ACTIONS.VERIFY_EMAIL, email).then(val => {
-            expect.fail(); 
-            done();
-          }).catch((error) => {
-            expect(error).to.be.a('string');
-            done();
-          });
+      (driver, ACCOUNT_ACTIONS.VERIFY_EMAIL, email).then(val => {
+        expect.fail(); 
+        done();
+      }).catch((error) => {
+        expect(error).to.be.a('string');
+        done();
+      });
   });
 });
 

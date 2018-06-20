@@ -37,6 +37,20 @@ describe('AuthenticationInteractor', () => {
         done();
       });
     });
+    it('should return a user - should come with a token!', done => {
+      const username = 'nvisal1';
+      const password = '122595';
+      login(driver, hasher, username, password).then(val => {
+        if (!val.hasOwnProperty('token')) {
+          expect.fail();
+          done();
+        }
+        done();
+      }).catch((error) => {
+        expect.fail();
+        done();
+      });
+    });
     it('should fail for incorrect password', done => {
       const username  = 'nvisal1'; 
       const password  = '';
@@ -83,6 +97,26 @@ describe('AuthenticationInteractor', () => {
         val['user'].username = 'UnitTester';
         return register(driver, hasher, val['user']).then(val => {
           expect(val).to.be.a('object');
+          done();
+        }).catch ((error) => {
+          expect.fail();
+          done();
+        });
+      }).catch ((error) => {
+        expect.fail();
+        done();
+      });
+    });
+    it('should return a user - should come with a token!', done => {
+      const username  = 'nvisal1'; 
+      const password  = '122595';
+      login(driver, hasher, username, password).then(val => {
+        val['user'].username = 'UnitTester';
+        return register(driver, hasher, val['user']).then(val => {
+          if (!val.hasOwnProperty('token')) {
+            expect.fail();
+            done();
+          }
           done();
         }).catch ((error) => {
           expect.fail();

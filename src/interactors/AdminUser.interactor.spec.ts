@@ -25,7 +25,6 @@ beforeAll(done => {
 });
 
 describe('fetchUsers', () => {
-    // Test 1: Provide expected input 
   it('should return an array of users', done => {
     const query = { username: 'nvisal1' };
     return AdminUserInteractor.fetchUsers(driver, query).then(val => {
@@ -33,6 +32,17 @@ describe('fetchUsers', () => {
       done();
     }).catch((error) => {
       console.log(error);
+      expect.fail();
+      done();
+    });
+  });
+  it('should return a user - password should be undefined when returned!', done => {
+    const query = { username: 'nvisal1' };
+    return AdminUserInteractor.fetchUsers(driver, query).then(val => {
+      console.log(val.users[0]['_password']);
+      expect(val.users[0]['_password'], 'user not returned!').to.be.undefined;
+      done();
+    }).catch((error) => {
       expect.fail();
       done();
     });
