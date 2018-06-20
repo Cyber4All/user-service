@@ -207,7 +207,6 @@ describe('updatePassword', () => {
 }); 
 
 describe('identifierInUse', () => {
-    // Test 1: Provide expected input 
   it('should return a boolean inUse - true', done => {
     const username = 'nvisal1';
     return UserInteractor.identifierInUse(driver, username).then(val => {
