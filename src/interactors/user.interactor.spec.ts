@@ -38,7 +38,6 @@ describe('searchUsers', () => {
   it('should return an array of users - password should be undefined when returned!', done => {
     const query = { username: 'nvisal1' };
     return UserInteractor.searchUsers(driver, query).then(val => {
-      console.log(val);
       expect(val[0].password, 'users is not an array!').to.be.an('undefined');
       done();
     }).catch((error) => {
@@ -54,7 +53,6 @@ describe('searchUsers', () => {
         expect.fail();
         done();
       }
-      // expect(val[0].accessGroups, 'users is not an array!').to.be.empty;
       done();
     }).catch((error) => {
       expect.fail();
@@ -82,6 +80,32 @@ describe('findUser', () => {
       expect(val.username, 'Expected user was not returned!').to.equal('nvisal1'); 
       done();
     }).catch((error) => {
+      expect.fail();
+      done();
+    });
+  });
+  it('should return a user - password should be undefined when returned!', done => {
+    const username = 'nvisal1';
+    return UserInteractor.findUser(driver, username).then(val => {
+      console.log(val);
+      expect(val.password, 'user not returned!').to.be.an('undefined');
+      done();
+    }).catch((error) => {
+      console.log(error);
+      expect.fail();
+      done();
+    });
+  });
+  it('should return a user - accessGroups should be gone when returned!', done => {
+    const username = 'nvisal1';
+    return UserInteractor.findUser(driver, username).then(val => {
+      if (val.hasOwnProperty('accessGroups')) {
+        expect.fail();
+        done();
+      }
+      done();
+    }).catch((error) => {
+      console.log(error);
       expect.fail();
       done();
     });
