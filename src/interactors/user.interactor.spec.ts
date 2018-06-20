@@ -73,7 +73,6 @@ describe('searchUsers', () => {
 });
 
 describe('findUser', () => {
-    // Test 1: Provide expected input 
   it('should return a user', done => {
     const username = 'nvisal1';
     return UserInteractor.findUser(driver, username).then(val => {
@@ -124,11 +123,37 @@ describe('findUser', () => {
 });
 
 describe('verifyEmail', () => {
-    // Test 1: Provide expected input 
   it('should return a user', done => {
-    const email = 'nvisal1';
+    const email = 'nvisal1@students.towson.edu';
     return UserInteractor.verifyEmail(driver, email).then(val => {
+      console.log(val);
       expect(val, 'Expected user was not returned!').to.be.a('object'); 
+      done();
+    }).catch((error) => {
+      console.log(error);
+      expect.fail();
+      done();
+    });
+  });
+  it('should return a user - password should be undefined when returned!', done => {
+    const email = 'nvisal1@students.towson.edu';
+    return UserInteractor.verifyEmail(driver, email).then(val => {
+      console.log(val);
+      expect(val.user.password, 'user not returned!').to.be.an('undefined');
+      done();
+    }).catch((error) => {
+      console.log(error);
+      expect.fail();
+      done();
+    });
+  });
+  it('should return a user - with a token!', done => {
+    const email = 'nvisal1@students.towson.edu';
+    return UserInteractor.verifyEmail(driver, email).then(val => {
+      if (!val.hasOwnProperty('token')) {
+        expect.fail();
+        done();
+      }
       done();
     }).catch((error) => {
       console.log(error);
