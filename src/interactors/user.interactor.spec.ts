@@ -164,12 +164,39 @@ describe('verifyEmail', () => {
 }); 
 
 describe('updatePassword', () => {
-    // Test 1: Provide expected input 
   it('should return a user', done => {
     const email = 'nvisal1';
     const password = '122595';
     return UserInteractor.updatePassword(driver, hasher, email, password).then(val => {
       expect(val, 'Expected user was not returned!').to.be.a('object'); 
+      done();
+    }).catch((error) => {
+      console.log(error);
+      expect.fail();
+      done();
+    });
+  });
+  it('should return a user - password should be undefined when returned!', done => {
+    const email = 'nvisal1';
+    const password = '122595';
+    return UserInteractor.updatePassword(driver, hasher, email, password).then(val => {
+      console.log(val);
+      expect(val.password, 'user not returned!').to.be.an('undefined');
+      done();
+    }).catch((error) => {
+      console.log(error);
+      expect.fail();
+      done();
+    });
+  });
+  it('should return a user - accessGroups should be gone when returned!', done => {
+    const email = 'nvisal1';
+    const password = '122595';
+    return UserInteractor.updatePassword(driver, hasher, email, password).then(val => {
+      if (val.hasOwnProperty('accessGroups')) {
+        expect.fail();
+        done();
+      }
       done();
     }).catch((error) => {
       console.log(error);
