@@ -27,4 +27,5 @@ export interface UserQuery extends Query {
   name?: string;
   email?: string;
   organization?: string;
+  orderBy?: UserOrderBy;
 }
