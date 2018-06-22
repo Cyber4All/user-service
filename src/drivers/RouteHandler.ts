@@ -194,6 +194,39 @@ export default class RouteHandler {
       }
     });
 
+    router
+    .route('/users/organizations')
+    .get(async (req, res) => {
+      const responder = this.responseFactory.buildResponder(res);
+      try {
+        // Hard coded implementation
+        responder.sendObject(
+          [
+            {
+              "institution": "Alabama A & M University"
+            },
+            {
+              "institution": "University of Alabama at Birmingham"
+            },
+            {
+              "institution": "Amridge University"
+            },
+            {
+              "institution": "University of Alabama in Huntsville"
+            },
+            {
+              "institution": "Alabama State University"
+            },
+            {
+              "institution": "University of Alabama System Office"
+            }
+          ]
+        );
+      } catch (e) {
+        responder.sendOperationError('Invalid orgs request');
+      }
+    });
+
     router.route('/users/identifiers/active').get(async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
