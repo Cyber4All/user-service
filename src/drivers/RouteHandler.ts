@@ -199,29 +199,20 @@ export default class RouteHandler {
     .get(async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
-        // Hard coded implementation
-        responder.sendObject(
-          [
-            {
-              "institution": "Alabama A & M University"
-            },
-            {
-              "institution": "University of Alabama at Birmingham"
-            },
-            {
-              "institution": "Amridge University"
-            },
-            {
-              "institution": "University of Alabama in Huntsville"
-            },
-            {
-              "institution": "Alabama State University"
-            },
-            {
-              "institution": "University of Alabama System Office"
-            }
-          ]
-        );
+        const orgs = await UserInteractor.findOrganizations(this.dataStore, req.query.query);
+        responder.sendObject(orgs);
+      } catch (e) {
+        responder.sendOperationError('Invalid orgs request');
+      }
+    });
+
+    router
+    .route('/users/verifyorganization')
+    .get(async (req, res) => {
+      const responder = this.responseFactory.buildResponder(res);
+      try {
+        const isValid = await UserInteractor.checkOrganization(this.dataStore, req.query.org);
+        responder.sendObject({ isValid });
       } catch (e) {
         responder.sendOperationError('Invalid orgs request');
       }

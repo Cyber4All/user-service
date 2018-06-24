@@ -119,4 +119,29 @@ export class UserInteractor {
       return Promise.reject(e);
     }
   }
+
+  public static async findOrganizations(
+    dataStore: DataStore,
+    query: string
+  ): Promise<any[]> {
+    try {
+      const orgs = await dataStore.findOrganizations(query);
+      return orgs;
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+
+  public static async checkOrganization(
+    dataStore: DataStore,
+    query: string
+  ): Promise<boolean> {
+    try {
+      console.log(query);
+      const isValid = await dataStore.checkOrganization(query);
+      return isValid;
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
 }
