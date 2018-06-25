@@ -23,6 +23,9 @@ export const enforceTokenAccess = jwt({
     { url: /\/users\/[0-z,.,-]+\/profile/i, methods: ['GET'] },
     { url: '/users/tokens', methods: ['POST'] },
     'validate-captcha',
-    '/users/identifiers/active'
+    '/users/identifiers/active',
+    '/users/organizations',
+    '/users/verifyorganization'
+
   ]
 }); // register & search // all ota-code routes do their own verification outsides of JWT // login
