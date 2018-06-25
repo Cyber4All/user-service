@@ -137,7 +137,6 @@ export class UserInteractor {
     query: string
   ): Promise<boolean> {
     try {
-      console.log(query);
       const isValid = await dataStore.checkOrganization(query);
       return isValid;
     } catch (e) {

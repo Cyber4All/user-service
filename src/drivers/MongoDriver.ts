@@ -391,7 +391,6 @@ export default class MongoDriver implements DataStore {
 
   async checkOrganization(query: string): Promise<boolean> {
     try {
-      console.log(query);
       let isValid: boolean;
       const organizations = await this.db
         .collection(COLLECTIONS.Organization.name)
