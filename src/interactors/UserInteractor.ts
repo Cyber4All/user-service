@@ -147,7 +147,6 @@ export class UserInteractor {
       return Promise.reject(`Unable to delete user. Error: ${e}`);
     }
   }
-}
 
 /**
  * Formats text properly for usage in DataStore
@@ -167,4 +166,28 @@ export function sanitizeText(text: string, lowerCase = true): string {
   }
 
   return clean;
+}
+  public static async findOrganizations(
+    dataStore: DataStore,
+    query: string
+  ): Promise<any[]> {
+    try {
+      const orgs = await dataStore.findOrganizations(query);
+      return orgs;
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+
+  public static async checkOrganization(
+    dataStore: DataStore,
+    query: string
+  ): Promise<boolean> {
+    try {
+      const isValid = await dataStore.checkOrganization(query);
+      return isValid;
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
 }
