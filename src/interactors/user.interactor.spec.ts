@@ -72,10 +72,10 @@ describe('searchUsers', () => {
 });
 
 describe('findUser', () => {
-  it('should return a user', done => {
+  it('should return a user ID', done => {
     const username = 'nvisal1';
     return UserInteractor.findUser(driver, username).then(val => {
-      expect(val.username, 'Expected user was not returned!').to.equal('nvisal1'); 
+      expect(val, 'Expected user was not returned!').to.equal('5a9583401405cb053272ced1'); 
       done();
     }).catch((error) => {
       expect.fail();
@@ -132,19 +132,8 @@ describe('verifyEmail', () => {
   it('should return a user - password should be undefined when returned!', done => {
     const email = 'nvisal1@students.towson.edu';
     return UserInteractor.verifyEmail(driver, email).then(val => {
-      expect(val.user.password, 'user not returned!').to.be.an('undefined');
-      done();
-    }).catch((error) => {
-      expect.fail();
-      done();
-    });
-  });
-  it('should return a user - with a token!', done => {
-    const email = 'nvisal1@students.towson.edu';
-    return UserInteractor.verifyEmail(driver, email).then(val => {
-      if (!val.hasOwnProperty('token')) {
+      if (val.hasOwnProperty('password')) {
         expect.fail();
-        done();
       }
       done();
     }).catch((error) => {
@@ -152,7 +141,7 @@ describe('verifyEmail', () => {
       done();
     });
   });
-}); 
+});
 
 describe('updatePassword', () => {
   it('should return a user', done => {
