@@ -90,43 +90,45 @@ describe('AuthenticationInteractor', () => {
 // Commented out so that we don't add new user for every test ran
 describe('AuthenticationInteractor', () => {
   describe('#register', () => {
-    it('should pass for new user object', done => {
-      const username  = 'nvisal1'; 
-      const password  = '122595';
-      login(driver, hasher, username, password).then(val => {
-        val['user'].username = 'UnitTester';
-        return register(driver, hasher, val['user']).then(val => {
-          expect(val).to.be.a('object');
-          done();
-        }).catch ((error) => {
-          expect.fail();
-          done();
-        });
-      }).catch ((error) => {
-        expect.fail();
-        done();
-      });
-    });
-    it('should return a user - should come with a token!', done => {
-      const username  = 'nvisal1'; 
-      const password  = '122595';
-      login(driver, hasher, username, password).then(val => {
-        val['user'].username = 'UnitTester';
-        return register(driver, hasher, val['user']).then(val => {
-          if (!val.hasOwnProperty('token')) {
-            expect.fail();
-            done();
-          }
-          done();
-        }).catch ((error) => {
-          expect.fail();
-          done();
-        });
-      }).catch ((error) => {
-        expect.fail();
-        done();
-      });
-    });
+    // it('should pass for new user object', done => {
+    //   const username  = 'nvisal1'; 
+    //   const password  = '122595';
+    //   login(driver, hasher, username, password).then(val => {
+    //     val['user'].username = 'UnitTester';
+    //     return register(driver, hasher, val['user']).then(val => {
+    //       console.log(val);
+    //       expect(val).to.be.a('object');
+    //       done();
+    //     }).catch ((error) => {
+    //       console.log(error);
+    //       expect.fail();
+    //       done();
+    //     });
+    //   }).catch ((error) => {
+    //     expect.fail();
+    //     done();
+    //   });
+    // });
+    // it('should return a user - should come with a token!', done => {
+    //   const username  = 'nvisal1'; 
+    //   const password  = '122595';
+    //   login(driver, hasher, username, password).then(val => {
+    //     val['user'].username = 'UnitTester';
+    //     return register(driver, hasher, val['user']).then(val => {
+    //       if (!val.hasOwnProperty('token')) {
+    //         expect.fail();
+    //         done();
+    //       }
+    //       done();
+    //     }).catch ((error) => {
+    //       expect.fail();
+    //       done();
+    //     });
+    //   }).catch ((error) => {
+    //     expect.fail();
+    //     done();
+    //   });
+    // });
     it('should fail for existing username', done => {
       const username  = 'nvisal1'; 
       const password  = '122595';

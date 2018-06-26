@@ -136,7 +136,7 @@ export default class RouteHandler {
     router.get('/users/update', async (req, res) => {
       try {
         const query = req.query.username;
-        const user = await UserInteractor.findUser(this.dataStore, query);
+        const user = await UserInteractor.loadUser(this.dataStore, query);
         this.responseFactory.buildResponder(res).sendUser(user);
       } catch (e) {
         this.responseFactory.buildResponder(res).sendOperationError(e);
@@ -198,7 +198,7 @@ export default class RouteHandler {
     router.get('/users/:username/profile', async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
-        const user = await UserInteractor.findUser(
+        const user = await UserInteractor.loadUser(
           this.dataStore,
           req.params.username
         );
@@ -224,7 +224,7 @@ export default class RouteHandler {
     router.get('/users/tokens/refresh', async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
-        const user = await UserInteractor.findUser(
+        const user = await UserInteractor.loadUser(
           this.dataStore,
           req.user.username
         );
@@ -244,8 +244,14 @@ export default class RouteHandler {
     // logout
     router.delete('/users/:username/tokens', async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
-      responder.removeCookie('presence');
-      responder.sendOperationSuccess();
+      const username = req.params.username;
+      const user = req.user;
+      if (user && user.username === username) {
+        responder.removeCookie('presence');
+        responder.sendOperationSuccess();
+      } else {
+        responder.sendOperationError('Unauthorized');
+      }
     });
 
     router
@@ -348,15 +354,21 @@ export default class RouteHandler {
         }
       });
 
-    // TODO: Remove account
-    // When implemented...
-    // provide token, which is then unauthorized, and return success message
-    // Need to implement promise rejection catch - error message in console on failure.
-    router.delete('/users/:username', async (req, res) => {
-      this.responseFactory
-        .buildResponder(res)
-        .sendOperationError('Cannot delete user accounts at this time');
-      throw new Error('Cannot delete user accounts at this time');
+    router.delete('/users/:username/account', async (req, res) => {
+      const responder = this.responseFactory.buildResponder(res);
+      try {
+        const user = req.user;
+        const username = req.params.username;
+        if (user.username === username) {
+          await UserInteractor.deleteUser(this.dataStore, username);
+          responder.removeCookie('presence');
+          responder.sendOperationSuccess();
+        } else {
+          responder.sendOperationError('User unauthorized for this action');
+        }
+      } catch (e) {
+        responder.sendOperationError(e);
+      }
     });
 
     router.get('/validate-captcha', async (req, res) => {

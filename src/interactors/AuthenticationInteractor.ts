@@ -7,6 +7,7 @@ import {
 import { TokenManager, OTACodeManager } from '../drivers/drivers';
 import { User } from '@cyber4all/clark-entity';
 import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
+import { sanitizeText } from './UserInteractor';
 
 /**
  * Attempts user login via datastore and issues JWT access token
@@ -28,8 +29,10 @@ export async function login(
   try {
     let id;
     let authenticated = false;
+    const userName = sanitizeText(username);
+    console.log(userName);
     try {
-      id = await dataStore.findUser(username);
+      id = await dataStore.findUser(userName);
     } catch (e) {
       return authenticated;
     }
@@ -72,6 +75,8 @@ export async function register(
     ) {
       const pwdhash = await hasher.hash(user.password);
       user.password = pwdhash;
+      const formattedUser = sanitizeUser(user);
+      const userID = await datastore.insertUser(user);
       const token = TokenManager.generateToken(user);
       delete user.password;
       return { user, token };
@@ -85,7 +90,7 @@ export async function register(
 }
 
 /**
- * Attempts to find the user via username and 
+ * Attempts to find the user via username and
  * and checks to see if the provided password is correct.
  *
  * @export
@@ -101,12 +106,8 @@ export async function passwordMatch(
   password: string
 ) {
   try {
-    let id;
-    try {
-      id = await dataStore.findUser(username);
-    } catch (e) {
-      return Promise.reject(`Could not perform password match. Error:${e}`);
-    }
+    const userName = sanitizeText(username);
+    const id = await dataStore.findUser(userName);
     const user = await dataStore.loadUser(id);
     const authenticated = await hasher.verify(password, user.password);
     delete user.password;
@@ -119,6 +120,15 @@ export async function passwordMatch(
     console.log(e);
     return Promise.reject(`Could not perform password match. Error:${e}`);
   }
+}
+
+function sanitizeUser(user: User): User {
+  user.username = sanitizeText(user.username);
+  user.email = sanitizeText(user.email);
+  user.name = sanitizeText(user.name);
+  user.organization = sanitizeText(user.organization);
+  user.bio = sanitizeText(user.bio, false);
+  return user;
 }
 
 /**

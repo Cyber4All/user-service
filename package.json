@@ -1,6 +1,6 @@
 {
   "name": "user-service",
-  "version": "1.0.0-beta.3.0",
+  "version": "1.0.0-beta.3.1",
   "description": "A microservice for handling user account actions in the CLARK platform.",
   "main": "app.js",
   "scripts": {
@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/Cyber4All/user-service#readme",
   "dependencies": {
-    "@cyber4all/clark-entity": "^2.1.0-beta.0.4",
+    "@cyber4all/clark-entity": "^2.0.5",
     "@cyber4all/clark-schema": "^2.0.0-beta.0.3",
     "@cyber4all/clark-taxonomy": "^2.0.0",
     "@oriented/express": "^1.0.3",

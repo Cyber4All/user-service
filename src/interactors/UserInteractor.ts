@@ -135,6 +135,7 @@ export class UserInteractor {
     }
   }
 
+<<<<<<< HEAD
   public static async findOrganizations(
     dataStore: DataStore,
     query: string
@@ -158,6 +159,8 @@ export class UserInteractor {
       return Promise.reject(e);
     }
   }
+=======
+>>>>>>> 9fb27d68970b98f5480907aa20f182cad23dfc32
   public static async deleteUser(
     dataStore: DataStore,
     username: string
