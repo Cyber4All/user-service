@@ -30,7 +30,6 @@ export async function login(
     let id;
     let authenticated = false;
     const userName = sanitizeText(username);
-    console.log(userName);
     try {
       id = await dataStore.findUser(userName);
     } catch (e) {

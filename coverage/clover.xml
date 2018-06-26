@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1530019914904" clover="3.2.0">
-  <project timestamp="1530019914905" name="All files">
-    <metrics statements="1635" coveredstatements="804" conditionals="1132" coveredconditionals="463" methods="381" coveredmethods="189" elements="3148" coveredelements="1456" complexity="0" loc="1635" ncloc="1635" packages="4" files="17" classes="17">
+<coverage generated="1530020014020" clover="3.2.0">
+  <project timestamp="1530020014020" name="All files">
+    <metrics statements="1612" coveredstatements="801" conditionals="1124" coveredconditionals="463" methods="375" coveredmethods="189" elements="3111" coveredelements="1453" complexity="0" loc="1612" ncloc="1612" packages="4" files="17" classes="17">
       <package name="drivers">
         <metrics statements="1017" coveredstatements="403" conditionals="646" coveredconditionals="188" methods="211" coveredmethods="87"/>
         <file name="BcryptDriver.js" path="/Users/anthonyvisalli/Desktop/Clark/user/dist/drivers/BcryptDriver.js">
@@ -1061,7 +1061,7 @@
         </file>
       </package>
       <package name="interactors">
-        <metrics statements="594" coveredstatements="378" conditionals="478" coveredconditionals="267" methods="165" coveredmethods="98"/>
+        <metrics statements="571" coveredstatements="375" conditionals="470" coveredconditionals="267" methods="159" coveredmethods="98"/>
         <file name="AdminUserInteractor.js" path="/Users/anthonyvisalli/Desktop/Clark/user/dist/interactors/AdminUserInteractor.js">
           <metrics statements="66" coveredstatements="50" conditionals="73" coveredconditionals="45" methods="23" coveredmethods="17"/>
           <line num="2" count="1" type="cond" truecount="3" falsecount="0"/>
@@ -1132,7 +1132,7 @@
           <line num="118" count="1" type="stmt"/>
         </file>
         <file name="AuthenticationInteractor.js" path="/Users/anthonyvisalli/Desktop/Clark/user/dist/interactors/AuthenticationInteractor.js">
-          <metrics statements="113" coveredstatements="102" conditionals="95" coveredconditionals="75" methods="23" coveredmethods="22"/>
+          <metrics statements="112" coveredstatements="101" conditionals="95" coveredconditionals="75" methods="23" coveredmethods="22"/>
           <line num="2" count="4" type="cond" truecount="3" falsecount="0"/>
           <line num="3" count="12" type="cond" truecount="2" falsecount="0"/>
           <line num="4" count="24" type="stmt"/>
@@ -1172,80 +1172,79 @@
           <line num="59" count="7" type="stmt"/>
           <line num="60" count="7" type="stmt"/>
           <line num="61" count="7" type="stmt"/>
-          <line num="62" count="7" type="stmt"/>
+          <line num="63" count="7" type="stmt"/>
           <line num="64" count="7" type="stmt"/>
-          <line num="65" count="7" type="stmt"/>
-          <line num="67" count="7" type="stmt"/>
-          <line num="68" count="5" type="stmt"/>
+          <line num="66" count="7" type="stmt"/>
+          <line num="67" count="5" type="stmt"/>
+          <line num="69" count="2" type="stmt"/>
           <line num="70" count="2" type="stmt"/>
-          <line num="71" count="2" type="stmt"/>
-          <line num="72" count="5" type="stmt"/>
+          <line num="71" count="5" type="stmt"/>
+          <line num="73" count="5" type="stmt"/>
           <line num="74" count="5" type="stmt"/>
-          <line num="75" count="5" type="stmt"/>
+          <line num="76" count="5" type="stmt"/>
           <line num="77" count="5" type="stmt"/>
-          <line num="78" count="5" type="stmt"/>
-          <line num="79" count="5" type="cond" truecount="2" falsecount="0"/>
-          <line num="80" count="4" type="stmt"/>
-          <line num="82" count="4" type="stmt"/>
-          <line num="84" count="1" type="stmt"/>
+          <line num="78" count="5" type="cond" truecount="2" falsecount="0"/>
+          <line num="79" count="4" type="stmt"/>
+          <line num="81" count="4" type="stmt"/>
+          <line num="83" count="1" type="stmt"/>
+          <line num="85" count="0" type="stmt"/>
           <line num="86" count="0" type="stmt"/>
           <line num="87" count="0" type="stmt"/>
           <line num="88" count="0" type="stmt"/>
-          <line num="89" count="0" type="stmt"/>
-          <line num="94" count="4" type="stmt"/>
-          <line num="106" count="2" type="stmt"/>
-          <line num="108" count="2" type="stmt"/>
-          <line num="109" count="8" type="cond" truecount="7" falsecount="1"/>
+          <line num="93" count="4" type="stmt"/>
+          <line num="105" count="2" type="stmt"/>
+          <line num="107" count="2" type="stmt"/>
+          <line num="108" count="8" type="cond" truecount="7" falsecount="1"/>
+          <line num="110" count="2" type="stmt"/>
           <line num="111" count="2" type="stmt"/>
-          <line num="112" count="2" type="stmt"/>
-          <line num="113" count="2" type="cond" truecount="1" falsecount="1"/>
-          <line num="114" count="2" type="stmt"/>
+          <line num="112" count="2" type="cond" truecount="1" falsecount="1"/>
+          <line num="113" count="2" type="stmt"/>
+          <line num="115" count="2" type="stmt"/>
           <line num="116" count="2" type="stmt"/>
-          <line num="117" count="2" type="stmt"/>
-          <line num="119" count="2" type="cond" truecount="2" falsecount="0"/>
-          <line num="120" count="1" type="stmt"/>
+          <line num="118" count="2" type="cond" truecount="2" falsecount="0"/>
+          <line num="119" count="1" type="stmt"/>
+          <line num="121" count="1" type="stmt"/>
           <line num="122" count="1" type="stmt"/>
           <line num="123" count="1" type="stmt"/>
           <line num="124" count="1" type="stmt"/>
-          <line num="125" count="1" type="stmt"/>
-          <line num="127" count="1" type="stmt"/>
+          <line num="126" count="1" type="stmt"/>
+          <line num="127" count="0" type="stmt"/>
           <line num="128" count="0" type="stmt"/>
           <line num="129" count="0" type="stmt"/>
-          <line num="130" count="0" type="stmt"/>
-          <line num="131" count="1" type="stmt"/>
+          <line num="130" count="1" type="stmt"/>
+          <line num="132" count="1" type="stmt"/>
           <line num="133" count="1" type="stmt"/>
           <line num="134" count="1" type="stmt"/>
-          <line num="135" count="1" type="stmt"/>
-          <line num="136" count="0" type="stmt"/>
-          <line num="141" count="4" type="stmt"/>
-          <line num="153" count="3" type="stmt"/>
-          <line num="155" count="3" type="stmt"/>
-          <line num="156" count="11" type="cond" truecount="5" falsecount="1"/>
+          <line num="135" count="0" type="stmt"/>
+          <line num="140" count="4" type="stmt"/>
+          <line num="152" count="3" type="stmt"/>
+          <line num="154" count="3" type="stmt"/>
+          <line num="155" count="11" type="cond" truecount="5" falsecount="1"/>
+          <line num="157" count="3" type="stmt"/>
           <line num="158" count="3" type="stmt"/>
           <line num="159" count="3" type="stmt"/>
-          <line num="160" count="3" type="stmt"/>
-          <line num="162" count="3" type="stmt"/>
-          <line num="163" count="2" type="stmt"/>
+          <line num="161" count="3" type="stmt"/>
+          <line num="162" count="2" type="stmt"/>
+          <line num="164" count="2" type="stmt"/>
           <line num="165" count="2" type="stmt"/>
-          <line num="166" count="2" type="stmt"/>
+          <line num="167" count="2" type="stmt"/>
           <line num="168" count="2" type="stmt"/>
-          <line num="169" count="2" type="stmt"/>
-          <line num="170" count="2" type="cond" truecount="2" falsecount="0"/>
-          <line num="171" count="1" type="stmt"/>
-          <line num="173" count="1" type="stmt"/>
+          <line num="169" count="2" type="cond" truecount="2" falsecount="0"/>
+          <line num="170" count="1" type="stmt"/>
+          <line num="172" count="1" type="stmt"/>
+          <line num="174" count="1" type="stmt"/>
           <line num="175" count="1" type="stmt"/>
           <line num="176" count="1" type="stmt"/>
-          <line num="177" count="1" type="stmt"/>
-          <line num="178" count="0" type="stmt"/>
-          <line num="183" count="4" type="stmt"/>
+          <line num="177" count="0" type="stmt"/>
+          <line num="182" count="4" type="stmt"/>
+          <line num="184" count="1" type="stmt"/>
           <line num="185" count="1" type="stmt"/>
           <line num="186" count="1" type="stmt"/>
           <line num="187" count="1" type="stmt"/>
           <line num="188" count="1" type="stmt"/>
           <line num="189" count="1" type="stmt"/>
-          <line num="190" count="1" type="stmt"/>
-          <line num="202" count="7" type="cond" truecount="2" falsecount="0"/>
-          <line num="204" count="4" type="stmt"/>
+          <line num="201" count="7" type="cond" truecount="2" falsecount="0"/>
+          <line num="203" count="4" type="stmt"/>
         </file>
         <file name="MailerInteractor.js" path="/Users/anthonyvisalli/Desktop/Clark/user/dist/interactors/MailerInteractor.js">
           <metrics statements="104" coveredstatements="16" conditionals="77" coveredconditionals="6" methods="40" coveredmethods="1"/>
@@ -1468,7 +1467,7 @@
           <line num="167" count="4" type="stmt"/>
         </file>
         <file name="UserInteractor.js" path="/Users/anthonyvisalli/Desktop/Clark/user/dist/interactors/UserInteractor.js">
-          <metrics statements="194" coveredstatements="112" conditionals="132" coveredconditionals="71" methods="49" coveredmethods="30"/>
+          <metrics statements="172" coveredstatements="110" conditionals="124" coveredconditionals="71" methods="43" coveredmethods="30"/>
           <line num="2" count="4" type="cond" truecount="3" falsecount="0"/>
           <line num="3" count="15" type="cond" truecount="2" falsecount="0"/>
           <line num="4" count="20" type="stmt"/>
@@ -1625,44 +1624,22 @@
           <line num="242" count="0" type="cond" truecount="0" falsecount="4"/>
           <line num="244" count="0" type="stmt"/>
           <line num="245" count="0" type="stmt"/>
-          <line num="247" count="0" type="stmt"/>
+          <line num="246" count="0" type="stmt"/>
           <line num="248" count="0" type="stmt"/>
-          <line num="250" count="0" type="stmt"/>
+          <line num="249" count="0" type="stmt"/>
           <line num="251" count="0" type="stmt"/>
           <line num="252" count="0" type="stmt"/>
-          <line num="257" count="4" type="stmt"/>
-          <line num="258" count="0" type="stmt"/>
-          <line num="260" count="0" type="stmt"/>
-          <line num="261" count="0" type="cond" truecount="0" falsecount="4"/>
-          <line num="263" count="0" type="stmt"/>
-          <line num="264" count="0" type="stmt"/>
-          <line num="266" count="0" type="stmt"/>
-          <line num="267" count="0" type="stmt"/>
-          <line num="269" count="0" type="stmt"/>
-          <line num="270" count="0" type="stmt"/>
-          <line num="271" count="0" type="stmt"/>
-          <line num="276" count="4" type="stmt"/>
-          <line num="277" count="0" type="stmt"/>
-          <line num="279" count="0" type="stmt"/>
-          <line num="280" count="0" type="cond" truecount="0" falsecount="4"/>
-          <line num="282" count="0" type="stmt"/>
-          <line num="283" count="0" type="stmt"/>
-          <line num="284" count="0" type="stmt"/>
-          <line num="286" count="0" type="stmt"/>
-          <line num="287" count="0" type="stmt"/>
-          <line num="289" count="0" type="stmt"/>
-          <line num="290" count="0" type="stmt"/>
-          <line num="291" count="0" type="stmt"/>
-          <line num="296" count="4" type="stmt"/>
-          <line num="298" count="4" type="stmt"/>
-          <line num="308" count="30" type="cond" truecount="2" falsecount="0"/>
-          <line num="309" count="30" type="stmt"/>
-          <line num="310" count="30" type="cond" truecount="2" falsecount="0"/>
-          <line num="311" count="26" type="cond" truecount="2" falsecount="0"/>
-          <line num="312" count="25" type="stmt"/>
-          <line num="314" count="26" type="stmt"/>
-          <line num="316" count="30" type="stmt"/>
-          <line num="318" count="4" type="stmt"/>
+          <line num="253" count="0" type="stmt"/>
+          <line num="258" count="4" type="stmt"/>
+          <line num="260" count="4" type="stmt"/>
+          <line num="270" count="30" type="cond" truecount="2" falsecount="0"/>
+          <line num="271" count="30" type="stmt"/>
+          <line num="272" count="30" type="cond" truecount="2" falsecount="0"/>
+          <line num="273" count="26" type="cond" truecount="2" falsecount="0"/>
+          <line num="274" count="25" type="stmt"/>
+          <line num="276" count="26" type="stmt"/>
+          <line num="278" count="30" type="stmt"/>
+          <line num="280" count="4" type="stmt"/>
         </file>
         <file name="interactors.js" path="/Users/anthonyvisalli/Desktop/Clark/user/dist/interactors/interactors.js">
           <metrics statements="7" coveredstatements="7" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
