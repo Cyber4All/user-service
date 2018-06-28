@@ -59,7 +59,7 @@ export async function logout(dataStore: DataStore, responder: Responder) {
 }
 
 /**
- * Attempt user registraction via datastore and issues JWT access token
+ * Attempt user registration via datastore and issues JWT access token
  * If username is unique sends user with access token
  * Else sends invalidRegistration Response via Responder
  *
@@ -84,7 +84,7 @@ export async function register(
       const formattedUser = sanitizeUser(user);
       const userID = await datastore.insertUser(user);
       const token = TokenManager.generateToken(user);
-      delete user.password;
+      user = removeSensitiveData(user);
       responder.setCookie('presence', token);
       responder.sendUser(user);
     } else {
@@ -94,6 +94,13 @@ export async function register(
     console.log(e);
     responder.sendOperationError(e);
   }
+}
+
+function removeSensitiveData(user: User) {
+  user.password = undefined;
+  delete user.password;
+  delete user._password;
+  return user;
 }
 
 /**
@@ -116,9 +123,9 @@ export async function passwordMatch(
   try {
     const userName = sanitizeText(username);
     const id = await dataStore.findUser(userName);
-    const user = await dataStore.loadUser(id);
+    let user = await dataStore.loadUser(id);
     const authenticated = await hasher.verify(password, user.password);
-    delete user.password;
+    user = removeSensitiveData(user);
 
     if (authenticated) {
       responder.sendPasswordMatch(true);
