@@ -1,0 +1,6 @@
+# add files/directories here that you don't want copied into the Docker image
+
+,git
+*Dockerfile*
+*docker-compose*
+node_modules
