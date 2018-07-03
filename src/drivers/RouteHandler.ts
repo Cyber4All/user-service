@@ -107,30 +107,13 @@ export default class RouteHandler {
         } catch (e) {
           console.log(e);
         }
-      })
-      .patch(async (req, res) => {
-        const responder = this.responseFactory.buildResponder(res);
-        try {
-          if (req.body.user) {
-            await UserInteractor.editInfo(
-              this.dataStore,
-              responder,
-              this.hasher,
-              req.user.username,
-              req.body.user
-            );
-            responder.sendOperationSuccess();
-          }
-        } catch (e) {
-          responder.sendOperationError(e);
-        }
       });
 
     // Get user information
     router.get('/users/update', async (req, res) => {
       try {
         const query = req.query.username;
-        const user = await UserInteractor.findUser(this.dataStore, query);
+        const user = await UserInteractor.loadUser(this.dataStore, query);
         this.responseFactory.buildResponder(res).sendUser(user);
       } catch (e) {
         this.responseFactory.buildResponder(res).sendOperationError(e);
@@ -152,39 +135,10 @@ export default class RouteHandler {
       }
     });
 
-    router.route('/users/password').get(async (req, res) => {
-      try {
-        await passwordMatch(
-          this.dataStore,
-          this.responseFactory.buildResponder(res),
-          this.hasher,
-          req.user.username,
-          req.query.password
-        );
-      } catch (e) {
-        console.log(e);
-      }
-    });
-
-    router
-      .route('/users/tokens')
-      // Validate Token
-      // Param: Valid token (for testing, get from users/tokens route)
-      // if valid, returns OK
-      // else, returns "INVALID TOKEN"
-      .get(async (req, res) => {
-        const responder = this.responseFactory.buildResponder(res);
-        try {
-          responder.sendUser(req['user']);
-        } catch (e) {
-          responder.sendOperationError('Invalid token');
-        }
-      });
-
     router.get('/users/:username/profile', async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
-        const user = await UserInteractor.findUser(
+        const user = await UserInteractor.loadUser(
           this.dataStore,
           req.params.username
         );
@@ -229,31 +183,6 @@ export default class RouteHandler {
       } catch (e) {
         responder.sendOperationError(e);
       }
-    });
-    // refresh token
-    router.get('/users/tokens/refresh', async (req, res) => {
-      const responder = this.responseFactory.buildResponder(res);
-      try {
-        const user = await UserInteractor.findUser(
-          this.dataStore,
-          req.user.username
-        );
-
-        if (user) {
-          const token = generateToken(user);
-          responder.setCookie('presence', token);
-          responder.sendUser(user);
-        } else {
-          responder.sendOperationError('Error: No user found');
-        }
-      } catch (error) {
-        responder.sendOperationError(`Error refreshing token ${error}`);
-      }
-    });
-
-    router.delete('/users/:username/tokens', async (req, res) => {
-      // TODO invalidate JWT here as well as clearing the login cookie
-      logout(this.dataStore, this.responseFactory.buildResponder(res));
     });
 
     router
@@ -355,17 +284,6 @@ export default class RouteHandler {
           responder.sendOperationError(e);
         }
       });
-
-    // TODO: Remove account
-    // When implemented...
-    // provide token, which is then unauthorized, and return success message
-    // Need to implement promise rejection catch - error message in console on failure.
-    router.delete('/users/:username', async (req, res) => {
-      this.responseFactory
-        .buildResponder(res)
-        .sendOperationError('Cannot delete user accounts at this time');
-      throw new Error('Cannot delete user accounts at this time');
-    });
 
     router.get('/validate-captcha', async (req, res) => {
       try {

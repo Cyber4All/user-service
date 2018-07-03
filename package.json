@@ -1,6 +1,6 @@
 {
   "name": "user-service",
-  "version": "1.0.0-beta.3.0",
+  "version": "1.0.0-beta.3.3",
   "description": "A microservice for handling user account actions in the CLARK platform.",
   "main": "app.js",
   "scripts": {
@@ -30,6 +30,7 @@
     "@cyber4all/clark-taxonomy": "^2.0.0",
     "@oriented/express": "^1.0.3",
     "@sendgrid/mail": "^6.2.1",
+    "@types/morgan": "^1.7.35",
     "bcrypt": "^2.0.0",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
