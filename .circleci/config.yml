@@ -28,7 +28,7 @@ jobs:
       - checkout
       - attach_workspace : 
           at: ~/user-service
-      - run: echo('we need tests')
+      - run: echo 'we need tests'
   deploy:
     <<: *defaults
     steps:
