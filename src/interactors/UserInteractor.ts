@@ -137,6 +137,29 @@ export class UserInteractor {
     }
   }
 
+  public static async findOrganizations(
+    dataStore: DataStore,
+    query: string
+  ): Promise<any[]> {
+    try {
+      const orgs = await dataStore.findOrganizations(query);
+      return orgs;
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+
+  public static async checkOrganization(
+    dataStore: DataStore,
+    query: string
+  ): Promise<boolean> {
+    try {
+      const isValid = await dataStore.checkOrganization(query);
+      return isValid;
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
   public static async deleteUser(
     dataStore: DataStore,
     username: string

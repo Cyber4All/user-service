@@ -76,6 +76,7 @@ export class COLLECTIONS {
   public static StandardOutcome: Collection = { name: 'outcomes' };
   public static LearningObjectCollection: Collection = { name: 'collections' };
   public static OTACode: Collection = { name: 'ota-codes' };
+  public static Organization: Collection = { name: 'organizations' };
 }
 
 const COLLECTIONS_MAP = new Map<string, Collection>();
@@ -88,6 +89,7 @@ COLLECTIONS_MAP.set(
   COLLECTIONS.LearningObjectCollection
 );
 COLLECTIONS_MAP.set('OTACode', COLLECTIONS.OTACode);
+COLLECTIONS_MAP.set('Organization', COLLECTIONS.Organization);
 
 export default class MongoDriver implements DataStore {
   private db: Db;
@@ -356,6 +358,55 @@ export default class MongoDriver implements DataStore {
   async deleteOTACode(id: string): Promise<void> {
     try {
       await this.db.collection(COLLECTIONS.OTACode.name).deleteOne({ id });
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+
+  async findOrganizations(query: string): Promise<any[]> {
+    try {
+      const regex = new RegExp(query, 'g');
+      const text: any = {
+        $or: [
+          { $text: { $search: query } },
+          { institution: regex },
+        ],
+      };
+      const organizations = await this.db
+        .collection(COLLECTIONS.Organization.name)
+        .aggregate([
+          { $match: text },
+          {
+            $project: {
+              institution: 1,
+              score: { $meta: 'textScore' },
+            },
+          },
+          { $limit: 5 },
+        ])
+        .sort({ score: { $meta: 'textScore' } });
+      const arr = await organizations.toArray();
+      console.log(arr);
+      return arr;
+    } catch (e) {
+      console.log(e);
+      return Promise.reject(e);
+    }
+  }
+
+  async checkOrganization(query: string): Promise<boolean> {
+    try {
+      let isValid: boolean;
+      const organizations = await this.db
+        .collection(COLLECTIONS.Organization.name)
+        .find({ 'institution': query })
+        .toArray();
+      if (organizations.length === 0) {
+        isValid = false;
+      } else {
+        isValid = true;
+      }
+      return isValid;
     } catch (e) {
       return Promise.reject(e);
     }

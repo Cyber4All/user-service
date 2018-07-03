@@ -21,12 +21,14 @@ jobs:
               - ./dist
               - ./package.json
               - ./.elasticbeanstalk
+              - ./node_modules
   test:
     <<: *defaults
     steps:
+      - checkout
       - attach_workspace : 
           at: ~/user-service
-      - run: echo 'We need tests'
+      - run: echo 'we need tests'
   deploy:
     <<: *defaults
     steps:
