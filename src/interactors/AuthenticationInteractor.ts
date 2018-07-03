@@ -7,6 +7,7 @@ import {
 import { TokenManager, OTACodeManager } from '../drivers/drivers';
 import { User } from '@cyber4all/clark-entity';
 import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
+import { sanitizeText } from './UserInteractor';
 
 /**
  * Attempts user login via datastore and issues JWT access token
@@ -28,9 +29,9 @@ export async function login(
 ) {
   try {
     let id;
-
+    const userName = sanitizeText(username);
     try {
-      id = await dataStore.findUser(username);
+      id = await dataStore.findUser(userName);
     } catch (e) {
       responder.invalidLogin();
       return;
@@ -48,7 +49,6 @@ export async function login(
       responder.invalidLogin();
     }
   } catch (e) {
-    console.log(e);
     responder.sendOperationError(e);
   }
 }
@@ -59,7 +59,7 @@ export async function logout(dataStore: DataStore, responder: Responder) {
 }
 
 /**
- * Attempt user registraction via datastore and issues JWT access token
+ * Attempt user registration via datastore and issues JWT access token
  * If username is unique sends user with access token
  * Else sends invalidRegistration Response via Responder
  *
@@ -81,9 +81,10 @@ export async function register(
     ) {
       const pwdhash = await hasher.hash(user.password);
       user.password = pwdhash;
+      const formattedUser = sanitizeUser(user);
       const userID = await datastore.insertUser(user);
       const token = TokenManager.generateToken(user);
-      delete user.password;
+      user = removeSensitiveData(user);
       responder.setCookie('presence', token);
       responder.sendUser(user);
     } else {
@@ -95,8 +96,15 @@ export async function register(
   }
 }
 
+function removeSensitiveData(user: User) {
+  user.password = undefined;
+  delete user.password;
+  delete user._password;
+  return user;
+}
+
 /**
- * Attempts to find the user via username and 
+ * Attempts to find the user via username and
  * and checks to see if the provided password is correct.
  *
  * @export
@@ -113,17 +121,11 @@ export async function passwordMatch(
   password: string
 ) {
   try {
-    let id;
-    // User is already logged in, should never return invalid login
-    try {
-      id = await dataStore.findUser(username);
-    } catch (e) {
-      responder.invalidLogin();
-      return;
-    }
-    const user = await dataStore.loadUser(id);
+    const userName = sanitizeText(username);
+    const id = await dataStore.findUser(userName);
+    let user = await dataStore.loadUser(id);
     const authenticated = await hasher.verify(password, user.password);
-    delete user.password;
+    user = removeSensitiveData(user);
 
     if (authenticated) {
       responder.sendPasswordMatch(true);
@@ -131,9 +133,17 @@ export async function passwordMatch(
       responder.sendPasswordMatch(false);
     }
   } catch (e) {
-    console.log(e);
     responder.sendOperationError(e);
   }
+}
+
+function sanitizeUser(user: User): User {
+  user.username = sanitizeText(user.username);
+  user.email = sanitizeText(user.email);
+  user.name = sanitizeText(user.name);
+  user.organization = sanitizeText(user.organization);
+  user.bio = sanitizeText(user.bio, false);
+  return user;
 }
 
 /**
