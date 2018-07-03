@@ -373,10 +373,11 @@ export default class MongoDriver implements DataStore {
 
   async findOrganizations(query: string): Promise<any[]> {
     try {
+      const regex = new RegExp(query, 'ig');
       const text: any = {
         $or: [
           { $text: { $search: query } },
-          { institution: query },
+          { institution: regex },
         ],
       };
       const organizations = await this.db
