@@ -23,16 +23,4 @@ export const enforceTokenAccess = jwt({
     }
     return null;
   }
-}).unless({
-  // Routes that don't require authorization
-  path: [
-    '/',
-    '/validate-captcha',
-    { url: '/users', methods: ['POST', 'GET'] },
-    '/users/ota-codes',
-    { url: /\/users\/[0-z,.,-]+\/profile/i, methods: ['GET'] },
-    { url: '/users/tokens', methods: ['POST'] },
-    'validate-captcha',
-    '/users/identifiers/active'
-  ]
-}); // register & search // all ota-code routes do their own verification outsides of JWT // login
+});
