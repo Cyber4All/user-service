@@ -1,12 +1,13 @@
 import { ExpressDriver } from '@oriented/express';
 import RouteHandler from './drivers/RouteHandler';
+import AuthRouteHandler from './drivers/AuthRouteHandler';
+import AdminRouteHandler from './drivers/AdminRouteHandler';
 import MongoDriver from './drivers/MongoDriver';
 import { SendgridDriver, BcryptDriver } from './drivers/drivers';
 import { UserResponseFactory } from './drivers/UserResponseFactory';
 import * as cookieParser from 'cookie-parser';
 import * as cors from 'cors';
 import { enforceTokenAccess } from './middleware/jwt.config';
-import AdminRouteHandler from './drivers/AdminRouteHandler';
 import { enforceAdminAccess } from './middleware/admin-access';
 import * as logger from 'morgan';
 
@@ -21,14 +22,7 @@ app.use(logger('dev'));
 app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
 
-// Set Validation Middleware
-app.use(enforceTokenAccess);
-app.use((error: any, req: any, res: any, next: any) => {
-  if (error.name === 'UnauthorizedError') {
-    res.status(401).send('Invalid Access Token');
-  }
-});
-
+// Set unauthenticated api routes
 app.use(
   '/',
   RouteHandler.buildRouter(
@@ -37,6 +31,19 @@ app.use(
     sendgridDriver,
     responseFactory
   )
+);
+
+// Set Validation Middleware
+app.use(enforceTokenAccess);
+app.use((error: any, req: any, res: any, next: any) => {
+  if (error.name === 'UnauthorizedError') {
+    res.status(401).send('Invalid Access Token');
+  }
+});
+// Set authenticated api routes
+app.use(
+  '/',
+  AuthRouteHandler.buildRouter(mongoDriver, bcryptDriver, responseFactory)
 );
 
 // Set Admin middleware
