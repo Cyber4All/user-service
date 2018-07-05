@@ -62,16 +62,17 @@ export default class AuthRouteHandler {
     });
 
     router.route('/users/password').get(async (req, res) => {
+      const responder = this.responseFactory.buildResponder(res);
       try {
-        passwordMatch(
+        const match = await passwordMatch(
           this.dataStore,
-          this.responseFactory.buildResponder(res),
           this.hasher,
           req.user.username,
           req.query.password
         );
+        responder.sendPasswordMatch(match);
       } catch (e) {
-        console.log(e);
+        responder.sendOperationError(e);
       }
     });
 

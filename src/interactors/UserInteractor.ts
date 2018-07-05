@@ -177,7 +177,7 @@ export class UserInteractor {
  */
 export function sanitizeText(text: string, lowerCase = true): string {
   let clean = text;
-  if (text) {
+  if (clean) {
     if (lowerCase) {
       clean = clean.toLowerCase();
     }

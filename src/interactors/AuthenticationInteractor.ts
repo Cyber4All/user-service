@@ -108,10 +108,8 @@ export async function passwordMatch(
   try {
     const userName = sanitizeText(username);
     const id = await dataStore.findUser(userName);
-    let user = await dataStore.loadUser(id);
+    const user = await dataStore.loadUser(id);
     const authenticated = await hasher.verify(password, user.password);
-    user = removeSensitiveData(user);
-
     if (authenticated) {
       return true;
     }
