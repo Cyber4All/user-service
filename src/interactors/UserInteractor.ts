@@ -1,9 +1,4 @@
-import {
-  DataStore,
-  Responder,
-  HashInterface,
-  MailerInteractorInterface
-} from '../interfaces/interfaces';
+import { DataStore, Responder, HashInterface } from '../interfaces/interfaces';
 import { User } from '@cyber4all/clark-entity';
 import { TokenManager } from '../drivers/drivers';
 import { UserQuery } from '../interfaces/Query';
@@ -148,25 +143,6 @@ export class UserInteractor {
     }
   }
 
-/**
- * Formats text properly for usage in DataStore
- *
- * @export
- * @param {string} text
- * @param {boolean} [lowerCase=true]
- * @returns {string}
- */
-export function sanitizeText(text: string, lowerCase = true): string {
-  let clean = text;
-  if (text) {
-    if (lowerCase) {
-      clean = clean.toLowerCase();
-    }
-    clean.trim();
-  }
-
-  return clean;
-}
   public static async findOrganizations(
     dataStore: DataStore,
     query: string
@@ -190,4 +166,24 @@ export function sanitizeText(text: string, lowerCase = true): string {
       return Promise.reject(e);
     }
   }
+}
+
+/**
+ * Formats text properly for usage in DataStore
+ *
+ * @export
+ * @param {string} text
+ * @param {boolean} [lowerCase=true]
+ * @returns {string}
+ */
+export function sanitizeText(text: string, lowerCase = true): string {
+  let clean = text;
+  if (text) {
+    if (lowerCase) {
+      clean = clean.toLowerCase();
+    }
+    clean.trim();
+  }
+
+  return clean;
 }

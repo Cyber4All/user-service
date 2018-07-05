@@ -1,17 +1,12 @@
 import * as express from 'express';
 type Router = express.Router;
-import {
-  DataStore,
-  Responder,
-  Mailer,
-  HashInterface
-} from '../interfaces/interfaces';
+import { DataStore, Mailer, HashInterface } from '../interfaces/interfaces';
 import {
   login,
   register,
   passwordMatch
 } from '../interactors/AuthenticationInteractor';
-import { UserResponseFactory, OTACodeManager } from './drivers';
+import { UserResponseFactory } from './drivers';
 import {
   UserInteractor,
   MailerInteractor,
@@ -22,7 +17,7 @@ import { REDIRECT_ROUTES } from '../environment/routes';
 import { User } from '@cyber4all/clark-entity';
 import * as request from 'request';
 import { generateToken } from './TokenManager';
-const version = require('../package.json').version;
+const version = require('../../package.json').version;
 
 export default class RouteHandler {
   constructor(
@@ -208,24 +203,26 @@ export default class RouteHandler {
       }
     });
 
-    router
-    .route('/users/organizations')
-    .get(async (req, res) => {
+    router.route('/users/organizations').get(async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
-        const orgs = await UserInteractor.findOrganizations(this.dataStore, req.query.query);
+        const orgs = await UserInteractor.findOrganizations(
+          this.dataStore,
+          req.query.query
+        );
         responder.sendObject(orgs);
       } catch (e) {
         responder.sendOperationError('Invalid orgs request');
       }
     });
 
-    router
-    .route('/users/verifyorganization')
-    .get(async (req, res) => {
+    router.route('/users/verifyorganization').get(async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
-        const isValid = await UserInteractor.checkOrganization(this.dataStore, req.query.org);
+        const isValid = await UserInteractor.checkOrganization(
+          this.dataStore,
+          req.query.org
+        );
         responder.sendObject({ isValid });
       } catch (e) {
         responder.sendOperationError('Invalid orgs request');
