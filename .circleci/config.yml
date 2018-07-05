@@ -28,7 +28,7 @@ jobs:
       - checkout
       - attach_workspace : 
           at: ~/user-service
-      - run: ./node_modules/.bin/danger ci
+      - run: echo 'we need tests'
   deploy:
     <<: *defaults
     steps:

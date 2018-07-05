@@ -94,4 +94,8 @@ export default class RouteResponder implements Responder {
 
     return this.res.clearCookie(name, options);
   }
+
+  unauthorized(message?: string) {
+    this.res.status(403).send(`Invalid access. ${message}`.trim());
+  }
 }

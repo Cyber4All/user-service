@@ -130,19 +130,6 @@ export class UserInteractor {
     }
   }
 
-  public static async deleteUser(
-    dataStore: DataStore,
-    username: string
-  ): Promise<void> {
-    try {
-      const userName = sanitizeText(username);
-      const id = await this.findUser(dataStore, userName);
-      return dataStore.deleteUser(id);
-    } catch (e) {
-      return Promise.reject(`Unable to delete user. Error: ${e}`);
-    }
-  }
-
   public static async findOrganizations(
     dataStore: DataStore,
     query: string
@@ -164,6 +151,18 @@ export class UserInteractor {
       return isValid;
     } catch (e) {
       return Promise.reject(e);
+    }
+  }
+  public static async deleteUser(
+    dataStore: DataStore,
+    username: string
+  ): Promise<void> {
+    try {
+      const userName = sanitizeText(username);
+      const id = await this.findUser(dataStore, userName);
+      return dataStore.deleteUser(id);
+    } catch (e) {
+      return Promise.reject(`Unable to delete user. Error: ${e}`);
     }
   }
 }

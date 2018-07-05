@@ -1,11 +1,7 @@
 import * as express from 'express';
 type Router = express.Router;
 import { DataStore, Mailer, HashInterface } from '../interfaces/interfaces';
-import {
-  login,
-  register,
-  passwordMatch
-} from '../interactors/AuthenticationInteractor';
+import { login, register } from '../interactors/AuthenticationInteractor';
 import { UserResponseFactory } from './drivers';
 import {
   UserInteractor,
@@ -16,7 +12,6 @@ import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
 import { REDIRECT_ROUTES } from '../environment/routes';
 import { User } from '@cyber4all/clark-entity';
 import * as request from 'request';
-import { generateToken } from './TokenManager';
 const version = require('../../package.json').version;
 
 export default class RouteHandler {
@@ -108,23 +103,6 @@ export default class RouteHandler {
         } catch (e) {
           responder.sendOperationError(e);
         }
-      })
-      .patch(async (req, res) => {
-        const responder = this.responseFactory.buildResponder(res);
-        try {
-          if (req.body.user) {
-            await UserInteractor.editInfo(
-              this.dataStore,
-              responder,
-              this.hasher,
-              req.user.username,
-              req.body.user
-            );
-            responder.sendOperationSuccess();
-          }
-        } catch (e) {
-          responder.sendOperationError(e);
-        }
       });
 
     // Get user information
@@ -158,37 +136,6 @@ export default class RouteHandler {
         responder.sendOperationError(e);
       }
     });
-    // password match
-    router.route('/users/password').get(async (req, res) => {
-      const responder = this.responseFactory.buildResponder(res);
-      try {
-        const status = await passwordMatch(
-          this.dataStore,
-          this.hasher,
-          req.user.username,
-          req.query.password
-        );
-        responder.sendPasswordMatch(status);
-      } catch (e) {
-        console.log(e);
-        responder.sendOperationError(e);
-      }
-    });
-
-    router
-      .route('/users/tokens')
-      // Validate Token
-      // Param: Valid token (for testing, get from users/tokens route)
-      // if valid, returns OK
-      // else, returns "INVALID TOKEN"
-      .get(async (req, res) => {
-        const responder = this.responseFactory.buildResponder(res);
-        try {
-          responder.sendUser(req['user']);
-        } catch (e) {
-          responder.sendOperationError('Invalid token');
-        }
-      });
 
     router.get('/users/:username/profile', async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
@@ -239,39 +186,6 @@ export default class RouteHandler {
         responder.sendObject(inUse);
       } catch (e) {
         responder.sendOperationError(e);
-      }
-    });
-    // refresh token
-    router.get('/users/tokens/refresh', async (req, res) => {
-      const responder = this.responseFactory.buildResponder(res);
-      try {
-        const user = await UserInteractor.loadUser(
-          this.dataStore,
-          req.user.username
-        );
-
-        if (user) {
-          const token = generateToken(user);
-          responder.setCookie('presence', token);
-          responder.sendUser(user);
-        } else {
-          responder.sendOperationError('Error: No user found');
-        }
-      } catch (error) {
-        responder.sendOperationError(`Error refreshing token ${error}`);
-      }
-    });
-
-    // logout
-    router.delete('/users/:username/tokens', async (req, res) => {
-      const responder = this.responseFactory.buildResponder(res);
-      const username = req.params.username;
-      const user = req.user;
-      if (user && user.username === username) {
-        responder.removeCookie('presence');
-        responder.sendOperationSuccess();
-      } else {
-        responder.sendOperationError('Unauthorized');
       }
     });
 
@@ -374,23 +288,6 @@ export default class RouteHandler {
           responder.sendOperationError(e);
         }
       });
-
-    router.delete('/users/:username/account', async (req, res) => {
-      const responder = this.responseFactory.buildResponder(res);
-      try {
-        const user = req.user;
-        const username = req.params.username;
-        if (user.username === username) {
-          await UserInteractor.deleteUser(this.dataStore, username);
-          responder.removeCookie('presence');
-          responder.sendOperationSuccess();
-        } else {
-          responder.sendOperationError('User unauthorized for this action');
-        }
-      } catch (e) {
-        responder.sendOperationError(e);
-      }
-    });
 
     router.get('/validate-captcha', async (req, res) => {
       try {

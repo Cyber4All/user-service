@@ -365,18 +365,31 @@ export default class MongoDriver implements DataStore {
 
   async findOrganizations(query: string): Promise<any[]> {
     try {
-      const regex = new RegExp(query, 'ig');
+      const regex = new RegExp(query, 'g');
+      const text: any = {
+        $or: [
+          { $text: { $search: query } },
+          { institution: regex },
+        ],
+      };
       const organizations = await this.db
         .collection(COLLECTIONS.Organization.name)
-        .find({ 'institution': regex })
-        .toArray();
-      if (!organizations) {
-        return Promise.reject(
-          'No organizations'
-        );
-      }
-      return organizations;
+        .aggregate([
+          { $match: text },
+          {
+            $project: {
+              institution: 1,
+              score: { $meta: 'textScore' },
+            },
+          },
+          { $limit: 5 },
+        ])
+        .sort({ score: { $meta: 'textScore' } });
+      const arr = await organizations.toArray();
+      console.log(arr);
+      return arr;
     } catch (e) {
+      console.log(e);
       return Promise.reject(e);
     }
   }

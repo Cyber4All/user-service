@@ -1,12 +1,6 @@
-import {
-  DataStore,
-  Responder,
-  HashInterface,
-  Mailer
-} from './../interfaces/interfaces';
-import { TokenManager, OTACodeManager } from '../drivers/drivers';
+import { DataStore, HashInterface } from './../interfaces/interfaces';
+import { TokenManager } from '../drivers/drivers';
 import { User } from '@cyber4all/clark-entity';
-import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
 import { sanitizeText } from './UserInteractor';
 
 /**
@@ -44,7 +38,7 @@ export async function login(
       const token = TokenManager.generateToken(user);
       // responder.setCookie('presence', token);
       return { user, token };
-    } 
+    }
     return authenticated;
   } catch (e) {
     console.log(e);
@@ -53,7 +47,7 @@ export async function login(
 }
 
 /**
- * Attempt user registraction via datastore and issues JWT access token
+ * Attempt user registration via datastore and issues JWT access token
  * If username is unique sends user with access token
  * Else sends invalidRegistration Response via Responder
  *
@@ -75,17 +69,24 @@ export async function register(
       const pwdhash = await hasher.hash(user.password);
       user.password = pwdhash;
       const formattedUser = sanitizeUser(user);
-      const userID = await datastore.insertUser(user);
+      await datastore.insertUser(formattedUser);
       const token = TokenManager.generateToken(user);
-      delete user.password;
-      return { user, token };
-    } 
+      const cleanUser = removeSensitiveData(user);
+      return { token, user: cleanUser };
+    }
     return Promise.reject(`Invalid username provided`);
     // responder.sendOperationError('Invalid username provided.', 400);
   } catch (e) {
     console.log(e);
     return Promise.reject(`Invalid username provided. Error:${e}`);
   }
+}
+
+function removeSensitiveData(user: User) {
+  user.password = undefined;
+  delete user.password;
+  delete user._password;
+  return user;
 }
 
 /**
@@ -107,13 +108,13 @@ export async function passwordMatch(
   try {
     const userName = sanitizeText(username);
     const id = await dataStore.findUser(userName);
-    const user = await dataStore.loadUser(id);
+    let user = await dataStore.loadUser(id);
     const authenticated = await hasher.verify(password, user.password);
-    delete user.password;
+    user = removeSensitiveData(user);
 
     if (authenticated) {
       return true;
-    } 
+    }
     return false;
   } catch (e) {
     console.log(e);
