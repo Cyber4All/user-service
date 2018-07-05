@@ -79,7 +79,6 @@ describe('decode', () => {
         });
       })
       .catch(error => {
-        console.log('ERROR LINE 83', error);
         expect.fail();
         done();
       });
@@ -119,13 +118,11 @@ describe('applyOTACode', () => {
             done();
           })
           .catch(error => {
-            console.log('ERROR 123', error);
             expect.fail();
             done();
           });
       })
       .catch(error => {
-        console.log('ERROR 129', error);
         expect.fail();
         done();
       });
