@@ -4,7 +4,7 @@ import { DataStore, Mailer } from '../interfaces/interfaces';
 import { UserResponseFactory } from './drivers';
 import { AdminUserInteractor } from '../interactors/AdminUserInteractor';
 import { MailerInteractor } from '../interactors/interactors';
-const version = require('../package.json').version;
+const version = require('../../../package.json').version;
 
 export default class AdminRouteHandler {
   constructor(
