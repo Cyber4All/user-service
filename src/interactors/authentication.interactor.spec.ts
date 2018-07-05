@@ -1,88 +1,105 @@
-import { login, register, passwordMatch, isValidUsername } 
-from './AuthenticationInteractor';
+import {
+  login,
+  register,
+  passwordMatch,
+  isValidUsername
+} from './AuthenticationInteractor';
 import { BcryptDriver } from '../drivers/BcryptDriver';
 import MongoDriver from '../drivers/MongoDriver';
-const driver = new MongoDriver; // DataStore 
+const dburi = process.env.CLARK_DB_URI_TEST;
+const driver = new MongoDriver(dburi); // DataStore
 const hasher = new BcryptDriver(3); // Hasher
 const expect = require('chai').expect;
 
 beforeAll(done => {
   // Before running any tests, connect to database
-  const dburi = process.env.CLARK_DB_URI_TEST;
   // const dburi = process.env.CLARK_DB_URI_DEV.replace(
   //   /<DB_PASSWORD>/g,
   //   process.env.CLARK_DB_PWD
   // )
   // .replace(/<DB_PORT>/g, process.env.CLARK_DB_PORT)
   // .replace(/<DB_NAME>/g, process.env.CLARK_DB_NAME);
-  driver.connect(dburi).then(val => {
-    console.log('connected to database');
-    done();
-  }).catch((error) => {
-    console.log('failed to connect to database');
-    done();
-  });
+  driver
+    .connect(dburi)
+    .then(val => {
+      console.log('connected to database');
+      done();
+    })
+    .catch(error => {
+      console.log('failed to connect to database');
+      done();
+    });
 });
 
 describe('AuthenticationInteractor', () => {
   describe('#login', () => {
     it('should pass for correct username and password', done => {
-      const username  = 'nvisal1'; 
-      const password  = '122595';
-      login(driver, hasher, username, password).then(val => {
-        expect(val).to.be.a('object');
-        done();
-      }).catch ((error) => {
-        expect.fail();
-        done();
-      });
+      const username = 'nvisal1';
+      const password = '122595';
+      login(driver, hasher, username, password)
+        .then(val => {
+          expect(val).to.be.a('object');
+          done();
+        })
+        .catch(error => {
+          expect.fail();
+          done();
+        });
     });
     it('should return a user - should come with a token!', done => {
       const username = 'nvisal1';
       const password = '122595';
-      login(driver, hasher, username, password).then(val => {
-        if (!val.hasOwnProperty('token')) {
+      login(driver, hasher, username, password)
+        .then(val => {
+          if (!val.hasOwnProperty('token')) {
+            expect.fail();
+            done();
+          }
+          done();
+        })
+        .catch(error => {
           expect.fail();
           done();
-        }
-        done();
-      }).catch((error) => {
-        expect.fail();
-        done();
-      });
+        });
     });
     it('should fail for incorrect password', done => {
-      const username  = 'nvisal1'; 
-      const password  = '';
-      login(driver, hasher, username, password).then(val => {
-        expect.fail();
-        done();
-      }).catch ((error) => {
-        expect(error).to.be.a('object');
-        done();
-      });
+      const username = 'nvisal1';
+      const password = '';
+      login(driver, hasher, username, password)
+        .then(val => {
+          expect.fail();
+          done();
+        })
+        .catch(error => {
+          expect(error).to.be.a('object');
+          done();
+        });
     });
     it('should fail for incorrect user', done => {
-      const username  = ''; 
-      const password  = '122595';
-      login(driver, hasher, username, password).then(val => {
-        expect.fail();
-        done();
-      }).catch ((error) => {
-        expect(error).to.be.a('object');
-        done();
-      });
+      const username = '';
+      const password = '122595';
+      login(driver, hasher, username, password)
+        .then(val => {
+          expect.fail();
+          done();
+        })
+        .catch(error => {
+          expect(error).to.be.a('object');
+          done();
+        });
     });
     it('should fail for empty input', done => {
-      const username  = ''; 
-      const password  = '';
-      login(driver, hasher, username, password).then(val => {
-        expect.fail();
-        done();
-      }).catch ((error) => {
-        expect(error).to.be.a('object');
-        done();
-      });
+      const username = '';
+      const password = '';
+      login(driver, hasher, username, password)
+        .then(val => {
+          expect.fail();
+          done();
+        })
+        .catch(error => {
+          expect(error).to.be.a('object');
+          done();
+        });
     });
   });
 });
@@ -91,7 +108,7 @@ describe('AuthenticationInteractor', () => {
 describe('AuthenticationInteractor', () => {
   describe('#register', () => {
     // it('should pass for new user object', done => {
-    //   const username  = 'nvisal1'; 
+    //   const username  = 'nvisal1';
     //   const password  = '122595';
     //   login(driver, hasher, username, password).then(val => {
     //     val['user'].username = 'UnitTester';
@@ -110,7 +127,7 @@ describe('AuthenticationInteractor', () => {
     //   });
     // });
     // it('should return a user - should come with a token!', done => {
-    //   const username  = 'nvisal1'; 
+    //   const username  = 'nvisal1';
     //   const password  = '122595';
     //   login(driver, hasher, username, password).then(val => {
     //     val['user'].username = 'UnitTester';
@@ -130,38 +147,46 @@ describe('AuthenticationInteractor', () => {
     //   });
     // });
     it('should fail for existing username', done => {
-      const username  = 'nvisal1'; 
-      const password  = '122595';
-      login(driver, hasher, username, password).then(val => {
-        return register(driver, hasher, val['user']).then(val => {
+      const username = 'nvisal1';
+      const password = '122595';
+      login(driver, hasher, username, password)
+        .then(val => {
+          return register(driver, hasher, val['user'])
+            .then(val => {
+              expect.fail();
+              done();
+            })
+            .catch(error => {
+              expect(val).to.be.a('object');
+              done();
+            });
+        })
+        .catch(error => {
           expect.fail();
           done();
-        }).catch ((error) => {
-          expect(val).to.be.a('object');
-          done();
         });
-      }).catch ((error) => {
-        expect.fail();
-        done();
-      });
     });
     it('should fail for existing email', done => {
-      const username  = 'nvisal1'; 
-      const password  = '122595';
-      login(driver, hasher, username, password).then(val => {
-        val['user'].username = 'UnitTester';
-        val['user'].email = 'nvisal1@students.towson.edu';
-        return register(driver, hasher, val['user']).then(val => {
+      const username = 'nvisal1';
+      const password = '122595';
+      login(driver, hasher, username, password)
+        .then(val => {
+          val['user'].username = 'UnitTester';
+          val['user'].email = 'nvisal1@students.towson.edu';
+          return register(driver, hasher, val['user'])
+            .then(val => {
+              expect.fail();
+              done();
+            })
+            .catch(error => {
+              expect(val).to.be.a('object');
+              done();
+            });
+        })
+        .catch(error => {
           expect.fail();
           done();
-        }).catch ((error) => {
-          expect(val).to.be.a('object');
-          done();
         });
-      }).catch ((error) => {
-        expect.fail();
-        done();
-      });
     });
   });
 });
@@ -169,37 +194,43 @@ describe('AuthenticationInteractor', () => {
 describe('AuthenticationInteractor', () => {
   describe('#passwordMatch', () => {
     it('should pass for correct db, username, and password', done => {
-      const username  = 'nvisal1'; 
-      const password  = '122595';
-      passwordMatch(driver, hasher, username, password).then(val => {
-        expect(val).to.be.true;
-        done();
-      }).catch ((error) => {
-        expect.fail();
-        done();
-      });
+      const username = 'nvisal1';
+      const password = '122595';
+      passwordMatch(driver, hasher, username, password)
+        .then(val => {
+          expect(val).to.be.true;
+          done();
+        })
+        .catch(error => {
+          expect.fail();
+          done();
+        });
     });
     it('should fail for incorrect username', done => {
-      const username  = ''; 
-      const password  = '122595';
-      passwordMatch(driver, hasher, username, password).then(val => {
-        expect.fail();
-        done();
-      }).catch ((error) => {
-        expect(error).to.be.a('string');
-        done();
-      });
+      const username = '';
+      const password = '122595';
+      passwordMatch(driver, hasher, username, password)
+        .then(val => {
+          expect.fail();
+          done();
+        })
+        .catch(error => {
+          expect(error).to.be.a('string');
+          done();
+        });
     });
     it('should fail for incorrect password', done => {
-      const username  = 'nvisal1'; 
-      const password  = '';
-      passwordMatch(driver, hasher, username, password).then(val => {
-        expect(val).to.be.false;
-        done();
-      }).catch ((error) => {
-        expect.fail();
-        done();
-      });
+      const username = 'nvisal1';
+      const password = '';
+      passwordMatch(driver, hasher, username, password)
+        .then(val => {
+          expect(val).to.be.false;
+          done();
+        })
+        .catch(error => {
+          expect.fail();
+          done();
+        });
     });
   });
 });
@@ -224,8 +255,7 @@ describe('AuthenticationInteractor', () => {
   });
 });
 
-afterAll (() => {
+afterAll(() => {
   driver.disconnect();
   console.log('Disconnected from database');
 });
-
