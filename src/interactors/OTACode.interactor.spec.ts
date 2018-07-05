@@ -73,7 +73,6 @@ describe('decode', () => {
       email
     )
       .then(val => {
-        console.log('TOKEN ', val);
         return OTACodeInteractor.decode(driver, val).then(val => {
           expect(val, 'Did not return decoded').to.be.a('object');
           done();
