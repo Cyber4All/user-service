@@ -29,6 +29,9 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/user-service
+      - run:
+          name: Copy package.json
+          command: cp ./package.json ./dist
       - run: npm test
   deploy:
     working_directory: ~/user-service
