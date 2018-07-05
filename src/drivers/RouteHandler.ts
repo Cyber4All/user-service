@@ -1,18 +1,8 @@
 import * as express from 'express';
 type Router = express.Router;
-import {
-  DataStore,
-  Responder,
-  Mailer,
-  HashInterface
-} from '../interfaces/interfaces';
-import {
-  login,
-  register,
-  logout,
-  passwordMatch
-} from '../interactors/AuthenticationInteractor';
-import { UserResponseFactory, OTACodeManager } from './drivers';
+import { DataStore, Mailer, HashInterface } from '../interfaces/interfaces';
+import { login, register } from '../interactors/AuthenticationInteractor';
+import { UserResponseFactory } from './drivers';
 import {
   UserInteractor,
   MailerInteractor,
@@ -22,8 +12,7 @@ import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
 import { REDIRECT_ROUTES } from '../environment/routes';
 import { User } from '@cyber4all/clark-entity';
 import * as request from 'request';
-import { generateToken } from './TokenManager';
-const version = require('../package.json').version;
+const version = require('../../package.json').version;
 
 export default class RouteHandler {
   constructor(
@@ -85,27 +74,34 @@ export default class RouteHandler {
           responder.sendOperationError(e);
         }
       })
+      // register
       .post(async (req, res) => {
+        const responder = this.responseFactory.buildResponder(res);
         const user = User.instantiate(req.body);
-        await register(
-          this.dataStore,
-          this.responseFactory.buildResponder(res),
-          this.hasher,
-          user
-        );
         try {
-          const otaCode = await OTACodeInteractor.generateOTACode(
+          const registeredUser = await register(
             this.dataStore,
-            ACCOUNT_ACTIONS.VERIFY_EMAIL,
-            user.email
+            this.hasher,
+            user
           );
-          MailerInteractor.sendEmailVerification(
-            this.mailer,
-            user.email,
-            otaCode
-          );
+          try {
+            const otaCode = await OTACodeInteractor.generateOTACode(
+              this.dataStore,
+              ACCOUNT_ACTIONS.VERIFY_EMAIL,
+              user.email
+            );
+            MailerInteractor.sendEmailVerification(
+              this.mailer,
+              user.email,
+              otaCode
+            );
+            responder.setCookie('presence', registeredUser['token']);
+            responder.sendUser(registeredUser['user']);
+          } catch (e) {
+            console.log(e);
+          }
         } catch (e) {
-          console.log(e);
+          responder.sendOperationError(e);
         }
       });
 
@@ -122,16 +118,22 @@ export default class RouteHandler {
 
     // Login
     router.post('/users/tokens', async (req, res) => {
+      const responder = this.responseFactory.buildResponder(res);
       try {
-        await login(
+        const user = await login(
           this.dataStore,
-          this.responseFactory.buildResponder(res),
           this.hasher,
           req.body.username,
           req.body.password
         );
+        if (user === false) {
+          responder.invalidLogin();
+        } else {
+          responder.setCookie('presence', user['token']);
+          responder.sendUser(user['user']);
+        }
       } catch (e) {
-        console.log(e);
+        responder.sendOperationError(e);
       }
     });
 
@@ -148,24 +150,26 @@ export default class RouteHandler {
       }
     });
 
-    router
-    .route('/users/organizations')
-    .get(async (req, res) => {
+    router.route('/users/organizations').get(async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
-        const orgs = await UserInteractor.findOrganizations(this.dataStore, req.query.query);
+        const orgs = await UserInteractor.findOrganizations(
+          this.dataStore,
+          req.query.query
+        );
         responder.sendObject(orgs);
       } catch (e) {
         responder.sendOperationError('Invalid orgs request');
       }
     });
 
-    router
-    .route('/users/verifyorganization')
-    .get(async (req, res) => {
+    router.route('/users/verifyorganization').get(async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
-        const isValid = await UserInteractor.checkOrganization(this.dataStore, req.query.org);
+        const isValid = await UserInteractor.checkOrganization(
+          this.dataStore,
+          req.query.org
+        );
         responder.sendObject({ isValid });
       } catch (e) {
         responder.sendOperationError('Invalid orgs request');
@@ -235,11 +239,11 @@ export default class RouteHandler {
             case ACCOUNT_ACTIONS.VERIFY_EMAIL:
               const user = await UserInteractor.verifyEmail(
                 this.dataStore,
-                responder,
                 decoded.data.email
               );
               // await MailerInteractor.sendWelcomeEmail(this.mailer, user);
-              responder.sendObject({ username: user.username });
+              responder.setCookie('presence', user['token']);
+              responder.sendObject({ username: user.user.username });
               break;
             case ACCOUNT_ACTIONS.RESET_PASSWORD:
               responder.redirectTo(REDIRECT_ROUTES.RESET_PASSWORD(otaCode));

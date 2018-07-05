@@ -1,9 +1,4 @@
-import {
-  DataStore,
-  Responder,
-  HashInterface,
-  MailerInteractorInterface
-} from '../interfaces/interfaces';
+import { DataStore, Responder, HashInterface } from '../interfaces/interfaces';
 import { User } from '@cyber4all/clark-entity';
 import { TokenManager } from '../drivers/drivers';
 import { UserQuery } from '../interfaces/Query';
@@ -61,7 +56,6 @@ export class UserInteractor {
 
   public static async verifyEmail(
     dataStore: DataStore,
-    responder: Responder,
     email: string
   ): Promise<User> {
     try {
@@ -70,7 +64,6 @@ export class UserInteractor {
       await dataStore.editUser(userID, { emailVerified: true });
       const user = await dataStore.loadUser(userID);
       user.password = undefined;
-      responder.setCookie('presence', TokenManager.generateToken(user));
       return user;
     } catch (e) {
       return Promise.reject(`Problem verifying email. Error: ${e}`);

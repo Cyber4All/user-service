@@ -94,21 +94,7 @@ COLLECTIONS_MAP.set('Organization', COLLECTIONS.Organization);
 export default class MongoDriver implements DataStore {
   private db: Db;
 
-  constructor() {
-    const dburi =
-      process.env.NODE_ENV === 'production'
-        ? process.env.CLARK_DB_URI.replace(
-            /<DB_PASSWORD>/g,
-            process.env.CLARK_DB_PWD
-          )
-            .replace(/<DB_PORT>/g, process.env.CLARK_DB_PORT)
-            .replace(/<DB_NAME>/g, process.env.CLARK_DB_NAME)
-        : process.env.CLARK_DB_URI_DEV.replace(
-            /<DB_PASSWORD>/g,
-            process.env.CLARK_DB_PWD
-          )
-            .replace(/<DB_PORT>/g, process.env.CLARK_DB_PORT)
-            .replace(/<DB_NAME>/g, process.env.CLARK_DB_NAME);
+  constructor(dburi: string) {
     this.connect(dburi);
   }
 
@@ -367,10 +353,7 @@ export default class MongoDriver implements DataStore {
     try {
       const regex = new RegExp(query, 'g');
       const text: any = {
-        $or: [
-          { $text: { $search: query } },
-          { institution: regex },
-        ],
+        $or: [{ $text: { $search: query } }, { institution: regex }]
       };
       const organizations = await this.db
         .collection(COLLECTIONS.Organization.name)
@@ -379,10 +362,10 @@ export default class MongoDriver implements DataStore {
           {
             $project: {
               institution: 1,
-              score: { $meta: 'textScore' },
-            },
+              score: { $meta: 'textScore' }
+            }
           },
-          { $limit: 5 },
+          { $limit: 5 }
         ])
         .sort({ score: { $meta: 'textScore' } });
       const arr = await organizations.toArray();
@@ -399,7 +382,7 @@ export default class MongoDriver implements DataStore {
       let isValid: boolean;
       const organizations = await this.db
         .collection(COLLECTIONS.Organization.name)
-        .find({ 'institution': query })
+        .find({ institution: query })
         .toArray();
       if (organizations.length === 0) {
         isValid = false;
