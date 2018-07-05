@@ -42,6 +42,7 @@ describe('generateOTACode', () => {
         done();
       })
       .catch(error => {
+        console.log(error);
         expect.fail();
         done();
       });
@@ -58,6 +59,7 @@ describe('generateOTACode', () => {
         done();
       })
       .catch(error => {
+        console.log(error);
         expect(error).to.be.a('string');
         done();
       });
@@ -79,6 +81,7 @@ describe('decode', () => {
         });
       })
       .catch(error => {
+        console.log(error);
         expect.fail();
         done();
       });
@@ -118,11 +121,13 @@ describe('applyOTACode', () => {
             done();
           })
           .catch(error => {
+            console.log(error);
             expect.fail();
             done();
           });
       })
       .catch(error => {
+        console.log(error);
         expect.fail();
         done();
       });
