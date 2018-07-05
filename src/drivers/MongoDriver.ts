@@ -1,4 +1,4 @@
-import { MongoClient, Db, Cursor, ObjectID } from 'mongodb';
+import { MongoClient, Db, ObjectID } from 'mongodb';
 
 import { UserDocument } from '@cyber4all/clark-schema';
 
@@ -94,21 +94,7 @@ COLLECTIONS_MAP.set('Organization', COLLECTIONS.Organization);
 export default class MongoDriver implements DataStore {
   private db: Db;
 
-  constructor() {
-    const dburi =
-      process.env.NODE_ENV === 'production'
-        ? process.env.CLARK_DB_URI.replace(
-            /<DB_PASSWORD>/g,
-            process.env.CLARK_DB_PWD
-          )
-            .replace(/<DB_PORT>/g, process.env.CLARK_DB_PORT)
-            .replace(/<DB_NAME>/g, process.env.CLARK_DB_NAME)
-        : process.env.CLARK_DB_URI_DEV.replace(
-            /<DB_PASSWORD>/g,
-            process.env.CLARK_DB_PWD
-          )
-            .replace(/<DB_PORT>/g, process.env.CLARK_DB_PORT)
-            .replace(/<DB_NAME>/g, process.env.CLARK_DB_NAME);
+  constructor(dburi: string) {
     this.connect(dburi);
   }
 
@@ -211,13 +197,13 @@ export default class MongoDriver implements DataStore {
       }
       const userRecord = await this.db
         .collection(COLLECTIONS.User.name)
-        .findOne<UserDocument>(query, { _id: 1 });
+        .findOne<UserDocument>(query, <any>{ _id: 1 });
       if (!userRecord) {
         return Promise.reject(
           'No user with username or email ' + username + ' exists.'
         );
       }
-      return `${userRecord._id}`;
+      return `${(<any>userRecord)._id}`;
     } catch (e) {
       return Promise.reject(e);
     }
@@ -241,8 +227,7 @@ export default class MongoDriver implements DataStore {
 
       let objectCursor = await this.db
         .collection(COLLECTIONS.User.name)
-        .find<UserDocument>(mongoQuery, { score: { $meta: 'textScore' } })
-        .sort({ score: { $meta: 'textScore' } });
+        .find<UserDocument>(mongoQuery, { score: { $meta: 'textScore' } });
 
       const total = await objectCursor.count();
 
@@ -253,7 +238,7 @@ export default class MongoDriver implements DataStore {
 
       objectCursor = orderBy
         ? objectCursor.sort(orderBy, sortType ? sortType : 1)
-        : objectCursor;
+        : objectCursor.sort({ score: { $meta: 'textScore' } });
 
       const userDocs = await objectCursor.toArray();
 
@@ -270,35 +255,28 @@ export default class MongoDriver implements DataStore {
     delete query.orderBy;
     delete query.sortType;
 
-    const mongoQuery = {
-      $or: [
+    const text = query.text;
+    delete query.text;
+
+    const mongoQuery: any = {};
+
+    for (const key of Object.keys(query)) {
+      mongoQuery[key] = query[key];
+    }
+
+    if (text) {
+      mongoQuery.$or = [
         {
           $text: {
-            $search: query.username
-              ? query.username
-              : query.name
-                ? query.name
-                : query.email
-                  ? query.email
-                  : query.organization ? query.organization : query.text
+            $search: text
           }
-        }
-      ]
-    };
-
-    if (!mongoQuery.$or[0].$text.$search && !query.text) {
-      return {};
+        },
+        { username: new RegExp(text, 'g') },
+        { name: new RegExp(text, 'g') },
+        { email: new RegExp(text, 'g') },
+        { organization: new RegExp(text, 'g') }
+      ];
     }
-
-    if (query.text) {
-      (<any[]>mongoQuery.$or).push(
-        { username: { $regex: new RegExp(query.text, 'ig') } },
-        { name: { $regex: new RegExp(query.text, 'ig') } },
-        { email: { $regex: new RegExp(query.text, 'ig') } },
-        { organization: { $regex: new RegExp(query.text, 'ig') } }
-      );
-    }
-
     return mongoQuery;
   }
   /**
@@ -373,18 +351,28 @@ export default class MongoDriver implements DataStore {
 
   async findOrganizations(query: string): Promise<any[]> {
     try {
-      const regex = new RegExp(query, 'ig');
+      const regex = new RegExp(query, 'g');
+      const text: any = {
+        $or: [{ $text: { $search: query } }, { institution: regex }]
+      };
       const organizations = await this.db
         .collection(COLLECTIONS.Organization.name)
-        .find({ 'institution': regex })
-        .toArray();
-      if (!organizations) {
-        return Promise.reject(
-          'No organizations'
-        );
-      }
-      return organizations;
+        .aggregate([
+          { $match: text },
+          {
+            $project: {
+              institution: 1,
+              score: { $meta: 'textScore' }
+            }
+          },
+          { $limit: 5 }
+        ])
+        .sort({ score: { $meta: 'textScore' } });
+      const arr = await organizations.toArray();
+      console.log(arr);
+      return arr;
     } catch (e) {
+      console.log(e);
       return Promise.reject(e);
     }
   }
@@ -394,7 +382,7 @@ export default class MongoDriver implements DataStore {
       let isValid: boolean;
       const organizations = await this.db
         .collection(COLLECTIONS.Organization.name)
-        .find({ 'institution': query })
+        .find({ institution: query })
         .toArray();
       if (organizations.length === 0) {
         isValid = false;
@@ -414,7 +402,7 @@ export default class MongoDriver implements DataStore {
   private documentUser(user: User, isNew?: boolean): UserDocument {
     const userDocument: UserDocument = {
       username: user.username,
-      name: user.name.trim(),
+      name: user.name,
       email: user.email,
       organization: user.organization.toLowerCase(),
       password: user.password,
@@ -764,6 +752,7 @@ export default class MongoDriver implements DataStore {
 }
 
 export function isEmail(value: string): boolean {
+  // tslint:disable-next-line:max-line-length
   const emailPattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   if (emailPattern.test(value)) {
     return true;
