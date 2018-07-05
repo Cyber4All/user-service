@@ -42,7 +42,6 @@ describe('generateOTACode', () => {
         done();
       })
       .catch(error => {
-        console.log(error);
         expect.fail();
         done();
       });
@@ -59,7 +58,6 @@ describe('generateOTACode', () => {
         done();
       })
       .catch(error => {
-        console.log(error);
         expect(error).to.be.a('string');
         done();
       });
@@ -75,13 +73,14 @@ describe('decode', () => {
       email
     )
       .then(val => {
+        console.log('TOKEN ', val);
         return OTACodeInteractor.decode(driver, val).then(val => {
           expect(val, 'Did not return decoded').to.be.a('object');
           done();
         });
       })
       .catch(error => {
-        console.log(error);
+        console.log('ERROR LINE 83', error);
         expect.fail();
         done();
       });
@@ -121,13 +120,13 @@ describe('applyOTACode', () => {
             done();
           })
           .catch(error => {
-            console.log(error);
+            console.log('ERROR 123', error);
             expect.fail();
             done();
           });
       })
       .catch(error => {
-        console.log(error);
+        console.log('ERROR 129', error);
         expect.fail();
         done();
       });
