@@ -10,6 +10,8 @@ import * as cors from 'cors';
 import { enforceTokenAccess } from './middleware/jwt.config';
 import { enforceAdminAccess } from './middleware/admin-access';
 import * as logger from 'morgan';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 let dburi;
 switch (process.env.NODE_ENV) {
@@ -28,6 +30,7 @@ switch (process.env.NODE_ENV) {
     )
       .replace(/<DB_PORT>/g, process.env.CLARK_DB_PORT)
       .replace(/<DB_NAME>/g, process.env.CLARK_DB_NAME);
+    break;
   case 'test':
     dburi = process.env.CLARK_DB_URI_TEST;
     break;
@@ -35,7 +38,7 @@ switch (process.env.NODE_ENV) {
     break;
 }
 
-const mongoDriver = new MongoDriver(dburi);
+const dataStore = new MongoDriver(dburi);
 const sendgridDriver = new SendgridDriver();
 const bcryptDriver = new BcryptDriver(10);
 const app = ExpressDriver.start();
@@ -50,7 +53,7 @@ app.use(cookieParser());
 app.use(
   '/',
   RouteHandler.buildRouter(
-    mongoDriver,
+    dataStore,
     bcryptDriver,
     sendgridDriver,
     responseFactory
@@ -67,7 +70,7 @@ app.use((error: any, req: any, res: any, next: any) => {
 // Set authenticated api routes
 app.use(
   '/',
-  AuthRouteHandler.buildRouter(mongoDriver, bcryptDriver, responseFactory)
+  AuthRouteHandler.buildRouter(dataStore, bcryptDriver, responseFactory)
 );
 
 // Set Admin middleware
@@ -77,7 +80,7 @@ app.use(enforceAdminAccess);
 
 app.use(
   '/admin',
-  AdminRouteHandler.buildRouter(mongoDriver, sendgridDriver, responseFactory)
+  AdminRouteHandler.buildRouter(dataStore, sendgridDriver, responseFactory)
 );
 
 app.set('trust proxy', true);
