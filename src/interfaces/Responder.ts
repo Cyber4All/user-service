@@ -8,6 +8,7 @@ export interface Responder {
   redirectTo(url: string): void;
   setCookie(key: string, value: string): void;
   removeCookie(key: string): void;
-  sendObject(obj: object): void; 
+  sendObject(obj: object): void;
   sendPasswordMatch(isMatch: boolean): void;
+  unauthorized(message?: string): void;
 }

@@ -1,12 +1,12 @@
-defaults: &defaults
+defaults:
   working_directory: ~/user-service
-  docker:
-    - image: cyber4all/circleci-aws:latest
-
+  docker: &ref_0
+    - image: 'cyber4all/circleci-aws:latest'
 version: 2
 jobs:
   build:
-    <<: *defaults
+    working_directory: ~/user-service
+    docker: *ref_0
     steps:
       - checkout
       - run:
@@ -15,38 +15,48 @@ jobs:
       - run:
           name: Build Application
           command: npm run build
-      - persist_to_workspace: 
+      - persist_to_workspace:
           root: ./
-          paths: 
-              - ./dist
-              - ./package.json
-              - ./.elasticbeanstalk
-              - ./node_modules
+          paths:
+            - ./dist
+            - ./package.json
+            - ./.elasticbeanstalk
+            - ./node_modules
   test:
-    <<: *defaults
+    working_directory: ~/user-service
+    docker: *ref_0
     steps:
       - checkout
       - attach_workspace : 
           at: ~/user-service
       - run: ./node_modules/.bin/danger ci
+      - run:
+          name: Copy package.json
+          command: cp ./package.json ./dist
+      - run: npm test
   deploy:
-    <<: *defaults
+    working_directory: ~/user-service
+    docker: *ref_0
     steps:
-      - attach_workspace : 
+      - attach_workspace:
           at: ~/user-service
       - run:
           name: Setup AWS credentials
-          command: |
-            mkdir ~/.aws && printf "[profile default]\naws_access_key_id = ${AWS_ACCESS_KEY_ID}\naws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}" > ~/.aws/config
-      - run: 
+          command: >
+            mkdir ~/.aws && printf "[profile default]\naws_access_key_id =
+            ${AWS_ACCESS_KEY_ID}\naws_secret_access_key =
+            ${AWS_SECRET_ACCESS_KEY}" > ~/.aws/config
+      - run:
           name: Copy package.json
           command: cp ./package.json ./dist
-      - run: 
+      - run:
           name: Zip dist
           command: cd ./dist; zip -r ../dist.zip . *; cd ..
       - run:
-          name: Deploy to Elastic Beanstalk 
-          command: eb deploy User-Service-Production --verbose --label User-Service-v$(node -p "require('./package.json').version")
+          name: Deploy to Elastic Beanstalk
+          command: >-
+            eb deploy User-Service-Production --verbose --label
+            User-Service-v$(node -p "require('./package.json').version")
 workflows:
   version: 2
   build-and-test:
