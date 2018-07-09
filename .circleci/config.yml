@@ -27,8 +27,9 @@ jobs:
     docker: *ref_0
     steps:
       - checkout
-      - attach_workspace:
+      - attach_workspace : 
           at: ~/user-service
+      - run: ./node_modules/.bin/danger ci
       - run:
           name: Copy package.json
           command: cp ./package.json ./dist
