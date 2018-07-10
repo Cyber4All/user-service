@@ -1,5 +1,7 @@
 # user-service
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/Cyber4All/user-service.svg)](https://greenkeeper.io/)
+
 A microservice for handling user account actions in the CLARK platform.
 
 ## Testing
