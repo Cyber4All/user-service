@@ -351,9 +351,10 @@ export default class MongoDriver implements DataStore {
 
   async findOrganizations(query: string): Promise<any[]> {
     try {
+      const search =  '\" + query + \"';
       const regex = new RegExp(query, 'g');
       const text: any = {
-        $or: [{ $text: { $search: query } }, { institution: regex }]
+        $or: [{ $text: { $search: search } }, { institution: regex }]
       };
       const organizations = await this.db
         .collection(COLLECTIONS.Organization.name)
@@ -371,7 +372,7 @@ export default class MongoDriver implements DataStore {
       const arr = await organizations.toArray();
       console.log(arr);
       return arr;
-    } catch (e) {
+    } catch (e) { 
       console.log(e);
       return Promise.reject(e);
     }
