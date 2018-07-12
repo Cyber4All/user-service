@@ -352,11 +352,10 @@ export default class MongoDriver implements DataStore {
   async findOrganizations(query: string): Promise<any[]> {
     try {
       // Match the entire phrase instead of individual words
-      const search =  '\" + query + \"';
+      const search =  '\"' + query + '\"';
+      console.log('\"' + query + '\"');
       const regex = new RegExp(query, 'g');
-      const text: any = {
-        $or: [{ $text: { $search: search } }, { institution: regex }]
-      };
+      const text: any = { $text: { $search: search } };
       const organizations = await this.db
         .collection(COLLECTIONS.Organization.name)
         .aggregate([
@@ -373,7 +372,7 @@ export default class MongoDriver implements DataStore {
       const arr = await organizations.toArray();
       console.log(arr);
       return arr;
-    } catch (e) { 
+    } catch (e) {
       console.log(e);
       return Promise.reject(e);
     }
