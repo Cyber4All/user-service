@@ -351,10 +351,9 @@ export default class MongoDriver implements DataStore {
 
   async findOrganizations(query: string): Promise<any[]> {
     try {
-      const regex = new RegExp(query, 'g');
-      const text: any = {
-        $or: [{ $text: { $search: query } }, { institution: regex }]
-      };
+      // Match the entire phrase instead of individual words
+      const search =  '\"' + query + '\"';
+      const text: any = { $text: { $search: search } };
       const organizations = await this.db
         .collection(COLLECTIONS.Organization.name)
         .aggregate([
