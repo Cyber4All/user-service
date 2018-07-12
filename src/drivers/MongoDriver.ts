@@ -353,7 +353,6 @@ export default class MongoDriver implements DataStore {
     try {
       // Match the entire phrase instead of individual words
       const search =  '\"' + query + '\"';
-      console.log('\"' + query + '\"');
       const regex = new RegExp(query, 'g');
       const text: any = { $text: { $search: search } };
       const organizations = await this.db
