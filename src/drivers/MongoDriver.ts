@@ -351,6 +351,7 @@ export default class MongoDriver implements DataStore {
 
   async findOrganizations(query: string): Promise<any[]> {
     try {
+      // Match the entire phrase instead of individual words
       const search =  '\" + query + \"';
       const regex = new RegExp(query, 'g');
       const text: any = {
