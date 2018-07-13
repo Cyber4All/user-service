@@ -376,24 +376,6 @@ export default class MongoDriver implements DataStore {
     }
   }
 
-  async checkOrganization(query: string): Promise<boolean> {
-    try {
-      let isValid: boolean;
-      const organizations = await this.db
-        .collection(COLLECTIONS.Organization.name)
-        .find({ institution: query })
-        .toArray();
-      if (organizations.length === 0) {
-        isValid = false;
-      } else {
-        isValid = true;
-      }
-      return isValid;
-    } catch (e) {
-      return Promise.reject(e);
-    }
-  }
-
   ////////////////////////////////////////////////
   // GENERIC HELPER METHODS - not in public API //
   ////////////////////////////////////////////////
