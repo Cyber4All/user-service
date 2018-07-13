@@ -142,17 +142,6 @@ export class UserInteractor {
     }
   }
 
-  public static async checkOrganization(
-    dataStore: DataStore,
-    query: string
-  ): Promise<boolean> {
-    try {
-      const isValid = await dataStore.checkOrganization(query);
-      return isValid;
-    } catch (e) {
-      return Promise.reject(e);
-    }
-  }
   public static async deleteUser(
     dataStore: DataStore,
     username: string
