@@ -19,7 +19,7 @@ COPY . /opt/app
 # Build source and clean up
 RUN npm run build && npm uninstall --only=dev
 
-FROM node:9.11-alpine
+FROM node:8-alpine
 # Defaults the node environment to production, however compose will override this to use development
 # when working locally
 ARG NODE_ENV=production
