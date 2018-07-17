@@ -32,7 +32,7 @@ jobs:
           name: Unit Test Image
           command: |
             docker load < "docker-image/user-service:${CIRCLE_SHA1}.tar"
-            echo docker run -it user-service:$CIRCLE_SHA1 npm test
+            docker run -it user-service:$CIRCLE_SHA1 npm test
       - run:
           name: Login to docker
           command: docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
