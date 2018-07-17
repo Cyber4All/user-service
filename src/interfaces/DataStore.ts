@@ -16,5 +16,4 @@ export interface DataStore {
   deleteOTACode(id: string): Promise<void>;
   searchUsers(query: UserQuery): Promise<{ users: User[]; total: number }>;
   findOrganizations(query: string): Promise<any[]>;
-  checkOrganization(query: string): Promise<boolean>;
 }

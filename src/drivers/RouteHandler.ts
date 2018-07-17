@@ -163,19 +163,6 @@ export default class RouteHandler {
       }
     });
 
-    router.route('/users/verifyorganization').get(async (req, res) => {
-      const responder = this.responseFactory.buildResponder(res);
-      try {
-        const isValid = await UserInteractor.checkOrganization(
-          this.dataStore,
-          req.query.org
-        );
-        responder.sendObject({ isValid });
-      } catch (e) {
-        responder.sendOperationError('Invalid orgs request');
-      }
-    });
-
     router.route('/users/identifiers/active').get(async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
