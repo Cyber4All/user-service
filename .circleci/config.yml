@@ -1,85 +1,120 @@
-defaults:
+defaults: &defaults
   working_directory: ~/user-service
-  docker: &ref_0
-    - image: 'cyber4all/circleci-aws:latest'
+  docker:
+    - image: cyber4all/circleci-aws:latest
 version: 2
 jobs:
   build:
-    working_directory: ~/user-service
-    docker: *ref_0
+    <<: *defaults
     steps:
       - checkout
+      - setup_remote_docker
       - run:
-          name: Install Dependencies
-          command: npm install
-      - run:
-          name: Build Application
-          command: npm run build
-      - persist_to_workspace:
+          name: Build Image
+          command: | 
+            docker build -t user-service:$CIRCLE_SHA1 .
+            mkdir -p docker-image
+            docker save -o "docker-image/user-service:${CIRCLE_SHA1}.tar" user-service:$CIRCLE_SHA1
+      - persist_to_workspace: 
           root: ./
-          paths:
-            - ./dist
-            - ./package.json
-            - ./.elasticbeanstalk
-            - ./node_modules
-  test:
-    working_directory: ~/user-service
-    docker: *ref_0
+          paths: 
+              - ./docker-image
+              - ./package.json
+              - ./deploy.sh
+
+  unit-test:
+    <<: *defaults
     steps:
-      - checkout
-      - attach_workspace : 
+      - attach_workspace: 
           at: ~/user-service
-      - run: ./node_modules/.bin/danger ci
+      - setup_remote_docker
       - run:
-          name: Copy package.json
-          command: cp ./package.json ./dist
-      - run: npm test
-  deploy:
-    working_directory: ~/user-service
-    docker: *ref_0
+          name: Unit Test Image
+          command: |
+            docker load < "docker-image/user-service:${CIRCLE_SHA1}.tar"
+            echo docker run -it user-service:$CIRCLE_SHA1 npm test
+      - run:
+          name: Login to docker
+          command: docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
+      - run:
+          name: Publish Image 
+          command: |
+            docker tag user-service:$CIRCLE_SHA1 "${DOCKER_USER_ORG}/user-service:${CIRCLE_SHA1}"
+            docker push "${DOCKER_USER_ORG}/user-service:${CIRCLE_SHA1}"
+
+  integration-test:
+    <<: *defaults
     steps:
-      - attach_workspace:
+      - attach_workspace: 
           at: ~/user-service
+      - setup_remote_docker
       - run:
-          name: Setup AWS credentials
-          command: >
-            mkdir ~/.aws && printf "[profile default]\naws_access_key_id =
-            ${AWS_ACCESS_KEY_ID}\naws_secret_access_key =
-            ${AWS_SECRET_ACCESS_KEY}" > ~/.aws/config
+          name: Pull Image
+          command: docker pull "${DOCKER_USER_ORG}/user-service:${CIRCLE_SHA1}"
       - run:
-          name: Copy package.json
-          command: cp ./package.json ./dist
+          name: Run Integration Test
+          command: |
+            echo docker run -it user-service:$CIRCLE_SHA1 npm test
+
+  deploy-production:
+    <<: *defaults
+    steps:
+      - attach_workspace: 
+          at: ~/user-service
+      - setup_remote_docker
       - run:
-          name: Zip dist
-          command: cd ./dist; zip -r ../dist.zip . *; cd ..
+          name: Login to docker
+          command: docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
       - run:
-          name: Deploy to Elastic Beanstalk
-          command: >-
-            eb deploy User-Service-Production --verbose --label
-            User-Service-v$(node -p "require('./package.json').version")
+          name: Pull Image
+          command: docker pull "${DOCKER_USER_ORG}/user-service:${CIRCLE_SHA1}"
+      - run:
+          name: Publish Image 
+          command: |
+            export SEMVER=$(cat ./package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/[version:,\",]//g' | tr -d '[[:space:]]')
+            docker tag "${DOCKER_USER_ORG}/user-service:${CIRCLE_SHA1}" "${DOCKER_USER_ORG}/user-service:${SEMVER}"
+            docker push "${DOCKER_USER_ORG}/user-service:${SEMVER}"
+      - run:
+          name: Deploy to ECS
+          command: |
+            export SEMVER=$(cat ./package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/[version:,\",]//g' | tr -d '[[:space:]]')
+            export DOCKER_IMAGE="${DOCKER_USER_ORG}/user-service:${SEMVER}"
+            chmod +x ./deploy.sh
+            sh ./deploy.sh
+            
 workflows:
   version: 2
   build-and-test:
     jobs:
       - build
-      - test:
+      - unit-test:
           requires:
             - build
-  build-test-and-deploy:
+      - integration-test:
+          requires:
+            - unit-test
+
+  build-test-and-deploy-production:
     jobs:
       - build:
           filters:
             branches:
               only: /master/
-      - test:
+      - unit-test:
           requires:
             - build
           filters:
             branches:
               only: /master/
-      - deploy:
+      - integration-test:
           requires:
-            - test
+            - unit-test
+          filters:
+            branches:
+              only: /master/
+      - deploy-production:
+          requires:
+            - integration-test
           filters:
             branches:
               only: /master/
