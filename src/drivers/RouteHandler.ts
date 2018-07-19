@@ -12,7 +12,7 @@ import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
 import { REDIRECT_ROUTES } from '../environment/routes';
 import { User } from '@cyber4all/clark-entity';
 import * as request from 'request';
-const version = require('../package.json').version;
+const version = require('../../package.json').version;
 
 export default class RouteHandler {
   constructor(
