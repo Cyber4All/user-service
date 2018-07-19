@@ -1,7 +1,7 @@
 defaults: &defaults
   working_directory: ~/user-service
   docker:
-    - image: cyber4all/circleci-aws:latest
+    - image: cyber4all/circleci-aws:1.0.0
 version: 2
 jobs:
   build:

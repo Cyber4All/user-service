@@ -1,5 +1,5 @@
 # Anything beyond local dev should pin this to a specific version at https://hub.docker.com/_/node/
-FROM node:8 as builder
+FROM node:8-alpine as builder
 
 RUN mkdir -p /opt/app
 
@@ -17,7 +17,7 @@ WORKDIR /opt/app
 COPY . /opt/app
 
 # Build source and clean up
-RUN npm run build && npm uninstall --only=dev
+RUN npm run build
 
 FROM node:8-alpine
 # Defaults the node environment to production, however compose will override this to use development
@@ -31,7 +31,12 @@ EXPOSE $PORT 5858 9229
 
 WORKDIR /opt
 COPY --from=builder /opt/ .
+
+# Uninstall dev dependencies for the production image
+WORKDIR /opt
+RUN npm uninstall --only=dev
+
 WORKDIR /opt/app/dist
 # Run the container! Using the node command instead of npm allows for better passing of signals
-# and graceful shutdown. Further examination would be useful here
+# and graceful shutdown. Further examination would be useful here.
 CMD [ "node", "app.js" ] 
