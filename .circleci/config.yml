@@ -12,7 +12,7 @@ jobs:
       - run:
           name: Build Image & Unit Test
           command: | 
-            docker build -t user-service:$CIRCLE_SHA1 . --build-arg UNIT_TEST=1 CLARK_DB_URI_TEST=$CLARK_DB_URI_TEST
+            docker build -t user-service:$CIRCLE_SHA1 . --build-arg UNIT_TEST=1 --build-arg CLARK_DB_URI_TEST=$CLARK_DB_URI_TEST
       - run:
           name: Login to docker
           command: docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
