@@ -1,7 +1,7 @@
 defaults: &defaults
   working_directory: ~/user-service
   docker:
-    - image: cyber4all/circleci-aws:latest
+    - image: cyber4all/circleci-aws:docker-git
 version: 2
 jobs:
   build:
@@ -10,29 +10,9 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
-          name: Build Image
+          name: Build Image & Unit Test
           command: | 
-            docker build -t user-service:$CIRCLE_SHA1 .
-            mkdir -p docker-image
-            docker save -o "docker-image/user-service:${CIRCLE_SHA1}.tar" user-service:$CIRCLE_SHA1
-      - persist_to_workspace: 
-          root: ./
-          paths: 
-              - ./docker-image
-              - ./package.json
-              - ./deploy.sh
-
-  unit-test:
-    <<: *defaults
-    steps:
-      - attach_workspace: 
-          at: ~/user-service
-      - setup_remote_docker
-      - run:
-          name: Unit Test Image
-          command: |
-            docker load < "docker-image/user-service:${CIRCLE_SHA1}.tar"
-            echo docker run -it user-service:$CIRCLE_SHA1 npm test
+            docker build -t user-service:$CIRCLE_SHA1 . --build-arg UNIT_TEST=1 --build-arg CLARK_DB_URI_TEST=$CLARK_DB_URI_TEST
       - run:
           name: Login to docker
           command: docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
@@ -41,6 +21,11 @@ jobs:
           command: |
             docker tag user-service:$CIRCLE_SHA1 "${DOCKER_USER_ORG}/user-service:${CIRCLE_SHA1}"
             docker push "${DOCKER_USER_ORG}/user-service:${CIRCLE_SHA1}"
+      - persist_to_workspace: 
+          root: ./
+          paths: 
+              - ./package.json
+              - ./deploy.sh
 
   integration-test:
     <<: *defaults
@@ -87,12 +72,9 @@ workflows:
   build-and-test:
     jobs:
       - build
-      - unit-test:
-          requires:
-            - build
       - integration-test:
           requires:
-            - unit-test
+            - build
 
   build-test-and-deploy-production:
     jobs:
@@ -100,15 +82,9 @@ workflows:
           filters:
             branches:
               only: /master/
-      - unit-test:
-          requires:
-            - build
-          filters:
-            branches:
-              only: /master/
       - integration-test:
           requires:
-            - unit-test
+            - build
           filters:
             branches:
               only: /master/
