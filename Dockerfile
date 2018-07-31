@@ -36,6 +36,11 @@ COPY . /opt/app
 # Build source and clean up
 RUN npm run build
 
+FROM node:8 as tester
+
+COPY --from=builder . .
+ENV PATH /opt/node_modules/.bin:$PATH
+
 # Swtich working dir to opt to use node_modules for testing
 WORKDIR /opt
 RUN if [ "$UNIT_TEST" = "1" ] ; then npm test ; else echo Not running unit tests ; fi
