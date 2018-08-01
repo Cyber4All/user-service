@@ -32,12 +32,11 @@ export async function login(
 
     const user = await dataStore.loadUser(id);
     authenticated = await hasher.verify(password, user.password);
-    delete user.password;
 
     if (authenticated) {
       const token = TokenManager.generateToken(user);
-      // responder.setCookie('presence', token);
-      return { user, token };
+      const cleanUser = removeSensitiveData(user);
+      return { token, user: cleanUser };
     }
     return authenticated;
   } catch (e) {
