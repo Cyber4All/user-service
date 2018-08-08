@@ -2,3 +2,7 @@ node_modules
 dist
 .env
 dist.zip
+
+coverage
+coverage/
+/coverage

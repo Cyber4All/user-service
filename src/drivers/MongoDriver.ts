@@ -76,6 +76,7 @@ export class COLLECTIONS {
   public static StandardOutcome: Collection = { name: 'outcomes' };
   public static LearningObjectCollection: Collection = { name: 'collections' };
   public static OTACode: Collection = { name: 'ota-codes' };
+  public static Organization: Collection = { name: 'organizations' };
 }
 
 const COLLECTIONS_MAP = new Map<string, Collection>();
@@ -88,25 +89,12 @@ COLLECTIONS_MAP.set(
   COLLECTIONS.LearningObjectCollection
 );
 COLLECTIONS_MAP.set('OTACode', COLLECTIONS.OTACode);
+COLLECTIONS_MAP.set('Organization', COLLECTIONS.Organization);
 
 export default class MongoDriver implements DataStore {
   private db: Db;
 
-  constructor() {
-    const dburi =
-      process.env.NODE_ENV === 'production'
-        ? process.env.CLARK_DB_URI.replace(
-            /<DB_PASSWORD>/g,
-            process.env.CLARK_DB_PWD
-          )
-            .replace(/<DB_PORT>/g, process.env.CLARK_DB_PORT)
-            .replace(/<DB_NAME>/g, process.env.CLARK_DB_NAME)
-        : process.env.CLARK_DB_URI_DEV.replace(
-            /<DB_PASSWORD>/g,
-            process.env.CLARK_DB_PWD
-          )
-            .replace(/<DB_PORT>/g, process.env.CLARK_DB_PORT)
-            .replace(/<DB_NAME>/g, process.env.CLARK_DB_NAME);
+  constructor(dburi: string) {
     this.connect(dburi);
   }
 
@@ -357,6 +345,33 @@ export default class MongoDriver implements DataStore {
     try {
       await this.db.collection(COLLECTIONS.OTACode.name).deleteOne({ id });
     } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+
+  async findOrganizations(query: string): Promise<any[]> {
+    try {
+      // Match the entire phrase instead of individual words
+      const search =  '\"' + query + '\"';
+      const text: any = { $text: { $search: search } };
+      const organizations = await this.db
+        .collection(COLLECTIONS.Organization.name)
+        .aggregate([
+          { $match: text },
+          {
+            $project: {
+              institution: 1,
+              score: { $meta: 'textScore' }
+            }
+          },
+          { $limit: 5 }
+        ])
+        .sort({ score: { $meta: 'textScore' } });
+      const arr = await organizations.toArray();
+      console.log(arr);
+      return arr;
+    } catch (e) {
+      console.log(e);
       return Promise.reject(e);
     }
   }

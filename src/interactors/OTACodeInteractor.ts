@@ -95,7 +95,7 @@ export class OTACodeInteractor {
       if (e.message && /expired/gi.test(e.message)) {
         error = 'Link expired';
       }
-      return Promise.reject(error);
+      return Promise.reject(`${error}. E: ${e}`);
     }
   }
 }

@@ -1,18 +1,8 @@
 import * as express from 'express';
 type Router = express.Router;
-import {
-  DataStore,
-  Responder,
-  Mailer,
-  HashInterface
-} from '../interfaces/interfaces';
-import {
-  login,
-  register,
-  logout,
-  passwordMatch
-} from '../interactors/AuthenticationInteractor';
-import { UserResponseFactory, OTACodeManager } from './drivers';
+import { DataStore, Mailer, HashInterface } from '../interfaces/interfaces';
+import { login, register } from '../interactors/AuthenticationInteractor';
+import { UserResponseFactory } from './drivers';
 import {
   UserInteractor,
   MailerInteractor,
@@ -22,8 +12,7 @@ import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
 import { REDIRECT_ROUTES } from '../environment/routes';
 import { User } from '@cyber4all/clark-entity';
 import * as request from 'request';
-import { generateToken } from './TokenManager';
-const version = require('../package.json').version;
+const version = require('../../package.json').version;
 
 export default class RouteHandler {
   constructor(
@@ -85,41 +74,31 @@ export default class RouteHandler {
           responder.sendOperationError(e);
         }
       })
+      // register
       .post(async (req, res) => {
-        const user = User.instantiate(req.body);
-        await register(
-          this.dataStore,
-          this.responseFactory.buildResponder(res),
-          this.hasher,
-          user
-        );
-        try {
-          const otaCode = await OTACodeInteractor.generateOTACode(
-            this.dataStore,
-            ACCOUNT_ACTIONS.VERIFY_EMAIL,
-            user.email
-          );
-          MailerInteractor.sendEmailVerification(
-            this.mailer,
-            user.email,
-            otaCode
-          );
-        } catch (e) {
-          console.log(e);
-        }
-      })
-      .patch(async (req, res) => {
         const responder = this.responseFactory.buildResponder(res);
+        const user = User.instantiate(req.body);
         try {
-          if (req.body.user) {
-            await UserInteractor.editInfo(
+          const registeredUser = await register(
+            this.dataStore,
+            this.hasher,
+            user
+          );
+          try {
+            const otaCode = await OTACodeInteractor.generateOTACode(
               this.dataStore,
-              responder,
-              this.hasher,
-              req.user.username,
-              req.body.user
+              ACCOUNT_ACTIONS.VERIFY_EMAIL,
+              user.email
             );
-            responder.sendOperationSuccess();
+            MailerInteractor.sendEmailVerification(
+              this.mailer,
+              user.email,
+              otaCode
+            );
+            responder.setCookie('presence', registeredUser['token']);
+            responder.sendUser(registeredUser['user']);
+          } catch (e) {
+            console.log(e);
           }
         } catch (e) {
           responder.sendOperationError(e);
@@ -139,47 +118,24 @@ export default class RouteHandler {
 
     // Login
     router.post('/users/tokens', async (req, res) => {
+      const responder = this.responseFactory.buildResponder(res);
       try {
-        await login(
+        const user = await login(
           this.dataStore,
-          this.responseFactory.buildResponder(res),
           this.hasher,
           req.body.username,
           req.body.password
         );
-      } catch (e) {
-        console.log(e);
-      }
-    });
-
-    router.route('/users/password').get(async (req, res) => {
-      try {
-        passwordMatch(
-          this.dataStore,
-          this.responseFactory.buildResponder(res),
-          this.hasher,
-          req.user.username,
-          req.query.password
-        );
-      } catch (e) {
-        console.log(e);
-      }
-    });
-
-    router
-      .route('/users/tokens')
-      // Validate Token
-      // Param: Valid token (for testing, get from users/tokens route)
-      // if valid, returns OK
-      // else, returns "INVALID TOKEN"
-      .get(async (req, res) => {
-        const responder = this.responseFactory.buildResponder(res);
-        try {
-          responder.sendUser(req['user']);
-        } catch (e) {
-          responder.sendOperationError('Invalid token');
+        if (user === false) {
+          responder.invalidLogin();
+        } else {
+          responder.setCookie('presence', user['token']);
+          responder.sendUser(user['user']);
         }
-      });
+      } catch (e) {
+        responder.sendOperationError(e);
+      }
+    });
 
     router.get('/users/:username/profile', async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
@@ -194,6 +150,19 @@ export default class RouteHandler {
       }
     });
 
+    router.route('/users/organizations').get(async (req, res) => {
+      const responder = this.responseFactory.buildResponder(res);
+      try {
+        const orgs = await UserInteractor.findOrganizations(
+          this.dataStore,
+          req.query.query
+        );
+        responder.sendObject(orgs);
+      } catch (e) {
+        responder.sendOperationError('Invalid orgs request');
+      }
+    });
+
     router.route('/users/identifiers/active').get(async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
@@ -204,38 +173,6 @@ export default class RouteHandler {
         responder.sendObject(inUse);
       } catch (e) {
         responder.sendOperationError(e);
-      }
-    });
-    // refresh token
-    router.get('/users/tokens/refresh', async (req, res) => {
-      const responder = this.responseFactory.buildResponder(res);
-      try {
-        const user = await UserInteractor.loadUser(
-          this.dataStore,
-          req.user.username
-        );
-
-        if (user) {
-          const token = generateToken(user);
-          responder.setCookie('presence', token);
-          responder.sendUser(user);
-        } else {
-          responder.sendOperationError('Error: No user found');
-        }
-      } catch (error) {
-        responder.sendOperationError(`Error refreshing token ${error}`);
-      }
-    });
-
-    router.delete('/users/:username/tokens', async (req, res) => {
-      const responder = this.responseFactory.buildResponder(res);
-      const username = req.params.username;
-      const user = req.user;
-      if (user && user.username === username) {
-        responder.removeCookie('presence');
-        responder.sendOperationSuccess();
-      } else {
-        responder.sendOperationError('Unauthorized');
       }
     });
 
@@ -289,11 +226,11 @@ export default class RouteHandler {
             case ACCOUNT_ACTIONS.VERIFY_EMAIL:
               const user = await UserInteractor.verifyEmail(
                 this.dataStore,
-                responder,
                 decoded.data.email
               );
               // await MailerInteractor.sendWelcomeEmail(this.mailer, user);
-              responder.sendObject({ username: user.username });
+              responder.setCookie('presence', user['token']);
+              responder.redirectTo(REDIRECT_ROUTES.VERIFY_EMAIL);
               break;
             case ACCOUNT_ACTIONS.RESET_PASSWORD:
               responder.redirectTo(REDIRECT_ROUTES.RESET_PASSWORD(otaCode));
@@ -338,23 +275,6 @@ export default class RouteHandler {
           responder.sendOperationError(e);
         }
       });
-
-    router.delete('/users/:username/account', async (req, res) => {
-      const responder = this.responseFactory.buildResponder(res);
-      try {
-        const user = req.user;
-        const username = req.params.username;
-        if (user.username === username) {
-          await UserInteractor.deleteUser(this.dataStore, username);
-          responder.removeCookie('presence');
-          responder.sendOperationSuccess();
-        } else {
-          responder.sendOperationError('User unauthorized for this action');
-        }
-      } catch (e) {
-        responder.sendOperationError(e);
-      }
-    });
 
     router.get('/validate-captcha', async (req, res) => {
       try {

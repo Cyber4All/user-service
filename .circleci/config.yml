@@ -1,73 +1,96 @@
 defaults: &defaults
   working_directory: ~/user-service
   docker:
-    - image: cyber4all/circleci-aws:latest
-
+    - image: cyber4all/circleci-aws:docker-git
 version: 2
 jobs:
   build:
     <<: *defaults
     steps:
       - checkout
+      - setup_remote_docker
       - run:
-          name: Install Dependencies
-          command: npm install
+          name: Build Image & Unit Test
+          command: | 
+            docker build -t user-service:$CIRCLE_SHA1 . --build-arg UNIT_TEST=1 --build-arg CLARK_DB_URI_TEST=$CLARK_DB_URI_TEST
       - run:
-          name: Build Application
-          command: npm run build
+          name: Login to docker
+          command: docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
+      - run:
+          name: Publish Image 
+          command: |
+            docker tag user-service:$CIRCLE_SHA1 "${DOCKER_USER_ORG}/user-service:${CIRCLE_SHA1}"
+            docker push "${DOCKER_USER_ORG}/user-service:${CIRCLE_SHA1}"
       - persist_to_workspace: 
           root: ./
           paths: 
-              - ./dist
               - ./package.json
-              - ./.elasticbeanstalk
-  test:
+              - ./deploy.sh
+
+  integration-test:
     <<: *defaults
     steps:
-      - attach_workspace : 
+      - attach_workspace: 
           at: ~/user-service
-      - run: echo 'We need tests'
-  deploy:
-    <<: *defaults
-    steps:
-      - attach_workspace : 
-          at: ~/user-service
+      - setup_remote_docker
       - run:
-          name: Setup AWS credentials
+          name: Pull Image
+          command: docker pull "${DOCKER_USER_ORG}/user-service:${CIRCLE_SHA1}"
+      - run:
+          name: Run Integration Test
           command: |
-            mkdir ~/.aws && printf "[profile default]\naws_access_key_id = ${AWS_ACCESS_KEY_ID}\naws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}" > ~/.aws/config
-      - run: 
-          name: Copy package.json
-          command: cp ./package.json ./dist
-      - run: 
-          name: Zip dist
-          command: cd ./dist; zip -r ../dist.zip . *; cd ..
+            echo docker run -it user-service:$CIRCLE_SHA1 npm test
+
+  deploy-production:
+    <<: *defaults
+    steps:
+      - attach_workspace: 
+          at: ~/user-service
+      - setup_remote_docker
       - run:
-          name: Deploy to Elastic Beanstalk 
-          command: eb deploy User-Service-Production --verbose --label User-Service-v$(node -p "require('./package.json').version")
+          name: Login to docker
+          command: docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
+      - run:
+          name: Pull Image
+          command: docker pull "${DOCKER_USER_ORG}/user-service:${CIRCLE_SHA1}"
+      - run:
+          name: Publish Image 
+          command: |
+            export SEMVER=$(cat ./package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/[version:,\",]//g' | tr -d '[[:space:]]')
+            docker tag "${DOCKER_USER_ORG}/user-service:${CIRCLE_SHA1}" "${DOCKER_USER_ORG}/user-service:${SEMVER}"
+            docker push "${DOCKER_USER_ORG}/user-service:${SEMVER}"
+      - run:
+          name: Deploy to ECS
+          command: |
+            export SEMVER=$(cat ./package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/[version:,\",]//g' | tr -d '[[:space:]]')
+            export DOCKER_IMAGE="${DOCKER_USER_ORG}/user-service:${SEMVER}"
+            chmod +x ./deploy.sh
+            sh ./deploy.sh
+            
 workflows:
   version: 2
   build-and-test:
     jobs:
       - build
-      - test:
+      - integration-test:
           requires:
             - build
-  build-test-and-deploy:
+
+  build-test-and-deploy-production:
     jobs:
       - build:
           filters:
             branches:
               only: /master/
-      - test:
+      - integration-test:
           requires:
             - build
           filters:
             branches:
               only: /master/
-      - deploy:
+      - deploy-production:
           requires:
-            - test
+            - integration-test
           filters:
             branches:
               only: /master/
