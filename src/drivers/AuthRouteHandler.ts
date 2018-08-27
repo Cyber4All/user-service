@@ -61,14 +61,14 @@ export default class AuthRouteHandler {
       }
     });
 
-    router.route('/users/password').get(async (req, res) => {
+    router.route('/users/password').post(async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
         const match = await passwordMatch(
           this.dataStore,
           this.hasher,
           req.user.username,
-          req.query.password
+          req.body.password
         );
         responder.sendPasswordMatch(match);
       } catch (e) {
