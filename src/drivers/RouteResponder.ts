@@ -80,7 +80,7 @@ export default class RouteResponder implements Responder {
       maxAge: 604800000,
       httpOnly: false,
       domain: process.env.COOKIE_DOMAIN,
-      secure: process.env.NODE_ENV !== 'development'
+      secure: (process.env.NODE_ENV === 'production')
     };
 
     return this.res.cookie(key, value, options);
