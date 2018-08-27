@@ -163,19 +163,6 @@ export default class RouteHandler {
       }
     });
 
-    router.route('/users/verifyorganization').get(async (req, res) => {
-      const responder = this.responseFactory.buildResponder(res);
-      try {
-        const isValid = await UserInteractor.checkOrganization(
-          this.dataStore,
-          req.query.org
-        );
-        responder.sendObject({ isValid });
-      } catch (e) {
-        responder.sendOperationError('Invalid orgs request');
-      }
-    });
-
     router.route('/users/identifiers/active').get(async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
@@ -243,7 +230,7 @@ export default class RouteHandler {
               );
               // await MailerInteractor.sendWelcomeEmail(this.mailer, user);
               responder.setCookie('presence', user['token']);
-              responder.sendObject({ username: user.user.username });
+              responder.redirectTo(REDIRECT_ROUTES.VERIFY_EMAIL);
               break;
             case ACCOUNT_ACTIONS.RESET_PASSWORD:
               responder.redirectTo(REDIRECT_ROUTES.RESET_PASSWORD(otaCode));
