@@ -47,7 +47,7 @@ const app = ExpressDriver.start();
 const responseFactory = new UserResponseFactory();
 
 raven
-  .config('https://1a97ed6830614183ab3d6e205bccd3ba:7437efef4a3641b78e20c978e3d7a215@sentry.io/1276099')
+  .config(process.env.SENTRY_DSN)
   .install();
 
 app.use(raven.requestHandler());
