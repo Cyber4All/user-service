@@ -11,6 +11,8 @@ import { enforceTokenAccess } from './middleware/jwt.config';
 import { enforceAdminAccess } from './middleware/admin-access';
 import * as logger from 'morgan';
 import * as dotenv from 'dotenv';
+import * as raven from 'raven';
+
 dotenv.config();
 
 let dburi;
@@ -43,6 +45,14 @@ const sendgridDriver = new SendgridDriver();
 const bcryptDriver = new BcryptDriver(10);
 const app = ExpressDriver.start();
 const responseFactory = new UserResponseFactory();
+
+raven
+  .config('https://1a97ed6830614183ab3d6e205bccd3ba:7437efef4a3641b78e20c978e3d7a215@sentry.io/1276099')
+  .install();
+
+app.use(raven.requestHandler());
+app.use(raven.errorHandler());
+
 // Setup route logger
 app.use(logger('dev'));
 
