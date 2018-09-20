@@ -1,30 +1,13 @@
 import { AdminUserInteractor } from '../interactors/AdminUserInteractor';
 import { BcryptDriver } from '../drivers/BcryptDriver';
-import MongoDriver from '../drivers/MongoDriver';
+import LokiDriver from '../drivers/LokiDriver';
 
 const expect = require('chai').expect;
-const dburi = process.env.CLARK_DB_URI_TEST;
-const driver = new MongoDriver(dburi); // DataStore
-const hasher = new BcryptDriver(3); // Hasher
+const driver = new LokiDriver(); // DataStore
 
 beforeAll(done => {
-  // Before running any tests, connect to database
-  // const dburi = process.env.CLARK_DB_URI_DEV.replace(
-  //   /<DB_PASSWORD>/g,
-  //   process.env.CLARK_DB_PWD
-  // )
-  // .replace(/<DB_PORT>/g, process.env.CLARK_DB_PORT)
-  // .replace(/<DB_NAME>/g, process.env.CLARK_DB_NAME);
-  driver
-    .connect(dburi)
-    .then(val => {
-      console.log('connected to database');
-      done();
-    })
-    .catch(error => {
-      console.log('failed to connect to database');
-      done();
-    });
+  // String arg is defined in datastore interface but not used in lokidriver.
+  driver.connect('test');
 });
 
 describe('fetchUsers', () => {
@@ -66,6 +49,22 @@ describe('fetchUsers', () => {
         console.log(error);
         done();
       });
+  });
+});
+
+describe('deleteUser', () => {
+  it('Should delete a user', done => {
+    const userId = '12345';
+    AdminUserInteractor.deleteUser(driver, userId)
+    .then(val => {
+      expect(val).to.be.an.undefined;
+      done();
+    })
+    .catch(error => {
+      expect.fail();
+      console.log(error);
+      done();
+    });
   });
 });
 
