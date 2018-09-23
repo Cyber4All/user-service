@@ -3,39 +3,22 @@ import {
   MailerInteractor,
   OTACodeInteractor
 } from '../interactors/interactors';
-import MongoDriver from '../drivers/MongoDriver';
 import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
+import LokiDriver from '../drivers/LokiDriver';
+import { MOCK_OBJECTS } from '../../tests/mocks';
 const expect = require('chai').expect;
-const dburi = process.env.CLARK_DB_URI_TEST;
-const driver = new MongoDriver(dburi); // DataStore
+const driver = new LokiDriver(); // DataStore
 
 beforeAll(done => {
-  // Before running any tests, connect to database
-  // const dburi = process.env.CLARK_DB_URI_DEV.replace(
-  //   /<DB_PASSWORD>/g,
-  //   process.env.CLARK_DB_PWD
-  // )
-  // .replace(/<DB_PORT>/g, process.env.CLARK_DB_PORT)
-  // .replace(/<DB_NAME>/g, process.env.CLARK_DB_NAME);
-  driver
-    .connect(dburi)
-    .then(val => {
-      console.log('connected to database');
-      done();
-    })
-    .catch(error => {
-      console.log('failed to connect to database');
-      done();
-    });
+  driver.connect('test');
 });
 
 describe('generateOTACode', () => {
   it('should return an OTACode', done => {
-    const email = 'nvisal1@students.towson.edu';
     return OTACodeInteractor.generateOTACode(
       driver,
       ACCOUNT_ACTIONS.VERIFY_EMAIL,
-      email
+      MOCK_OBJECTS.EMAIL
     )
       .then(val => {
         expect(val, 'Did not return OTACode').to.be.a('string');
@@ -47,11 +30,10 @@ describe('generateOTACode', () => {
       });
   });
   it('should return an error - empty email was given', done => {
-    const email = '';
     return OTACodeInteractor.generateOTACode(
       driver,
       ACCOUNT_ACTIONS.VERIFY_EMAIL,
-      email
+      MOCK_OBJECTS.EMPTY_STRING
     )
       .then(val => {
         expect.fail();
@@ -66,11 +48,10 @@ describe('generateOTACode', () => {
 
 describe('decode', () => {
   it('should return decoded', done => {
-    const email = 'nvisal1@students.towson.edu';
     OTACodeInteractor.generateOTACode(
       driver,
       ACCOUNT_ACTIONS.VERIFY_EMAIL,
-      email
+      MOCK_OBJECTS.EMAIL
     )
       .then(val => {
         return OTACodeInteractor.decode(driver, val).then(val => {
@@ -84,11 +65,10 @@ describe('decode', () => {
       });
   });
   it('should return an error - empty email was given!', done => {
-    const email = '';
     OTACodeInteractor.generateOTACode(
       driver,
       ACCOUNT_ACTIONS.VERIFY_EMAIL,
-      email
+      MOCK_OBJECTS.EMPTY_STRING
     )
       .then(val => {
         return OTACodeInteractor.decode(driver, val).then(val => {
@@ -105,11 +85,10 @@ describe('decode', () => {
 
 describe('applyOTACode', () => {
   it('should return decoded', done => {
-    const email = 'nvisal1@students.towson.edu';
     OTACodeInteractor.generateOTACode(
       driver,
       ACCOUNT_ACTIONS.VERIFY_EMAIL,
-      email
+      MOCK_OBJECTS.EMAIL
     )
       .then(val => {
         return OTACodeInteractor.applyOTACode(driver, val)

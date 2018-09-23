@@ -10,15 +10,28 @@ export default class LokiDriver implements DataStore {
 
   connect(dbURI: string): Promise<void> {
     try {
-      this.db = new loki('lokistore.json');
+      // Read JSON
+      const onion = require('../../onion.json');
+      // Convert JSON into Loki dump
+      this.db = new loki('onion.db');
+      this.insertCollections(onion);
     } catch (e) {
       console.log(e);
       return Promise.reject(e);
     }
   }    
     
+  private insertCollections(onion: any) {
+    // Only need to create/insert collections used in tests
+    const objects = this.db.addCollection('objects');
+    objects.insert(onion.objects);
+    const users = this.db.addCollection('users');
+    users.insert(onion.users);
+  }
+
   disconnect(): void {
     throw new Error('Method not implemented.');
+    // Destory Loki Dump
   }
 
   async identifierInUse(username: string): Promise<boolean> {
@@ -44,11 +57,11 @@ export default class LokiDriver implements DataStore {
     }
   }
 
-  findUser(username: string): Promise<string> {
+  async findUser(username: string): Promise<string> {
     try {
       const coll = this.db.getCollection('users');
-      const user = coll.find({ username });
-      return user._id;
+      const user = await coll.find({ username });
+      return user[0]._id;
     } catch (e) {
       return Promise.reject(e);
     }
@@ -97,15 +110,22 @@ export default class LokiDriver implements DataStore {
     }
   }
 
-  async searchUsers(query: UserQuery): Promise<{ users: User[]; total: number; }> {
-    const coll = this.db.getCollection('users');
-    const users = coll.find();
-    return { users, users.length };
+  searchUsers(
+    query: UserQuery
+  ): Promise<{ users: User[]; total: number; }> {
+    try {
+      const coll = this.db.getCollection('users');
+      const users = coll.find({ username: 'nvisal1' });
+      const total = 1;
+      return { users, total };
+    } catch (e) {
+      return Promise.reject(e);
+    }
   }
 
   async findOrganizations(query: string): Promise<any[]> {
     const coll = this.db.getCollection('organizations');
-    const orgs = coll.find();
+    const orgs = coll.find({ institution: 'Towson University' });
     return orgs;
   }
 }

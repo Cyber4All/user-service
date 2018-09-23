@@ -5,38 +5,20 @@ import {
   isValidUsername
 } from './AuthenticationInteractor';
 import { BcryptDriver } from '../drivers/BcryptDriver';
-import MongoDriver from '../drivers/MongoDriver';
-const dburi = process.env.CLARK_DB_URI_TEST;
-const driver = new MongoDriver(dburi); // DataStore
+import LokiDriver from '../drivers/LokiDriver';
+import { MOCK_OBJECTS } from '../../tests/mocks';
+const driver = new LokiDriver(); // DataStore
 const hasher = new BcryptDriver(3); // Hasher
 const expect = require('chai').expect;
 
 beforeAll(done => {
-  // Before running any tests, connect to database
-  // const dburi = process.env.CLARK_DB_URI_DEV.replace(
-  //   /<DB_PASSWORD>/g,
-  //   process.env.CLARK_DB_PWD
-  // )
-  // .replace(/<DB_PORT>/g, process.env.CLARK_DB_PORT)
-  // .replace(/<DB_NAME>/g, process.env.CLARK_DB_NAME);
-  driver
-    .connect(dburi)
-    .then(val => {
-      console.log('connected to database');
-      done();
-    })
-    .catch(error => {
-      console.log('failed to connect to database');
-      done();
-    });
+  driver.connect('test');
 });
 
 describe('AuthenticationInteractor', () => {
   describe('#login', () => {
     it('should pass for correct username and password', done => {
-      const username = 'nvisal1';
-      const password = '122595';
-      login(driver, hasher, username, password)
+      login(driver, hasher, MOCK_OBJECTS.USERNAME, MOCK_OBJECTS.PASSWORD)
         .then(val => {
           expect(val).to.be.a('object');
           done();
@@ -47,9 +29,7 @@ describe('AuthenticationInteractor', () => {
         });
     });
     it('should return a user - should come with a token!', done => {
-      const username = 'nvisal1';
-      const password = '122595';
-      login(driver, hasher, username, password)
+      login(driver, hasher, MOCK_OBJECTS.USERNAME, MOCK_OBJECTS.PASSWORD)
         .then(val => {
           if (!val.hasOwnProperty('token')) {
             expect.fail();
@@ -63,9 +43,7 @@ describe('AuthenticationInteractor', () => {
         });
     });
     it('should fail for incorrect password', done => {
-      const username = 'nvisal1';
-      const password = '';
-      login(driver, hasher, username, password)
+      login(driver, hasher, MOCK_OBJECTS.USERNAME, MOCK_OBJECTS.EMPTY_STRING)
         .then(val => {
           expect.fail();
           done();
@@ -76,9 +54,7 @@ describe('AuthenticationInteractor', () => {
         });
     });
     it('should fail for incorrect user', done => {
-      const username = '';
-      const password = '122595';
-      login(driver, hasher, username, password)
+      login(driver, hasher, MOCK_OBJECTS.EMPTY_STRING, MOCK_OBJECTS.PASSWORD)
         .then(val => {
           expect.fail();
           done();
@@ -89,9 +65,7 @@ describe('AuthenticationInteractor', () => {
         });
     });
     it('should fail for empty input', done => {
-      const username = '';
-      const password = '';
-      login(driver, hasher, username, password)
+      login(driver, hasher, MOCK_OBJECTS.EMPTY_STRING, MOCK_OBJECTS.EMPTY_STRING)
         .then(val => {
           expect.fail();
           done();
@@ -108,9 +82,7 @@ describe('AuthenticationInteractor', () => {
 describe('AuthenticationInteractor', () => {
   describe('#register', () => {
     // it('should pass for new user object', done => {
-    //   const username  = 'nvisal1';
-    //   const password  = '122595';
-    //   login(driver, hasher, username, password).then(val => {
+    //   login(driver, hasher, MOCK_OBJECTS.USERNAME, MOCK_OBJECTS.PASSWORD).then(val => {
     //     val['user'].username = 'UnitTester';
     //     return register(driver, hasher, val['user']).then(val => {
     //       console.log(val);
@@ -127,9 +99,7 @@ describe('AuthenticationInteractor', () => {
     //   });
     // });
     // it('should return a user - should come with a token!', done => {
-    //   const username  = 'nvisal1';
-    //   const password  = '122595';
-    //   login(driver, hasher, username, password).then(val => {
+    //   login(driver, hasher, MOCK_OBJECTS.USERNAME, MOCK_OBJECTS.PASSWORD).then(val => {
     //     val['user'].username = 'UnitTester';
     //     return register(driver, hasher, val['user']).then(val => {
     //       if (!val.hasOwnProperty('token')) {
@@ -147,9 +117,7 @@ describe('AuthenticationInteractor', () => {
     //   });
     // });
     it('should fail for existing username', done => {
-      const username = 'nvisal1';
-      const password = '122595';
-      login(driver, hasher, username, password)
+      login(driver, hasher, MOCK_OBJECTS.USERNAME, MOCK_OBJECTS.PASSWORD)
         .then(val => {
           return register(driver, hasher, val['user'])
             .then(val => {
@@ -167,9 +135,7 @@ describe('AuthenticationInteractor', () => {
         });
     });
     it('should fail for existing email', done => {
-      const username = 'nvisal1';
-      const password = '122595';
-      login(driver, hasher, username, password)
+      login(driver, hasher, MOCK_OBJECTS.USERNAME, MOCK_OBJECTS.PASSWORD)
         .then(val => {
           val['user'].username = 'UnitTester';
           val['user'].email = 'nvisal1@students.towson.edu';
@@ -194,9 +160,7 @@ describe('AuthenticationInteractor', () => {
 describe('AuthenticationInteractor', () => {
   describe('#passwordMatch', () => {
     it('should pass for correct db, username, and password', done => {
-      const username = 'nvisal1';
-      const password = '122595';
-      passwordMatch(driver, hasher, username, password)
+      passwordMatch(driver, hasher, MOCK_OBJECTS.USERNAME, MOCK_OBJECTS.PASSWORD)
         .then(val => {
           expect(val).to.be.true;
           done();
@@ -207,9 +171,7 @@ describe('AuthenticationInteractor', () => {
         });
     });
     it('should fail for incorrect username', done => {
-      const username = '';
-      const password = '122595';
-      passwordMatch(driver, hasher, username, password)
+      passwordMatch(driver, hasher, MOCK_OBJECTS.EMPTY_STRING, MOCK_OBJECTS.PASSWORD)
         .then(val => {
           expect.fail();
           done();
@@ -220,9 +182,7 @@ describe('AuthenticationInteractor', () => {
         });
     });
     it('should fail for incorrect password', done => {
-      const username = 'nvisal1';
-      const password = '';
-      passwordMatch(driver, hasher, username, password)
+      passwordMatch(driver, hasher, MOCK_OBJECTS.USERNAME, MOCK_OBJECTS.EMPTY_STRING)
         .then(val => {
           expect(val).to.be.false;
           done();
@@ -238,19 +198,19 @@ describe('AuthenticationInteractor', () => {
 describe('AuthenticationInteractor', () => {
   describe('#isValidUsername', () => {
     it('should fail for usernames longer than 20 characters', () => {
-      expect(isValidUsername('abcdefghijklmnopqrstuvwxyz')).to.be.false;
+      expect(isValidUsername(MOCK_OBJECTS.LONG_USERNAME)).to.be.false;
     });
     it('should fail for usernames shorter than 3 characters', () => {
-      expect(isValidUsername('12')).to.be.false;
+      expect(isValidUsername(MOCK_OBJECTS.SHORT_USERNAME)).to.be.false;
     });
     it('should pass for usernames shorter than 20 characters', () => {
-      expect(isValidUsername('myshortusername')).to.be.true;
+      expect(isValidUsername(MOCK_OBJECTS.VALID_LONG_USERNAME)).to.be.true;
     });
     it('should pass for usernames with exactly 3 characters', () => {
-      expect(isValidUsername('123')).to.be.true;
+      expect(isValidUsername(MOCK_OBJECTS.VALID_SHORT_USERNAME)).to.be.true;
     });
     it('should pass for usernames with exactly 20 characters', () => {
-      expect(isValidUsername('aaaaaaaaaaaaaaaaaaaa')).to.be.true;
+      expect(isValidUsername(MOCK_OBJECTS.VALID_MAX_LENGTH_USERNAME)).to.be.true;
     });
   });
 });

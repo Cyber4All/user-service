@@ -4,37 +4,19 @@ import {
   OTACodeInteractor
 } from '../interactors/interactors';
 import { BcryptDriver } from '../drivers/BcryptDriver';
-import MongoDriver from '../drivers/MongoDriver';
-
+import LokiDriver from '../drivers/LokiDriver';
+import { MOCK_OBJECTS } from '../../tests/mocks';
 const expect = require('chai').expect;
-const dburi = process.env.CLARK_DB_URI_TEST;
-const driver = new MongoDriver(dburi); // DataStore
+const driver = new LokiDriver() // DataStore
 const hasher = new BcryptDriver(3); // Hasher
 
 beforeAll(done => {
-  // Before running any tests, connect to database
-  // const dburi = process.env.CLARK_DB_URI_DEV.replace(
-  //   /<DB_PASSWORD>/g,
-  //   process.env.CLARK_DB_PWD
-  // )
-  // .replace(/<DB_PORT>/g, process.env.CLARK_DB_PORT)
-  // .replace(/<DB_NAME>/g, process.env.CLARK_DB_NAME);
-  driver
-    .connect(dburi)
-    .then(val => {
-      console.log('connected to database');
-      done();
-    })
-    .catch(error => {
-      console.log('failed to connect to database');
-      done();
-    });
+  driver.connect('test');
 });
 
 describe('searchUsers', () => {
   it('should return an array of users', done => {
-    const query = { username: 'nvisal1' };
-    return UserInteractor.searchUsers(driver, query)
+    return UserInteractor.searchUsers(driver, MOCK_OBJECTS.USERNAME_QUERY)
       .then(val => {
         expect(val, 'users is not an array!').to.exist;
         done();
@@ -45,8 +27,7 @@ describe('searchUsers', () => {
       });
   });
   it('should return an array of users - password should be undefined when returned!', done => {
-    const query = { username: 'nvisal1' };
-    return UserInteractor.searchUsers(driver, query)
+    return UserInteractor.searchUsers(driver, MOCK_OBJECTS.USERNAME_QUERY)
       .then(val => {
         expect(val[0].password, 'users is not an array!').to.be.an('undefined');
         done();
@@ -57,8 +38,7 @@ describe('searchUsers', () => {
       });
   });
   it('should return an array of users - accessGroups should be gone when returned!', done => {
-    const query = { username: 'nvisal1' };
-    return UserInteractor.searchUsers(driver, query)
+    return UserInteractor.searchUsers(driver, MOCK_OBJECTS.USERNAME_QUERY)
       .then(val => {
         if (val[0].hasOwnProperty('accessGroups')) {
           expect.fail();
@@ -71,25 +51,11 @@ describe('searchUsers', () => {
         done();
       });
   });
-  it('should return an error message', done => {
-    const query = { username: 'nvisal1' };
-    // Here we are passing an incorrect parameter for DataStore
-    return UserInteractor.searchUsers(this.driver, query)
-      .then(val => {
-        expect.fail();
-        done();
-      })
-      .catch(error => {
-        expect(error, 'Expected error!').to.be.a('string');
-        done();
-      });
-  });
 });
 
 describe('findUser', () => {
   it('should return a user ID', done => {
-    const username = 'nvisal1';
-    return UserInteractor.findUser(driver, username)
+    return UserInteractor.findUser(driver, MOCK_OBJECTS.USERNAME)
       .then(val => {
         expect(val, 'Expected user was not returned!').to.equal(
           '5a9583401405cb053272ced1'
@@ -102,8 +68,7 @@ describe('findUser', () => {
       });
   });
   it('should return a user - password should be undefined when returned!', done => {
-    const username = 'nvisal1';
-    return UserInteractor.findUser(driver, username)
+    return UserInteractor.findUser(driver, MOCK_OBJECTS.USERNAME)
       .then(val => {
         expect(val.password, 'user not returned!').to.be.an('undefined');
         done();
@@ -114,8 +79,7 @@ describe('findUser', () => {
       });
   });
   it('should return a user - accessGroups should be gone when returned!', done => {
-    const username = 'nvisal1';
-    return UserInteractor.findUser(driver, username)
+    return UserInteractor.findUser(driver, MOCK_OBJECTS.USERNAME)
       .then(val => {
         if (val.hasOwnProperty('accessGroups')) {
           expect.fail();
@@ -129,9 +93,8 @@ describe('findUser', () => {
       });
   });
   it('should return an error message', done => {
-    const username = 'nvisal1';
     // Here we are passing an incorrect parameter for DataStore
-    return UserInteractor.findUser(this.driver, username)
+    return UserInteractor.findUser(this.driver, MOCK_OBJECTS.USERNAME)
       .then(val => {
         expect.fail();
         done();
@@ -145,8 +108,7 @@ describe('findUser', () => {
 
 describe('verifyEmail', () => {
   it('should return a user', done => {
-    const email = 'nvisal1@students.towson.edu';
-    return UserInteractor.verifyEmail(driver, email)
+    return UserInteractor.verifyEmail(driver, MOCK_OBJECTS.EMAIL)
       .then(val => {
         expect(val, 'Expected user was not returned!').to.be.a('object');
         done();
@@ -157,8 +119,7 @@ describe('verifyEmail', () => {
       });
   });
   it('should return a user - password should be undefined when returned!', done => {
-    const email = 'nvisal1@students.towson.edu';
-    return UserInteractor.verifyEmail(driver, email)
+    return UserInteractor.verifyEmail(driver, MOCK_OBJECTS.EMAIL)
       .then(val => {
         if (val.hasOwnProperty('password')) {
           expect.fail();
@@ -174,9 +135,7 @@ describe('verifyEmail', () => {
 
 describe('updatePassword', () => {
   it('should return a user', done => {
-    const email = 'nvisal1';
-    const password = '122595';
-    return UserInteractor.updatePassword(driver, hasher, email, password)
+    return UserInteractor.updatePassword(driver, hasher, MOCK_OBJECTS.EMAIL, MOCK_OBJECTS.PASSWORD)
       .then(val => {
         expect(val, 'Expected user was not returned!').to.be.a('object');
         done();
@@ -187,9 +146,7 @@ describe('updatePassword', () => {
       });
   });
   it('should return a user - password should be undefined when returned!', done => {
-    const email = 'nvisal1';
-    const password = '122595';
-    return UserInteractor.updatePassword(driver, hasher, email, password)
+    return UserInteractor.updatePassword(driver, hasher, MOCK_OBJECTS.EMAIL, MOCK_OBJECTS.PASSWORD)
       .then(val => {
         expect(val.password, 'user not returned!').to.be.an('undefined');
         done();
@@ -200,9 +157,7 @@ describe('updatePassword', () => {
       });
   });
   it('should return a user - accessGroups should be gone when returned!', done => {
-    const email = 'nvisal1';
-    const password = '122595';
-    return UserInteractor.updatePassword(driver, hasher, email, password)
+    return UserInteractor.updatePassword(driver, hasher, MOCK_OBJECTS.EMAIL, MOCK_OBJECTS.PASSWORD)
       .then(val => {
         if (val.hasOwnProperty('accessGroups')) {
           expect.fail();
@@ -219,8 +174,7 @@ describe('updatePassword', () => {
 
 describe('identifierInUse', () => {
   it('should return a boolean inUse - true', done => {
-    const username = 'nvisal1';
-    return UserInteractor.identifierInUse(driver, username)
+    return UserInteractor.identifierInUse(driver, MOCK_OBJECTS.USERNAME)
       .then(val => {
         expect(val.inUse, 'Expected isUse variable was not true').be.true;
         done();
@@ -231,8 +185,7 @@ describe('identifierInUse', () => {
       });
   });
   it('should return a boolean inUse - false', done => {
-    const username = '';
-    return UserInteractor.identifierInUse(driver, username)
+    return UserInteractor.identifierInUse(driver, MOCK_OBJECTS.EMPTY_STRING)
       .then(val => {
         expect(val.inUse, 'Expected isUse variable was not true').be.false;
         done();
