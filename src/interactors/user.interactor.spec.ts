@@ -1,18 +1,10 @@
-import {
-  UserInteractor,
-  MailerInteractor,
-  OTACodeInteractor
-} from '../interactors/interactors';
+import { UserInteractor } from '../interactors/interactors';
 import { BcryptDriver } from '../drivers/BcryptDriver';
-import LokiDriver from '../drivers/LokiDriver';
+import MockDriver from '../drivers/MockDriver';
 import { MOCK_OBJECTS } from '../../tests/mocks';
 const expect = require('chai').expect;
-const driver = new LokiDriver() // DataStore
+const driver = new MockDriver(); // DataStore
 const hasher = new BcryptDriver(3); // Hasher
-
-beforeAll(done => {
-  driver.connect('test');
-});
 
 describe('searchUsers', () => {
   it('should return an array of users', done => {
@@ -57,9 +49,7 @@ describe('findUser', () => {
   it('should return a user ID', done => {
     return UserInteractor.findUser(driver, MOCK_OBJECTS.USERNAME)
       .then(val => {
-        expect(val, 'Expected user was not returned!').to.equal(
-          '5a9583401405cb053272ced1'
-        );
+        expect(val, 'Expected user was not returned!').to.be.a('string');
         done();
       })
       .catch(error => {
@@ -110,20 +100,10 @@ describe('verifyEmail', () => {
   it('should return a user', done => {
     return UserInteractor.verifyEmail(driver, MOCK_OBJECTS.EMAIL)
       .then(val => {
-        expect(val, 'Expected user was not returned!').to.be.a('object');
-        done();
-      })
-      .catch(error => {
-        expect.fail();
-        done();
-      });
-  });
-  it('should return a user - password should be undefined when returned!', done => {
-    return UserInteractor.verifyEmail(driver, MOCK_OBJECTS.EMAIL)
-      .then(val => {
-        if (val.hasOwnProperty('password')) {
+        if (val.password !== undefined) {
           expect.fail();
         }
+        expect(val, 'Expected user was not returned!').to.be.a('object');
         done();
       })
       .catch(error => {
@@ -184,20 +164,4 @@ describe('identifierInUse', () => {
         done();
       });
   });
-  it('should return a boolean inUse - false', done => {
-    return UserInteractor.identifierInUse(driver, MOCK_OBJECTS.EMPTY_STRING)
-      .then(val => {
-        expect(val.inUse, 'Expected isUse variable was not true').be.false;
-        done();
-      })
-      .catch(error => {
-        expect.fail();
-        done();
-      });
-  });
-});
-
-afterAll(() => {
-  driver.disconnect();
-  console.log('Disconnected from database');
 });

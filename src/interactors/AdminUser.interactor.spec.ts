@@ -1,27 +1,22 @@
 import { AdminUserInteractor } from '../interactors/AdminUserInteractor';
-import { BcryptDriver } from '../drivers/BcryptDriver';
-import LokiDriver from '../drivers/LokiDriver';
+import MockDriver from '../drivers/MockDriver';
 import { MOCK_OBJECTS } from '../../tests/mocks';
-
-// const expect = require('chai').expect;
-const driver = new LokiDriver(); // DataStore
-
-beforeAll(done => {
-  // String arg is defined in datastore interface but not used in lokidriver.
-  driver.connect('test');
-
-});
+import { expect } from 'chai';
+const driver = new MockDriver(); // DataStore
 
 describe('fetchUsers', () => {
   it('should return an array of users', done => {
     return AdminUserInteractor.fetchUsers(driver, MOCK_OBJECTS.USERNAME_QUERY)
       .then(val => {
-        expect(val).toBeDefined();
+        expect(val).to.be.an('object');
         done();
-        console.log(val);
+      })
+      .catch(error => {
+        expect.fail();
+        done();
       });
   });
-  it('should return a user - password should be undefined when returned!', done => {
+  it('should return a user mock version - password should be undefined when returned!', done => {
     return AdminUserInteractor.fetchUsers(driver, MOCK_OBJECTS.USERNAME_QUERY)
       .then(val => {
         expect(val.users[0]['_password'], 'user not returned!').to.be.undefined;
@@ -61,8 +56,3 @@ describe('fetchUsers', () => {
 //     });
 //   });
 // });
-
-afterAll(() => {
-  // driver.disconnect();
-  console.log('Disconnected from database');
-});

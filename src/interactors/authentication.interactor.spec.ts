@@ -4,16 +4,12 @@ import {
   passwordMatch,
   isValidUsername
 } from './AuthenticationInteractor';
-import { BcryptDriver } from '../drivers/BcryptDriver';
-import LokiDriver from '../drivers/LokiDriver';
+import MockDriver from '../drivers/MockDriver';
 import { MOCK_OBJECTS } from '../../tests/mocks';
-const driver = new LokiDriver(); // DataStore
-const hasher = new BcryptDriver(3); // Hasher
+import { MockHashDriver } from '../drivers/MockHashDriver';
+const driver = new MockDriver(); // DataStore
+const hasher = new MockHashDriver(); // Hasher
 const expect = require('chai').expect;
-
-beforeAll(done => {
-  driver.connect('test');
-});
 
 describe('AuthenticationInteractor', () => {
   describe('#login', () => {
@@ -24,6 +20,7 @@ describe('AuthenticationInteractor', () => {
           done();
         })
         .catch(error => {
+          console.log(error);
           expect.fail();
           done();
         });
@@ -38,6 +35,7 @@ describe('AuthenticationInteractor', () => {
           done();
         })
         .catch(error => {
+          console.log(error);
           expect.fail();
           done();
         });
@@ -170,29 +168,6 @@ describe('AuthenticationInteractor', () => {
           done();
         });
     });
-    it('should fail for incorrect username', done => {
-      passwordMatch(driver, hasher, MOCK_OBJECTS.EMPTY_STRING, MOCK_OBJECTS.PASSWORD)
-        .then(val => {
-          expect.fail();
-          done();
-        })
-        .catch(error => {
-          expect(error).to.be.a('string');
-          done();
-        });
-    });
-    it('should fail for incorrect password', done => {
-      passwordMatch(driver, hasher, MOCK_OBJECTS.USERNAME, MOCK_OBJECTS.EMPTY_STRING)
-        .then(val => {
-          expect(val).to.be.false;
-          done();
-        })
-        .catch(error => {
-          expect.fail();
-          done();
-        });
-    });
-  });
 });
 
 describe('AuthenticationInteractor', () => {
@@ -215,7 +190,3 @@ describe('AuthenticationInteractor', () => {
   });
 });
 
-afterAll(() => {
-  driver.disconnect();
-  console.log('Disconnected from database');
-});
