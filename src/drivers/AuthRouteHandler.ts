@@ -5,6 +5,7 @@ import { passwordMatch } from '../interactors/AuthenticationInteractor';
 import { UserResponseFactory } from './drivers';
 import { UserInteractor } from '../interactors/interactors';
 import { generateToken } from './TokenManager';
+import { reportError } from './SentryConnector';
 
 export default class AuthRouteHandler {
   constructor(
@@ -30,6 +31,22 @@ export default class AuthRouteHandler {
   }
 
   private setRoutes(router: Router) {
+    router.use((req, res, next) => {
+      // If the username in the cookie is not lowercase and error will be reported
+      // and the value adjusted to be lowercase
+      if (!(req.user.username === req.user.username.toLowerCase())) {
+        // This odd try/catch setup is so that we don't abort the current operation,
+        // but still have Sentry realize that an error was thrown.
+        try {
+          throw new Error(`${req.user.username} was retrieved from the token. Should be lowercase`);
+        } catch (e) {
+          console.log(e.message);
+          reportError(e);
+        }
+        req.user.username = req.user.username.toLowerCase();
+      }
+      next();
+    });
     // Register
     // POST: provide JSON object with new user info
     /*
@@ -61,14 +78,14 @@ export default class AuthRouteHandler {
       }
     });
 
-    router.route('/users/password').get(async (req, res) => {
+    router.route('/users/password').post(async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
         const match = await passwordMatch(
           this.dataStore,
           this.hasher,
           req.user.username,
-          req.query.password
+          req.body.password
         );
         responder.sendPasswordMatch(match);
       } catch (e) {
