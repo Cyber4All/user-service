@@ -48,7 +48,7 @@
     "request-promise": "^4.2.2"
   },
   "devDependencies": {
-    "@types/bcrypt": "^2.0.0",
+    "@types/bcrypt": "^3.0.0",
     "@types/cookie-parser": "^1.4.1",
     "@types/cors": "^2.8.3",
     "@types/dotenv": "^4.0.2",
