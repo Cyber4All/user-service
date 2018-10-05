@@ -18,7 +18,7 @@ describe('searchUsers', () => {
         done();
       });
   });
-  it('should return an array of users - password should be undefined when returned!', done => {
+  it('should return an array of users. password should be undefined when returned!', done => {
     return UserInteractor.searchUsers(driver, MOCK_OBJECTS.USERNAME_QUERY)
       .then(val => {
         expect(val[0].password, 'users is not an array!').to.be.an('undefined');
@@ -29,7 +29,7 @@ describe('searchUsers', () => {
         done();
       });
   });
-  it('should return an array of users - accessGroups should be gone when returned!', done => {
+  it('should return an array of users. accessGroups should be gone when returned!', done => {
     return UserInteractor.searchUsers(driver, MOCK_OBJECTS.USERNAME_QUERY)
       .then(val => {
         if (val[0].hasOwnProperty('accessGroups')) {
@@ -57,7 +57,7 @@ describe('findUser', () => {
         done();
       });
   });
-  it('should return a user - password should be undefined when returned!', done => {
+  it('should return a user. password should be undefined when returned!', done => {
     return UserInteractor.findUser(driver, MOCK_OBJECTS.USERNAME)
       .then(val => {
         expect(val.password, 'user not returned!').to.be.an('undefined');
@@ -68,7 +68,7 @@ describe('findUser', () => {
         done();
       });
   });
-  it('should return a user - accessGroups should be gone when returned!', done => {
+  it('should return a user. accessGroups should be gone when returned!', done => {
     return UserInteractor.findUser(driver, MOCK_OBJECTS.USERNAME)
       .then(val => {
         if (val.hasOwnProperty('accessGroups')) {
@@ -125,7 +125,7 @@ describe('updatePassword', () => {
         done();
       });
   });
-  it('should return a user - password should be undefined when returned!', done => {
+  it('should return a user. password should be undefined when returned!', done => {
     return UserInteractor.updatePassword(driver, hasher, MOCK_OBJECTS.EMAIL, MOCK_OBJECTS.PASSWORD)
       .then(val => {
         expect(val.password, 'user not returned!').to.be.an('undefined');
@@ -136,7 +136,7 @@ describe('updatePassword', () => {
         done();
       });
   });
-  it('should return a user - accessGroups should be gone when returned!', done => {
+  it('should return a user. accessGroups should be gone when returned!', done => {
     return UserInteractor.updatePassword(driver, hasher, MOCK_OBJECTS.EMAIL, MOCK_OBJECTS.PASSWORD)
       .then(val => {
         if (val.hasOwnProperty('accessGroups')) {

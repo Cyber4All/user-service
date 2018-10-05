@@ -25,7 +25,7 @@ describe('AuthenticationInteractor', () => {
           done();
         });
     });
-    it('should return a user - should come with a token!', done => {
+    it('should return a user. should come with a token!', done => {
       login(driver, hasher, MOCK_OBJECTS.USERNAME, MOCK_OBJECTS.PASSWORD)
         .then(val => {
           if (!val.hasOwnProperty('token')) {
@@ -76,44 +76,8 @@ describe('AuthenticationInteractor', () => {
   });
 });
 
-// Commented out so that we don't add new user for every test ran
 describe('AuthenticationInteractor', () => {
   describe('#register', () => {
-    // it('should pass for new user object', done => {
-    //   login(driver, hasher, MOCK_OBJECTS.USERNAME, MOCK_OBJECTS.PASSWORD).then(val => {
-    //     val['user'].username = 'UnitTester';
-    //     return register(driver, hasher, val['user']).then(val => {
-    //       console.log(val);
-    //       expect(val).to.be.a('object');
-    //       done();
-    //     }).catch ((error) => {
-    //       console.log(error);
-    //       expect.fail();
-    //       done();
-    //     });
-    //   }).catch ((error) => {
-    //     expect.fail();
-    //     done();
-    //   });
-    // });
-    // it('should return a user - should come with a token!', done => {
-    //   login(driver, hasher, MOCK_OBJECTS.USERNAME, MOCK_OBJECTS.PASSWORD).then(val => {
-    //     val['user'].username = 'UnitTester';
-    //     return register(driver, hasher, val['user']).then(val => {
-    //       if (!val.hasOwnProperty('token')) {
-    //         expect.fail();
-    //         done();
-    //       }
-    //       done();
-    //     }).catch ((error) => {
-    //       expect.fail();
-    //       done();
-    //     });
-    //   }).catch ((error) => {
-    //     expect.fail();
-    //     done();
-    //   });
-    // });
     it('should fail for existing username', done => {
       login(driver, hasher, MOCK_OBJECTS.USERNAME, MOCK_OBJECTS.PASSWORD)
         .then(val => {

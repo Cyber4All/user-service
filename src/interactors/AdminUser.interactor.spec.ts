@@ -16,7 +16,7 @@ describe('fetchUsers', () => {
         done();
       });
   });
-  it('should return a user mock version - password should be undefined when returned!', done => {
+  it('password should be undefined on user object when returned!', done => {
     return AdminUserInteractor.fetchUsers(driver, MOCK_OBJECTS.USERNAME_QUERY)
       .then(val => {
         expect(val.users[0]['_password'], 'user not returned!').to.be.undefined;
@@ -27,7 +27,7 @@ describe('fetchUsers', () => {
         done();
       });
   });
-  it('should return all users - empty query', done => {
+  it('should return all users. empty query', done => {
     return AdminUserInteractor.fetchUsers(driver, MOCK_OBJECTS.EMPTY_USERNAME_QUERY)
       .then(val => {
         expect(val, 'users is not an array!').to.be.a('object');
@@ -40,19 +40,3 @@ describe('fetchUsers', () => {
       });
   });
 });
-
-// describe('deleteUser', () => {
-//   it('Should delete a user', done => {
-//     const userId = '12345';
-//     AdminUserInteractor.deleteUser(driver, userId)
-//     .then(val => {
-//       expect(val).to.be.an.undefined;
-//       done();
-//     })
-//     .catch(error => {
-//       expect.fail();
-//       console.log(error);
-//       done();
-//     });
-//   });
-// });

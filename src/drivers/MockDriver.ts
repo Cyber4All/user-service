@@ -7,13 +7,7 @@ import { MOCK_OBJECTS } from '../tests/mocks';
 export default class MockDriver implements DataStore {
 
   connect(dbURI: string): Promise<void> {
-    try {
-      // Read JSON
-      return Promise.resolve();
-    } catch (e) {
-      console.log(e);
-      return Promise.reject(e);
-    }
+    return Promise.resolve();
   }    
 
   disconnect(): void {
