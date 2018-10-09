@@ -5,7 +5,7 @@ import {
 } from '../interactors/interactors';
 import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
 import MockDriver from '../drivers/MockDriver';
-import { MOCK_OBJECTS } from '../../tests/mocks';
+import { MOCK_OBJECTS } from '../tests/mocks';
 const expect = require('chai').expect;
 const driver = new MockDriver(); // DataStore
 

@@ -5,7 +5,7 @@ import {
   isValidUsername
 } from './AuthenticationInteractor';
 import MockDriver from '../drivers/MockDriver';
-import { MOCK_OBJECTS } from '../../tests/mocks';
+import { MOCK_OBJECTS } from '../tests/mocks';
 import { MockHashDriver } from '../drivers/MockHashDriver';
 const driver = new MockDriver(); // DataStore
 const hasher = new MockHashDriver(); // Hasher

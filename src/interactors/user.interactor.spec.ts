@@ -1,7 +1,7 @@
 import { UserInteractor } from '../interactors/interactors';
 import { BcryptDriver } from '../drivers/BcryptDriver';
 import MockDriver from '../drivers/MockDriver';
-import { MOCK_OBJECTS } from '../../tests/mocks';
+import { MOCK_OBJECTS } from '../tests/mocks';
 const expect = require('chai').expect;
 const driver = new MockDriver(); // DataStore
 const hasher = new BcryptDriver(3); // Hasher

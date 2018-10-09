@@ -1,6 +1,6 @@
 import { AdminUserInteractor } from '../interactors/AdminUserInteractor';
 import MockDriver from '../drivers/MockDriver';
-import { MOCK_OBJECTS } from '../../tests/mocks';
+import { MOCK_OBJECTS } from '../tests/mocks';
 import { expect } from 'chai';
 const driver = new MockDriver(); // DataStore
 
