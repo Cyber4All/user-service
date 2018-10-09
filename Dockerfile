@@ -15,8 +15,8 @@ ARG OTA_CODE_REPLACEMENT=0000
 
 ARG COOKIE_DOMAIN=localhost
 
-ARG KEY=TEST_SECRET
-ARG ISSUER=TEST_ISSUER
+ENV KEY=TEST_SECRET
+ENV ISSUER=TEST_ISSUER
 
 RUN mkdir -p /opt/app
 
@@ -40,10 +40,20 @@ FROM node:8 as tester
 
 COPY --from=builder . .
 ENV PATH /opt/node_modules/.bin:$PATH
+ARG KEY=TEST_SECRET
+ARG ISSUER=TEST_ISSUER
+ARG OTA_CODE_SECRET=TEST_SECRET
+ARG OTA_CODE_ISSUER=TEST_ISSUER
+
+ARG TOKEN_REPLACER=1111
+ARG TOKEN_REPLACMENT=1111
+
+ARG OTA_CODE_REPLACER=0000
+ARG OTA_CODE_REPLACEMENT=0000
 
 # Swtich working dir to opt to use node_modules for testing
 WORKDIR /opt
-RUN if [ "$UNIT_TEST" = "1" ] ; then npm test ; else echo Not running unit tests ; fi
+RUN npm test
 
 FROM node:8-alpine
 # Defaults the node environment to production, however compose will override this to use development
