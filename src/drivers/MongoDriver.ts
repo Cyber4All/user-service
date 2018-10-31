@@ -422,6 +422,8 @@ export default class MongoDriver implements DataStore {
     user.createdAt = userRecord['createdAt'];
     user.accessGroups = userRecord['accessGroups'];
 
+    user.id = userRecord._id;
+
     return user;
   }
 
