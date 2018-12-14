@@ -22,6 +22,6 @@ export function initialize({ dataStore }: { dataStore: DataStore }) {
     }
   };
 
-  router.route('').get(getStats);
+  router.get(getStats);
   return router;
 }
