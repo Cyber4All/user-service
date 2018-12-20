@@ -7,6 +7,8 @@ import { User } from '@cyber4all/clark-entity';
 import * as dotenv from 'dotenv';
 import { OTACode } from './OTACodeManager';
 import { UserQuery } from '../interfaces/Query';
+import { UserStats } from '../UserStats/UserStatsInteractor';
+import { UserStatStore } from '../UserStats/UserStatStore';
 dotenv.config();
 
 export interface Collection {
@@ -94,6 +96,8 @@ COLLECTIONS_MAP.set('Organization', COLLECTIONS.Organization);
 export default class MongoDriver implements DataStore {
   private db: Db;
 
+  private statStore: UserStatStore;
+
   constructor(dburi: string) {
     this.connect(dburi);
   }
@@ -115,9 +119,13 @@ export default class MongoDriver implements DataStore {
   async connect(dbURI: string, retryAttempt?: number): Promise<void> {
     try {
       this.db = await MongoClient.connect(dbURI);
+      this.statStore = new UserStatStore(this.db);
     } catch (e) {
       if (!retryAttempt) {
-        this.connect(dbURI, 1);
+        this.connect(
+          dbURI,
+          1
+        );
       } else {
         return Promise.reject(
           'Problem connecting to database at ' + dbURI + ':\n\t' + e
@@ -132,6 +140,17 @@ export default class MongoDriver implements DataStore {
    */
   disconnect(): void {
     this.db.close();
+  }
+
+  /**
+   * Fetches Stats for User Accounts
+   *
+   * @param {{ query: any }} params
+   * @returns {Promise<UserStats>}
+   * @memberof MongoDriver
+   */
+  fetchStats(params: { query: any }): Promise<UserStats> {
+    return this.statStore.fetchStats({ query: params.query });
   }
 
   /**
@@ -234,7 +253,9 @@ export default class MongoDriver implements DataStore {
       objectCursor =
         skip !== undefined
           ? objectCursor.skip(skip).limit(limit)
-          : limit ? objectCursor.limit(limit) : objectCursor;
+          : limit
+            ? objectCursor.limit(limit)
+            : objectCursor;
 
       objectCursor = orderBy
         ? objectCursor.sort(orderBy, sortType ? sortType : 1)
@@ -352,7 +373,7 @@ export default class MongoDriver implements DataStore {
   async findOrganizations(query: string): Promise<any[]> {
     try {
       // Match the entire phrase instead of individual words
-      const search =  '\"' + query + '\"';
+      const search = '"' + query + '"';
       const text: any = { $text: { $search: search } };
       const organizations = await this.db
         .collection(COLLECTIONS.Organization.name)

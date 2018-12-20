@@ -12,6 +12,7 @@ import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
 import { REDIRECT_ROUTES } from '../environment/routes';
 import { User } from '@cyber4all/clark-entity';
 import * as request from 'request';
+import * as UserStatsRouteHandler from '../UserStats/UserStatsRouteHandler';
 const version = require('../../package.json').version;
 
 export default class RouteHandler {
@@ -295,5 +296,10 @@ export default class RouteHandler {
           .sendOperationError(`Could not validate captcha. Error: ${e}`);
       }
     });
+
+    router.use(
+      '/users/stats',
+      UserStatsRouteHandler.initialize({ dataStore: this.dataStore })
+    );
   }
 }
