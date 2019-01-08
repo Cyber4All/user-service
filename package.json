@@ -27,7 +27,7 @@
   "dependencies": {
     "@cyber4all/clark-entity": "^3.1.0",
     "@cyber4all/clark-schema": "^1.0.2",
-    "@cyber4all/clark-taxonomy": "^2.0.0",
+    "@cyber4all/clark-taxonomy": "^3.0.0",
     "@oriented/express": "^1.0.3",
     "@sendgrid/mail": "^6.2.1",
     "@types/chai": "^4.1.5",
