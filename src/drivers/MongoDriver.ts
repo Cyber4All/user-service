@@ -327,26 +327,19 @@ export default class MongoDriver implements DataStore {
     return userDocument;
   }
 
-  private generateUser(userRecord: UserDocument): User {
-    const user = new User(
-      userRecord.username,
-      userRecord.name,
-      userRecord.email,
-      userRecord.organization,
-      userRecord.password
-    );
-    // Append Email Verified Prop
-    user.emailVerified = userRecord.emailVerified
-      ? userRecord.emailVerified
-      : false;
-    // Append Email Verified Prop
-    user.bio = userRecord.bio;
-    // TODO: Add property to UserDocument
-    user.createdAt = userRecord['createdAt'];
-    user.accessGroups = userRecord['accessGroups'];
-
-    user.id = userRecord._id;
-
+  private generateUser(userRecord: UserDocument): AuthUser {
+    const user = new AuthUser({
+      id: userRecord._id,
+      username: userRecord.username,
+      name: userRecord.name,
+      email: userRecord.email,
+      emailVerified: userRecord.emailVerified,
+      bio: userRecord.bio,
+      organization: userRecord.organization,
+      createdAt: userRecord.createdAt,
+      password: userRecord.password,
+      accessGroups: userRecord.accessGroups
+    });
     return user;
   }
 }
