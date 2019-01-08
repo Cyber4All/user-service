@@ -160,9 +160,7 @@ export default class MongoDriver implements DataStore {
       let objectCursor = await this.client
         .db()
         .collection(COLLECTIONS.USERS)
-        .find<UserDocument>(mongoQuery, {
-          sort: { score: { $meta: 'textScore' } }
-        });
+        .find<UserDocument>(mongoQuery);
 
       const total = await objectCursor.count();
 
@@ -175,7 +173,7 @@ export default class MongoDriver implements DataStore {
 
       objectCursor = orderBy
         ? objectCursor.sort(orderBy, sortType ? sortType : 1)
-        : objectCursor.sort({ score: { $meta: 'textScore' } });
+        : objectCursor.sort({ score: { $meta: 'textScore' }}).project({ score: { $meta: 'textScore' } } );
 
       const userDocs = await objectCursor.toArray();
 
