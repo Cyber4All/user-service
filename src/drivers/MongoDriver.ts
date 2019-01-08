@@ -303,14 +303,13 @@ export default class MongoDriver implements DataStore {
   // GENERIC HELPER METHODS - not in public API //
   ////////////////////////////////////////////////
 
-  private documentUser(user: User, isNew?: boolean): UserDocument {
-    const userDocument: UserDocument = {
+  private documentUser(user: AuthUser, isNew?: boolean): Partial<UserDocument> {
+    const userDocument: Partial<UserDocument> = {
       username: user.username,
       name: user.name,
       email: user.email,
       organization: user.organization.toLowerCase(),
       password: user.password,
-      objects: [],
       emailVerified: user.emailVerified,
       bio: user.bio
     };
@@ -321,8 +320,7 @@ export default class MongoDriver implements DataStore {
       userDocument._id = new ObjectID().toHexString();
       userDocument.emailVerified = false;
       userDocument.bio = '';
-      //  TODO: Add property to UserDocument
-      userDocument['createdAt'] = Date.now().toString();
+      userDocument.createdAt = Date.now().toString();
     }
     return userDocument;
   }
