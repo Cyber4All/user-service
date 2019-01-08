@@ -111,8 +111,27 @@ export async function passwordMatch(
   }
 }
 
-function sanitizeUser(user: User): User {
-  user.username = sanitizeText(user.username);
+/**
+ * Returns latest token and user object
+ *
+ * @export
+ * @param {{
+ *   dataStore: DataStore;
+ *   username: string;
+ * }} params
+ * @returns {Promise<{ token: string; user: User }>}
+ */
+export async function refreshToken(params: {
+  dataStore: DataStore;
+  username: string;
+}): Promise<{ token: string; user: User }> {
+  const id = await params.dataStore.findUser(params.username);
+  const user = await params.dataStore.loadUser(id);
+  const token = TokenManager.generateToken(user);
+  return { token, user: new User(user) };
+}
+
+function sanitizeUser(user: AuthUser): AuthUser {
   user.email = sanitizeText(user.email);
   user.name = sanitizeText(user.name);
   user.organization = sanitizeText(user.organization);
