@@ -7,87 +7,12 @@ import { AuthUser } from '../types/auth-user';
 import { UserDocument } from '../types/user-document';
 dotenv.config();
 
-export interface Collection {
-  name: string;
-  foreigns?: Foreign[];
-  uniques?: string[];
-  text?: string[];
-}
-export interface Foreign {
-  name: string;
-  data: ForeignData;
-}
-
-export interface ForeignData {
-  target: string;
-  child: boolean;
-  registry?: string;
-}
-export class COLLECTIONS {
-  public static User: Collection = {
-    name: 'users',
-    foreigns: [
-      {
-        name: 'objects',
-        data: {
-          target: 'LearningObject',
-          child: true
-        }
-      }
-    ],
-    uniques: ['username']
+export const COLLECTIONS = {
+  USERS: 'users',
+  OTA_CODES: 'ota-codes',
+  LEARNING_OBJECTS: 'objects',
+  ORGANIZATIONS: 'organizations'
   };
-  public static LearningObject: Collection = {
-    name: 'objects',
-    foreigns: [
-      {
-        name: 'authorID',
-        data: {
-          target: 'User',
-          child: false,
-          registry: 'objects'
-        }
-      },
-      {
-        name: 'outcomes',
-        data: {
-          target: 'LearningOutcome',
-          child: true,
-          registry: 'source'
-        }
-      }
-    ]
-  };
-  public static LearningOutcome: Collection = {
-    name: 'learning-outcomes',
-    foreigns: [
-      {
-        name: 'source',
-        data: {
-          target: 'LearningObject',
-          child: false,
-          registry: 'outcomes'
-        }
-      }
-    ]
-  };
-  public static StandardOutcome: Collection = { name: 'outcomes' };
-  public static LearningObjectCollection: Collection = { name: 'collections' };
-  public static OTACode: Collection = { name: 'ota-codes' };
-  public static Organization: Collection = { name: 'organizations' };
-}
-
-const COLLECTIONS_MAP = new Map<string, Collection>();
-COLLECTIONS_MAP.set('User', COLLECTIONS.User);
-COLLECTIONS_MAP.set('LearningObject', COLLECTIONS.LearningObject);
-COLLECTIONS_MAP.set('LearningOutcome', COLLECTIONS.LearningOutcome);
-COLLECTIONS_MAP.set('StandardOutcome', COLLECTIONS.StandardOutcome);
-COLLECTIONS_MAP.set(
-  'LearningObjectCollection',
-  COLLECTIONS.LearningObjectCollection
-);
-COLLECTIONS_MAP.set('OTACode', COLLECTIONS.OTACode);
-COLLECTIONS_MAP.set('Organization', COLLECTIONS.Organization);
 
 export default class MongoDriver implements DataStore {
   private db: Db;
