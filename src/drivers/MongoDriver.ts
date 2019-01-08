@@ -1,12 +1,10 @@
 import { MongoClient, Db, ObjectID } from 'mongodb';
-
-import { UserDocument } from '@cyber4all/clark-schema';
-
 import { DataStore } from '../interfaces/interfaces';
-import { User } from '@cyber4all/clark-entity';
 import * as dotenv from 'dotenv';
 import { OTACode } from './OTACodeManager';
 import { UserQuery } from '../interfaces/Query';
+import { AuthUser } from '../types/auth-user';
+import { UserDocument } from '../types/user-document';
 dotenv.config();
 
 export interface Collection {
