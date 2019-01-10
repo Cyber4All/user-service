@@ -647,38 +647,6 @@ export default class MongoDriver implements DataStore {
   }
 
   /**
-   * Edit (update without foreigns) a generic item in the database.
-   * @async
-   *
-   * @param {Function} schema provides collection/validation information
-   * @param {RecordID} id which document to edit
-   * @param {Edit} record the values to change to
-   */
-  private async edit<T>(
-    collection: Collection,
-    id: string,
-    record: T
-  ): Promise<void> {
-    try {
-      // no foreign fields, no need to validate
-
-      // perform the actual update
-      await this.db
-        .collection(collection.name)
-        .updateOne({ _id: id }, { $set: record });
-
-      // registered fields must be fixed, nothing to change here
-
-      return Promise.resolve();
-    } catch (e) {
-      console.log(e);
-      return Promise.reject(
-        'Problem editing a ' + collection.name + ':\n\t' + e
-      );
-    }
-  }
-
-  /**
    * Cascade delete a record and its children.
    * @async
    *
