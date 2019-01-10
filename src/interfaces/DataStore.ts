@@ -4,8 +4,6 @@ import { UserQuery } from './Query';
 import { UserStatDatastore } from '../UserStats/UserStatsInteractor';
 
 export interface DataStore extends UserStatDatastore {
-  connect(dbURI: string): Promise<void>;
-  disconnect(): void;
   identifierInUse(username: string): Promise<boolean>;
   insertUser(user: User): Promise<string>;
   findUser(username: string): Promise<string>;
