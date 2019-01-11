@@ -16,9 +16,7 @@ export class UserInteractor {
       }
       const response = await dataStore.searchUsers(query);
       const users = response.users.map(user => {
-        user.password = undefined;
-        delete user.accessGroups;
-        return user;
+        return new User(user);
       });
       return users;
     } catch (e) {
@@ -46,9 +44,7 @@ export class UserInteractor {
       const userName = sanitizeText(username);
       const userID = await this.findUser(dataStore, userName);
       const user = await dataStore.loadUser(userID);
-      user.password = undefined;
-      delete user.accessGroups;
-      return user;
+      return new User(user);
     } catch (error) {
       return Promise.reject(`Problem finding specified user. Error: ${error}`);
     }
@@ -63,8 +59,7 @@ export class UserInteractor {
       const userID = await dataStore.findUser(eMail);
       await dataStore.editUser(userID, { emailVerified: true });
       const user = await dataStore.loadUser(userID);
-      user.password = undefined;
-      return user;
+      return new User(user);
     } catch (e) {
       return Promise.reject(`Problem verifying email. Error: ${e}`);
     }
@@ -80,10 +75,7 @@ export class UserInteractor {
       const pwdhash = await hasher.hash(password);
       const userID = await dataStore.findUser(eMail);
       const user = await dataStore.editUser(userID, { password: pwdhash });
-      user.password = undefined;
-      delete user.accessGroups;
-
-      return user;
+      return new User(user);
     } catch (e) {
       return Promise.reject(`Problem updating password. Error:${e}`);
     }
@@ -109,7 +101,6 @@ export class UserInteractor {
       if (edits.password) {
         this.updatePassword(dataStore, hasher, userName, edits.password);
       }
-      user.password = undefined;
       responder.setCookie('presence', TokenManager.generateToken(user));
       return Promise.resolve();
     } catch (e) {

@@ -10,9 +10,9 @@ import {
 } from '../interactors/interactors';
 import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
 import { REDIRECT_ROUTES } from '../environment/routes';
-import { User } from '@cyber4all/clark-entity';
 import * as request from 'request';
 import * as UserStatsRouteHandler from '../UserStats/UserStatsRouteHandler';
+import { AuthUser } from '../types/auth-user';
 const version = require('../../package.json').version;
 
 export default class RouteHandler {
@@ -70,7 +70,7 @@ export default class RouteHandler {
         try {
           const query = req.query;
           const users = await UserInteractor.searchUsers(this.dataStore, query);
-          responder.sendObject(users);
+          responder.sendObject(users.map(user => user.toPlainObject()));
         } catch (e) {
           responder.sendOperationError(e);
         }
@@ -78,7 +78,7 @@ export default class RouteHandler {
       // register
       .post(async (req, res) => {
         const responder = this.responseFactory.buildResponder(res);
-        const user = User.instantiate(req.body);
+        const user = new AuthUser(req.body);
         try {
           const registeredUser = await register(
             this.dataStore,
@@ -96,8 +96,8 @@ export default class RouteHandler {
               user.email,
               otaCode
             );
-            responder.setCookie('presence', registeredUser['token']);
-            responder.sendUser(registeredUser['user']);
+            responder.setCookie('presence', registeredUser.token);
+            responder.sendUser(registeredUser.user.toPlainObject());
           } catch (e) {
             console.log(e);
           }
@@ -111,7 +111,7 @@ export default class RouteHandler {
       try {
         const query = req.query.username;
         const user = await UserInteractor.loadUser(this.dataStore, query);
-        this.responseFactory.buildResponder(res).sendUser(user);
+        this.responseFactory.buildResponder(res).sendUser(user.toPlainObject());
       } catch (e) {
         this.responseFactory.buildResponder(res).sendOperationError(e);
       }
@@ -121,17 +121,17 @@ export default class RouteHandler {
     router.post('/users/tokens', async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
-        const user = await login(
+        const userPayload = await login(
           this.dataStore,
           this.hasher,
           req.body.username,
           req.body.password
         );
-        if (user === false) {
+        if (userPayload === false) {
           responder.invalidLogin();
-        } else {
-          responder.setCookie('presence', user['token']);
-          responder.sendUser(user['user']);
+        } else if (typeof userPayload !== 'boolean') {
+          responder.setCookie('presence', userPayload.token);
+          responder.sendUser(userPayload.user.toPlainObject());
         }
       } catch (e) {
         responder.sendOperationError(e);
@@ -145,7 +145,7 @@ export default class RouteHandler {
           this.dataStore,
           req.params.username
         );
-        responder.sendUser(user);
+        responder.sendUser(user.toPlainObject());
       } catch (e) {
         responder.sendOperationError(e);
       }
