@@ -42,7 +42,7 @@ switch (process.env.NODE_ENV) {
 
 const dataStore = new MongoDriver(dburi);
 const sendgridDriver = new SendgridDriver();
-const bcryptDriver = new BcryptDriver(10);
+const bcryptDriver = new BcryptDriver();
 const app = ExpressDriver.start();
 const responseFactory = new UserResponseFactory();
 
