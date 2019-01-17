@@ -3,6 +3,7 @@ import { TokenManager } from '../drivers/drivers';
 import { User } from '@cyber4all/clark-entity';
 import { sanitizeText } from './UserInteractor';
 import { AuthUser } from '../types/auth-user';
+import { reportError } from '../drivers/SentryConnector';
 
 /**
  * Attempts user login via datastore and issues JWT access token
@@ -73,10 +74,10 @@ export async function register(
       const token = TokenManager.generateToken(user);
       return { token, user: new User(formattedUser) };
     }
-    return Promise.reject(`Invalid username provided`);
+    return Promise.reject(new Error(`Invalid username provided`));
   } catch (e) {
-    console.log(e);
-    return Promise.reject(`Invalid username provided. Error:${e}`);
+    reportError(e);
+    return Promise.reject(new Error('Internal Server Error'));
   }
 }
 
