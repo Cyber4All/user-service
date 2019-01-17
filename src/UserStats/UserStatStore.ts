@@ -14,7 +14,7 @@ export class UserStatStore implements UserStatDatastore {
    */
   async fetchStats(params: { query: any }): Promise<UserStats> {
     const statCursor = await this.db
-      .collection(COLLECTIONS.User.name)
+      .collection(COLLECTIONS.USERS)
       .aggregate([
         { $match: params.query },
         {
