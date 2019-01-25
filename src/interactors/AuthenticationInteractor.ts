@@ -73,7 +73,7 @@ export async function register(
       const token = TokenManager.generateToken(user);
       return { token, user: new User(formattedUser) };
     }
-    return Promise.reject(`Invalid username provided`);
+    return Promise.reject(new Error('Invalid username provided'));
   } catch (e) {
     console.log(e);
     return Promise.reject(`Invalid username provided. Error:${e}`);

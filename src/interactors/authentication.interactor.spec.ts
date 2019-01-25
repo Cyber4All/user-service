@@ -7,6 +7,7 @@ import {
 import MockDriver from '../drivers/MockDriver';
 import { MOCK_OBJECTS } from '../tests/mocks';
 import { MockHashDriver } from '../drivers/MockHashDriver';
+import { AuthUser } from '../types/auth-user';
 const driver = new MockDriver(); // DataStore
 const hasher = new MockHashDriver(); // Hasher
 const expect = require('chai').expect;
@@ -96,25 +97,22 @@ describe('AuthenticationInteractor', () => {
           done();
         });
     });
-    it('should fail for existing email', done => {
-      login(driver, hasher, MOCK_OBJECTS.USERNAME, MOCK_OBJECTS.PASSWORD)
-        .then(val => {
-          val['user'].username = 'UnitTester';
-          val['user'].email = 'nvisal1@students.towson.edu';
-          return register(driver, hasher, val['user'])
-            .then(val => {
-              expect.fail();
-              done();
-            })
-            .catch(error => {
-              expect(val).to.be.a('object');
-              done();
-            });
-        })
-        .catch(error => {
-          expect.fail();
-          done();
-        });
+    it('should fail for existing email', async (done) => {
+      const registrationRequest = new AuthUser({
+        username: 'areallycoolhuman',
+        name: 'So Fun',
+        email: 'cool@test.com',
+        organization: 'towson university',
+        password: 'mypassissecure',
+        bio: ''
+      });
+      try {
+        await register(driver, hasher, registrationRequest);
+        expect.fail();
+      } catch (error) {
+        expect(error).to.be.a('error');
+        done();
+      }
     });
   });
 });
@@ -132,25 +130,25 @@ describe('AuthenticationInteractor', () => {
           done();
         });
     });
-});
+  });
 
-describe('AuthenticationInteractor', () => {
-  describe('#isValidUsername', () => {
-    it('should fail for usernames longer than 20 characters', () => {
-      expect(isValidUsername(MOCK_OBJECTS.LONG_USERNAME)).to.be.false;
-    });
-    it('should fail for usernames shorter than 3 characters', () => {
-      expect(isValidUsername(MOCK_OBJECTS.SHORT_USERNAME)).to.be.false;
-    });
-    it('should pass for usernames shorter than 20 characters', () => {
-      expect(isValidUsername(MOCK_OBJECTS.VALID_LONG_USERNAME)).to.be.true;
-    });
-    it('should pass for usernames with exactly 3 characters', () => {
-      expect(isValidUsername(MOCK_OBJECTS.VALID_SHORT_USERNAME)).to.be.true;
-    });
-    it('should pass for usernames with exactly 20 characters', () => {
-      expect(isValidUsername(MOCK_OBJECTS.VALID_MAX_LENGTH_USERNAME)).to.be.true;
+  describe('AuthenticationInteractor', () => {
+    describe('#isValidUsername', () => {
+      it('should fail for usernames longer than 20 characters', () => {
+        expect(isValidUsername(MOCK_OBJECTS.LONG_USERNAME)).to.be.false;
+      });
+      it('should fail for usernames shorter than 3 characters', () => {
+        expect(isValidUsername(MOCK_OBJECTS.SHORT_USERNAME)).to.be.false;
+      });
+      it('should pass for usernames shorter than 20 characters', () => {
+        expect(isValidUsername(MOCK_OBJECTS.VALID_LONG_USERNAME)).to.be.true;
+      });
+      it('should pass for usernames with exactly 3 characters', () => {
+        expect(isValidUsername(MOCK_OBJECTS.VALID_SHORT_USERNAME)).to.be.true;
+      });
+      it('should pass for usernames with exactly 20 characters', () => {
+        expect(isValidUsername(MOCK_OBJECTS.VALID_MAX_LENGTH_USERNAME)).to.be.true;
+      });
     });
   });
-});
 
