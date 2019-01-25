@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/Cyber4All/user-service#readme",
   "dependencies": {
-    "@cyber4all/clark-entity": "^4.0.0-rc.14.0",
+    "@cyber4all/clark-entity": "^4.0.0-rc.18.0",
     "@cyber4all/clark-schema": "^1.0.2",
     "@cyber4all/clark-taxonomy": "^2.0.0",
     "@oriented/express": "^1.0.3",
