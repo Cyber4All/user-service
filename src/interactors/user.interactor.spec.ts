@@ -4,7 +4,7 @@ import MockDriver from '../drivers/MockDriver';
 import { MOCK_OBJECTS } from '../tests/mocks';
 const expect = require('chai').expect;
 const driver = new MockDriver(); // DataStore
-const hasher = new BcryptDriver(); // Hasher
+const hasher = new BcryptDriver(10); // Hasher
 
 describe('searchUsers', () => {
   it('should return an array of users', (done) => {
