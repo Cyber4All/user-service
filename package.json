@@ -32,7 +32,7 @@
     "@sendgrid/mail": "^6.2.1",
     "@types/chai": "^4.1.5",
     "@types/morgan": "^1.7.35",
-    "bcrypt-nodejs": "0.0.3",
+    "bcrypt": "^3.0.2",
     "chai": "^4.1.2",
     "chai-http": "^4.0.0",
     "cookie-parser": "^1.4.3",
@@ -49,7 +49,7 @@
     "request-promise": "^4.2.2"
   },
   "devDependencies": {
-    "@types/bcrypt-nodejs": "0.0.30",
+    "@types/bcrypt": "^3.0.0",
     "@types/cookie-parser": "^1.4.1",
     "@types/cors": "^2.8.3",
     "@types/dotenv": "^4.0.2",
