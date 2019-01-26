@@ -10,7 +10,7 @@ import { BcryptDriver } from "./drivers";
 describe('BcryptDriver', () => {
   let bcrypt: BcryptDriver;
   beforeEach(() => {
-    bcrypt = new BcryptDriver();
+    bcrypt = new BcryptDriver(10);
   });
   it('should resolve a hashed string', async () => {
     const hash = await bcrypt.hash('password');
