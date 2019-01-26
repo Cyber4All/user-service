@@ -294,7 +294,7 @@ export default class MongoDriver implements DataStore {
 
   async insertOTACode(otaCode: OTACode): Promise<void> {
     try {
-      await this.db.collection(COLLECTIONS.OTA_CODES).insertOne(otaCode);
+      await this.client.db().collection(COLLECTIONS.OTA_CODES).insertOne(otaCode);
     } catch (e) {
       return Promise.reject(e);
     }
