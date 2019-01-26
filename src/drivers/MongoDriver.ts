@@ -1,12 +1,12 @@
-import { MongoClient, Db, ObjectID } from 'mongodb';
-import { DataStore } from '../interfaces/interfaces';
 import * as dotenv from 'dotenv';
-import { OTACode } from './OTACodeManager';
+import { Db, MongoClient, ObjectID } from 'mongodb';
+import { DataStore } from '../interfaces/interfaces';
 import { UserQuery } from '../interfaces/Query';
-import { UserStats } from '../UserStats/UserStatsInteractor';
-import { UserStatStore } from '../UserStats/UserStatStore';
 import { AuthUser } from '../types/auth-user';
 import { UserDocument } from '../types/user-document';
+import { UserStats } from '../UserStats/UserStatsInteractor';
+import { UserStatStore } from '../UserStats/UserStatStore';
+import { OTACode } from './OTACodeManager';
 dotenv.config();
 
 export const COLLECTIONS = {
@@ -260,12 +260,16 @@ export default class MongoDriver implements DataStore {
       if (object.name) {
         object.name = object.name.trim();
       }
-      await this.db.collection(COLLECTIONS.USERS).update(
-        { _id: id },
-        {
-          $set: object
-        }
+      await this.client
+        .db()
+        .collection(COLLECTIONS.USERS)
+        .update(
+          { _id: id },
+          {
+            $set: object
+          }
       );
+       
       return await this.loadUser(id);
     } catch (e) {
       return Promise.reject(e);

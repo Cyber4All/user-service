@@ -74,7 +74,7 @@ export async function register(
       const token = TokenManager.generateToken(user);
       return { token, user: new User(formattedUser) };
     }
-    return Promise.reject(new Error(`Invalid username provided`));
+    return Promise.reject(new Error('Invalid username provided'));
   } catch (e) {
     reportError(e);
     return Promise.reject(new Error('Internal Server Error'));

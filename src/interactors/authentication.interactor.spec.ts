@@ -109,8 +109,7 @@ describe('AuthenticationInteractor', () => {
       try {
         await register(driver, hasher, registrationRequest);
         expect.fail();
-      }
-      catch (error) {
+      } catch (error) {
         expect(error).to.be.a('error');
         done();
       }
