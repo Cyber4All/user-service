@@ -260,12 +260,16 @@ export default class MongoDriver implements DataStore {
       if (object.name) {
         object.name = object.name.trim();
       }
-      await this.db.collection(COLLECTIONS.USERS).update(
-        { _id: id },
-        {
-          $set: object
-        }
+      await this.client
+        .db()
+        .collection(COLLECTIONS.USERS)
+        .update(
+          { _id: id },
+          {
+            $set: object
+          }
       );
+       
       return await this.loadUser(id);
     } catch (e) {
       return Promise.reject(e);
