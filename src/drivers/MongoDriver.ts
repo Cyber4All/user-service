@@ -5,6 +5,8 @@ import { OTACode } from './OTACodeManager';
 import { UserQuery } from '../interfaces/Query';
 import { AuthUser } from '../types/auth-user';
 import { UserDocument } from '../types/user-document';
+import { UserStats } from '../UserStats/UserStatsInteractor';
+import { UserStatStore } from '../UserStats/UserStatStore';
 dotenv.config();
 
 export const COLLECTIONS = {
@@ -17,6 +19,8 @@ export const COLLECTIONS = {
 export default class MongoDriver implements DataStore {
   private client: MongoClient;
   private db: Db;
+
+  private statStore: UserStatStore;
 
   constructor(dburi: string) {
     this.connect(dburi);
@@ -39,6 +43,7 @@ export default class MongoDriver implements DataStore {
   async connect(dbURI: string, retryAttempt?: number): Promise<void> {
     try {
       this.client = await MongoClient.connect(dbURI);
+      this.statStore = new UserStatStore(this.db);
     } catch (e) {
       if (!retryAttempt) {
         this.connect(
@@ -59,6 +64,17 @@ export default class MongoDriver implements DataStore {
    */
   disconnect(): void {
     this.client.close();
+  }
+
+  /**
+   * Fetches Stats for User Accounts
+   *
+   * @param {{ query: any }} params
+   * @returns {Promise<UserStats>}
+   * @memberof MongoDriver
+   */
+  fetchStats(params: { query: any }): Promise<UserStats> {
+    return this.statStore.fetchStats({ query: params.query });
   }
 
   /**
