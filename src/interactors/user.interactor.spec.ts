@@ -18,20 +18,6 @@ describe('searchUsers', () => {
         done();
       });
   });
-  it('should return an array of users. accessGroups should be gone when returned!', (done) => {
-    return UserInteractor.searchUsers(driver, MOCK_OBJECTS.USERNAME_QUERY)
-      .then((val) => {
-        if (val[0].hasOwnProperty('accessGroups')) {
-          expect.fail();
-          done();
-        }
-        done();
-      })
-      .catch((error) => {
-        expect.fail();
-        done();
-      });
-  });
 });
 
 describe('findUser', () => {
@@ -39,20 +25,6 @@ describe('findUser', () => {
     return UserInteractor.findUser(driver, MOCK_OBJECTS.USERNAME)
       .then((val) => {
         expect(val, 'Expected user was not returned!').to.be.a('string');
-        done();
-      })
-      .catch((error) => {
-        expect.fail();
-        done();
-      });
-  });
-  it('should return a user. accessGroups should be gone when returned!', (done) => {
-    return UserInteractor.findUser(driver, MOCK_OBJECTS.USERNAME)
-      .then((val) => {
-        if (val.hasOwnProperty('accessGroups')) {
-          expect.fail();
-          done();
-        }
         done();
       })
       .catch((error) => {
@@ -79,20 +51,6 @@ describe('updatePassword', () => {
     return UserInteractor.updatePassword(driver, hasher, MOCK_OBJECTS.EMAIL, MOCK_OBJECTS.PASSWORD)
       .then((val) => {
         expect(val, 'Expected user was not returned!').to.be.a('object');
-        done();
-      })
-      .catch((error) => {
-        expect.fail();
-        done();
-      });
-  });
-  it('should return a user. accessGroups should be gone when returned!', (done) => {
-    return UserInteractor.updatePassword(driver, hasher, MOCK_OBJECTS.EMAIL, MOCK_OBJECTS.PASSWORD)
-      .then((val) => {
-        if (val.hasOwnProperty('accessGroups')) {
-          expect.fail();
-          done();
-        }
         done();
       })
       .catch((error) => {
