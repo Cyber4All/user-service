@@ -63,9 +63,10 @@ export async function register(
   user: AuthUser
 ): Promise<{ token: string; user: User }> {
   try {
+    const username = sanitizeText(user.username);
     if (
-      isValidUsername(user.username) &&
-      !(await datastore.identifierInUse(user.username))
+      isValidUsername(username) &&
+      !(await datastore.identifierInUse(username))
     ) {
       const pwdhash = await hasher.hash(user.password);
       user.password = pwdhash;
