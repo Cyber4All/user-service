@@ -1,18 +1,14 @@
 import * as express from 'express';
-type Router = express.Router;
-import { DataStore, Mailer, HashInterface } from '../interfaces/interfaces';
-import { login, register } from '../interactors/AuthenticationInteractor';
-import { UserResponseFactory } from './drivers';
-import {
-  UserInteractor,
-  MailerInteractor,
-  OTACodeInteractor
-} from '../interactors/interactors';
-import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
-import { REDIRECT_ROUTES } from '../environment/routes';
 import * as request from 'request';
+import { REDIRECT_ROUTES } from '../environment/routes';
+import { login, register } from '../interactors/AuthenticationInteractor';
+import { MailerInteractor, OTACodeInteractor, UserInteractor } from '../interactors/interactors';
+import { DataStore, HashInterface, Mailer } from '../interfaces/interfaces';
+import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
 import { AuthUser } from '../types/auth-user';
 import * as UserStatsRouteHandler from '../UserStats/UserStatsRouteHandler';
+import { UserResponseFactory } from './drivers';
+type Router = express.Router;
 const version = require('../../package.json').version;
 
 export default class RouteHandler {

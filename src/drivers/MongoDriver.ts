@@ -1,12 +1,12 @@
-import { MongoClient, Db, ObjectID } from 'mongodb';
-import { DataStore } from '../interfaces/interfaces';
 import * as dotenv from 'dotenv';
-import { OTACode } from './OTACodeManager';
+import { Db, MongoClient, ObjectID } from 'mongodb';
+import { DataStore } from '../interfaces/interfaces';
 import { UserQuery } from '../interfaces/Query';
 import { AuthUser } from '../types/auth-user';
 import { UserDocument } from '../types/user-document';
 import { UserStats } from '../UserStats/UserStatsInteractor';
 import { UserStatStore } from '../UserStats/UserStatStore';
+import { OTACode } from './OTACodeManager';
 dotenv.config();
 
 export const COLLECTIONS = {
@@ -294,7 +294,7 @@ export default class MongoDriver implements DataStore {
 
   async insertOTACode(otaCode: OTACode): Promise<void> {
     try {
-      await this.db.collection(COLLECTIONS.OTA_CODES).insertOne(otaCode);
+      await this.client.db().collection(COLLECTIONS.OTA_CODES).insertOne(otaCode);
     } catch (e) {
       return Promise.reject(e);
     }

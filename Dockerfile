@@ -55,7 +55,7 @@ ARG OTA_CODE_REPLACEMENT=0000
 WORKDIR /opt
 RUN npm test
 
-FROM node:8-alpine
+FROM node:8-slim
 # Defaults the node environment to production, however compose will override this to use development
 # when working locally
 ARG NODE_ENV=production
