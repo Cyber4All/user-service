@@ -3,12 +3,16 @@ import { User } from '@cyber4all/clark-entity';
 import { OTACode } from './OTACodeManager';
 import { UserQuery } from '../interfaces/Query';
 import { MOCK_OBJECTS } from '../tests/mocks';
+import { UserStats } from '../UserStats/UserStatsInteractor';
 
 export default class MockDriver implements DataStore {
+  fetchStats(params: { query: any; }): Promise<UserStats> {
+    throw new Error('Method not implemented.');
+  }
 
   connect(dbURI: string): Promise<void> {
     return Promise.resolve();
-  }    
+  }
 
   disconnect(): void {
     return;
@@ -37,7 +41,7 @@ export default class MockDriver implements DataStore {
   deleteUser(id: string): Promise<void> {
     return Promise.resolve();
   }
-    
+
   insertOTACode(otaCode: OTACode): Promise<void> {
     return Promise.resolve();
   }

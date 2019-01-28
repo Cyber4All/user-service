@@ -1,11 +1,11 @@
 import * as jwt from 'jsonwebtoken';
-import { User } from '@cyber4all/clark-entity';
+import { AuthUser } from '../types/auth-user';
 
 /**
  * Takes a user object and generates a JWT for the user
- * @param user contains the user's id, username, firstname, lastname, and email
+ * @param AuthUser contains the user's id, username, firstname, lastname, and email
  */
-export function generateToken(user: User) {
+export function generateToken(user: AuthUser) {
   const payload = {
     username: user.username,
     name: user.name,

@@ -36,9 +36,6 @@ export default class RouteResponder implements Responder {
    * @param user
    */
   sendUser(user: User) {
-    const t = user.token;
-    delete user.token;
-    delete user.password;
     this.res.status(200).json(user);
   }
 
@@ -80,7 +77,7 @@ export default class RouteResponder implements Responder {
       maxAge: 604800000,
       httpOnly: false,
       domain: process.env.COOKIE_DOMAIN,
-      secure: (process.env.NODE_ENV === 'production')
+      secure: process.env.NODE_ENV === 'production'
     };
 
     return this.res.cookie(key, value, options);

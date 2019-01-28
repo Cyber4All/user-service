@@ -2,6 +2,8 @@ import { DataStore, HashInterface } from './../interfaces/interfaces';
 import { TokenManager } from '../drivers/drivers';
 import { User } from '@cyber4all/clark-entity';
 import { sanitizeText } from './UserInteractor';
+import { AuthUser } from '../types/auth-user';
+import { reportError } from '../drivers/SentryConnector';
 
 /**
  * Attempts user login via datastore and issues JWT access token
@@ -19,7 +21,7 @@ export async function login(
   hasher: HashInterface,
   username: string,
   password: string
-) {
+): Promise<boolean | { token: string; user: User }> {
   try {
     let id;
     let authenticated = false;
@@ -27,6 +29,7 @@ export async function login(
     try {
       id = await dataStore.findUser(userName);
     } catch (e) {
+      console.error(e);
       return authenticated;
     }
 
@@ -35,8 +38,7 @@ export async function login(
 
     if (authenticated) {
       const token = TokenManager.generateToken(user);
-      const cleanUser = removeSensitiveData(user);
-      return { token, user: cleanUser };
+      return { token, user: new User(user) };
     }
     return authenticated;
   } catch (e) {
@@ -58,34 +60,26 @@ export async function login(
 export async function register(
   datastore: DataStore,
   hasher: HashInterface,
-  user: User
-) {
+  user: AuthUser
+): Promise<{ token: string; user: User }> {
   try {
+    const username = sanitizeText(user.username);
     if (
-      isValidUsername(user.username) &&
-      !await datastore.identifierInUse(user.username)
+      isValidUsername(username) &&
+      !(await datastore.identifierInUse(username))
     ) {
       const pwdhash = await hasher.hash(user.password);
       user.password = pwdhash;
       const formattedUser = sanitizeUser(user);
       await datastore.insertUser(formattedUser);
       const token = TokenManager.generateToken(user);
-      const cleanUser = removeSensitiveData(user);
-      return { token, user: cleanUser };
+      return { token, user: new User(formattedUser) };
     }
-    return Promise.reject(`Invalid username provided`);
-    // responder.sendOperationError('Invalid username provided.', 400);
+    return Promise.reject(new Error('Invalid username provided'));
   } catch (e) {
-    console.log(e);
-    return Promise.reject(`Invalid username provided. Error:${e}`);
+    reportError(e);
+    return Promise.reject(new Error('Internal Server Error'));
   }
-}
-
-function removeSensitiveData(user: User) {
-  user.password = undefined;
-  delete user.password;
-  delete user._password;
-  return user;
 }
 
 /**
@@ -119,8 +113,27 @@ export async function passwordMatch(
   }
 }
 
-function sanitizeUser(user: User): User {
-  user.username = sanitizeText(user.username);
+/**
+ * Returns latest token and user object
+ *
+ * @export
+ * @param {{
+ *   dataStore: DataStore;
+ *   username: string;
+ * }} params
+ * @returns {Promise<{ token: string; user: User }>}
+ */
+export async function refreshToken(params: {
+  dataStore: DataStore;
+  username: string;
+}): Promise<{ token: string; user: User }> {
+  const id = await params.dataStore.findUser(params.username);
+  const user = await params.dataStore.loadUser(id);
+  const token = TokenManager.generateToken(user);
+  return { token, user: new User(user) };
+}
+
+function sanitizeUser(user: AuthUser): AuthUser {
   user.email = sanitizeText(user.email);
   user.name = sanitizeText(user.name);
   user.organization = sanitizeText(user.organization);

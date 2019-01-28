@@ -44,11 +44,14 @@ export default class AdminRouteHandler {
       const responder = this.responseFactory.buildResponder(res);
       try {
         const query = req.query;
-        const users = await AdminUserInteractor.fetchUsers(
+        const payload = await AdminUserInteractor.fetchUsers(
           this.dataStore,
           query
         );
-        responder.sendObject(users);
+        responder.sendObject({
+          ...payload,
+          users: payload.users.map(user => user.toPlainObject())
+        });
       } catch (e) {
         responder.sendOperationError(e);
       }

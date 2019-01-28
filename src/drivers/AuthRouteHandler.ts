@@ -6,7 +6,7 @@ import { UserResponseFactory } from './drivers';
 import { UserInteractor } from '../interactors/interactors';
 import { generateToken } from './TokenManager';
 import { reportError } from './SentryConnector';
-
+import * as AuthInteractor from '../interactors/AuthenticationInteractor';
 export default class AuthRouteHandler {
   constructor(
     private dataStore: DataStore,
@@ -38,7 +38,11 @@ export default class AuthRouteHandler {
         // This odd try/catch setup is so that we don't abort the current operation,
         // but still have Sentry realize that an error was thrown.
         try {
-          throw new Error(`${req.user.username} was retrieved from the token. Should be lowercase`);
+          throw new Error(
+            `${
+              req.user.username
+            } was retrieved from the token. Should be lowercase`
+          );
         } catch (e) {
           console.log(e.message);
           reportError(e);
@@ -112,18 +116,12 @@ export default class AuthRouteHandler {
     router.get('/users/tokens/refresh', async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
-        const user = await UserInteractor.loadUser(
-          this.dataStore,
-          req.user.username
-        );
-
-        if (user) {
-          const token = generateToken(user);
-          responder.setCookie('presence', token);
-          responder.sendUser(user);
-        } else {
-          responder.sendOperationError('Error: No user found');
-        }
+        const userPayload = await AuthInteractor.refreshToken({
+          dataStore: this.dataStore,
+          username: req.user.username
+        });
+        responder.setCookie('presence', userPayload.token);
+        responder.sendUser(userPayload.user.toPlainObject());
       } catch (error) {
         responder.sendOperationError(`Error refreshing token ${error}`);
       }
