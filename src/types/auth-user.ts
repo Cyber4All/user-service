@@ -16,7 +16,8 @@ export class AuthUser extends User {
     this._accessGroups = accessGroups;
   }
   constructor(user: Partial<AuthUser>) {
-    super(user);
+    const username = user.username ? user.username.toLowerCase().trim() : '';
+    super({ ...user, username });
     this._password = user.password || '';
     this._accessGroups = user.accessGroups || [];
   }
