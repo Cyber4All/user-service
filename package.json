@@ -55,7 +55,7 @@
     "@types/dotenv": "^4.0.2",
     "@types/express": "^4.11.0",
     "@types/express-jwt": "0.0.40",
-    "@types/jest": "^23.3.12",
+    "@types/jest": "^24.0.0",
     "@types/jsonwebtoken": "^7.2.5",
     "@types/mongodb": "^3.1.18",
     "@types/node": "^10.5.2",
