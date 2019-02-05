@@ -22,7 +22,6 @@ export class AdminUserInteractor {
       const response = await dataStore.searchUsers(query);
       const users = await Promise.all(
         response.users.map(async user => {
-          user.id = await dataStore.findUser(user.username);
           user.password = undefined;
           return user;
         })
