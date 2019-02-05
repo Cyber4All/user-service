@@ -21,7 +21,7 @@ export async function login(
   hasher: HashInterface,
   username: string,
   password: string
-): Promise<boolean | { token: string; user: User }> {
+): Promise<boolean | { token: string; user: any }> {
   try {
     let id;
     let authenticated = false;
@@ -38,7 +38,15 @@ export async function login(
 
     if (authenticated) {
       const token = TokenManager.generateToken(user);
-      return { token, user: new User(user) };
+      const userResponse = {
+        username: user.username,
+        name: user.name,
+        email: user.email,
+        organization: user.organization,
+        emailVerified: user.emailVerified,
+        accessGroups: user.accessGroups
+      };
+      return {token, user: userResponse};
     }
     return authenticated;
   } catch (e) {
