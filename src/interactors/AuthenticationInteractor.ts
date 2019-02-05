@@ -4,6 +4,7 @@ import { User } from '@cyber4all/clark-entity';
 import { sanitizeText } from './UserInteractor';
 import { AuthUser } from '../types/auth-user';
 import { reportError } from '../drivers/SentryConnector';
+import { UserToken } from '../types/user-token';
 
 /**
  * Attempts user login via datastore and issues JWT access token
@@ -21,7 +22,7 @@ export async function login(
   hasher: HashInterface,
   username: string,
   password: string
-): Promise<boolean | { token: string; user: User }> {
+): Promise<boolean | { token: string; user: UserToken }> {
   try {
     let id;
     let authenticated = false;
@@ -38,7 +39,15 @@ export async function login(
 
     if (authenticated) {
       const token = TokenManager.generateToken(user);
-      return { token, user: new User(user) };
+      const userResponse: UserToken = {
+        username: user.username,
+        name: user.name,
+        email: user.email,
+        organization: user.organization,
+        emailVerified: user.emailVerified,
+        accessGroups: user.accessGroups
+      };
+      return {token, user: userResponse};
     }
     return authenticated;
   } catch (e) {
