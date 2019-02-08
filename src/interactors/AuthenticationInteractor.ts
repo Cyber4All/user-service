@@ -85,8 +85,13 @@ export async function register(
     }
     return Promise.reject(new Error('Invalid username provided'));
   } catch (e) {
-    reportError(e);
-    return Promise.reject(new Error('Internal Server Error'));
+    if (e.message.includes('email')) {
+      return Promise.reject(new Error('Duplicate/Invalid Email Found'))
+    }
+    else {
+      reportError(e);
+      return Promise.reject(new Error('Internal Server Error'));
+    }
   }
 }
 
