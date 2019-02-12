@@ -58,7 +58,7 @@
     "@types/jest": "^23.3.12",
     "@types/jsonwebtoken": "^7.2.5",
     "@types/mongodb": "^3.1.18",
-    "@types/node": "^10.5.2",
+    "@types/node": "^11.9.0",
     "@types/raven": "^2.5.1",
     "danger": "^6.0.2",
     "gulp": "^3.9.1",
