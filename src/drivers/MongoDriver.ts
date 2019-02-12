@@ -43,7 +43,7 @@ export default class MongoDriver implements DataStore {
   async connect(dbURI: string, retryAttempt?: number): Promise<void> {
     try {
       this.client = await MongoClient.connect(dbURI);
-      this.statStore = new UserStatStore(this.db);
+      this.statStore = new UserStatStore(this.client.db('onion'));
     } catch (e) {
       if (!retryAttempt) {
         this.connect(
