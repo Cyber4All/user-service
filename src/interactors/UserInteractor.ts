@@ -2,6 +2,7 @@ import { DataStore, Responder, HashInterface } from '../interfaces/interfaces';
 import { User } from '@cyber4all/clark-entity';
 import { TokenManager } from '../drivers/drivers';
 import { UserQuery } from '../interfaces/Query';
+import { UserToken } from '../types/user-token';
 
 export class UserInteractor {
   public static async searchUsers(
@@ -48,6 +49,18 @@ export class UserInteractor {
     } catch (error) {
       return Promise.reject(`Problem finding specified user. Error: ${error}`);
     }
+  }
+
+  static async fetchReviewers(
+    dataStore: DataStore,
+    user: UserToken,
+    collection: string,
+  ): Promise<any[] | Error> {
+    if (this.verifyCollectionName(user, collection)) {
+      const reviewers = await dataStore.fetchReviewers(collection);
+      return reviewers;
+    }
+    return new Error('Invalid Access');
   }
 
   public static async verifyEmail(
@@ -144,6 +157,13 @@ export class UserInteractor {
     } catch (e) {
       return Promise.reject(`Unable to delete user. Error: ${e}`);
     }
+  }
+
+  private static verifyCollectionName(
+    user: UserToken,
+    collection: string,
+  ): boolean {
+    return user.accessGroups.includes(`curator@${collection}`);
   }
 }
 

@@ -7,6 +7,7 @@ import { UserDocument } from '../types/user-document';
 import { UserStats } from '../UserStats/UserStatsInteractor';
 import { UserStatStore } from '../UserStats/UserStatStore';
 import { OTACode } from './OTACodeManager';
+import { UserToken } from '../types/user-token';
 dotenv.config();
 
 export const COLLECTIONS = {
@@ -290,6 +291,19 @@ export default class MongoDriver implements DataStore {
       .db()
       .collection(COLLECTIONS.USERS)
       .deleteOne({ _id: id });
+  }
+
+  async fetchReviewers(collection: string): Promise<any[]> {
+    try {
+      const users = await this.client
+        .db()
+        .collection(COLLECTIONS.USERS)
+        .find<UserDocument>({ accessGroups: { $regex: `reviewer@${collection}.*` }})
+        .toArray();
+      return users;
+    } catch (e) {
+      return Promise.reject(e);
+    }
   }
 
   async insertOTACode(otaCode: OTACode): Promise<void> {

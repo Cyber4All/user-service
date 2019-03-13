@@ -15,4 +15,5 @@ export interface DataStore extends UserStatDatastore {
   deleteOTACode(id: string): Promise<void>;
   searchUsers(query: UserQuery): Promise<{ users: AuthUser[]; total: number }>;
   findOrganizations(query: string): Promise<any[]>;
+  fetchReviewers(collection: string): Promise<any[]>;
 }
