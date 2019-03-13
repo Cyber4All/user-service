@@ -4,10 +4,8 @@ import { DataStore, HashInterface } from '../interfaces/interfaces';
 import { passwordMatch } from '../interactors/AuthenticationInteractor';
 import { UserResponseFactory } from './drivers';
 import { UserInteractor } from '../interactors/interactors';
-import { generateToken } from './TokenManager';
 import { reportError } from './SentryConnector';
 import * as AuthInteractor from '../interactors/AuthenticationInteractor';
-import { ResponseError } from '@sendgrid/helpers/classes';
 export default class AuthRouteHandler {
   constructor(
     private dataStore: DataStore,
