@@ -60,7 +60,7 @@ export class UserInteractor {
       const reviewers = await dataStore.fetchReviewers(collection);
       return reviewers;
     }
-    return new Error('Invalid Access');
+    throw new Error('Invalid Access');
   }
 
   public static async verifyEmail(
