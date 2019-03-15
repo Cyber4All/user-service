@@ -55,10 +55,13 @@ export class UserInteractor {
     dataStore: DataStore,
     user: UserToken,
     collection: string,
-  ): Promise<any[] | Error> {
+  ): Promise<any[]> {
     if (this.verifyCollectionName(user, collection)) {
       const reviewers = await dataStore.fetchReviewers(collection);
-      return reviewers;
+      const users = reviewers.map(user => {
+        return new User(user);
+      });
+      return users;
     }
     throw new Error('Invalid Access');
   }
