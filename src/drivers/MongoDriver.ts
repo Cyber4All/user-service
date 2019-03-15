@@ -292,6 +292,19 @@ export default class MongoDriver implements DataStore {
       .deleteOne({ _id: id });
   }
 
+  async fetchReviewers(collection: string): Promise<any[]> {
+    try {
+      const users = await this.client
+        .db()
+        .collection(COLLECTIONS.USERS)
+        .find<UserDocument>({ accessGroups: `reviewer@${collection}` })
+        .toArray();
+      return users;
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+
   async insertOTACode(otaCode: OTACode): Promise<void> {
     try {
       await this.client.db().collection(COLLECTIONS.OTA_CODES).insertOne(otaCode);

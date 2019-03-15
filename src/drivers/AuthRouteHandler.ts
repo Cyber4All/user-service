@@ -4,7 +4,6 @@ import { DataStore, HashInterface } from '../interfaces/interfaces';
 import { passwordMatch } from '../interactors/AuthenticationInteractor';
 import { UserResponseFactory } from './drivers';
 import { UserInteractor } from '../interactors/interactors';
-import { generateToken } from './TokenManager';
 import { reportError } from './SentryConnector';
 import * as AuthInteractor from '../interactors/AuthenticationInteractor';
 export default class AuthRouteHandler {
@@ -55,10 +54,10 @@ export default class AuthRouteHandler {
     // POST: provide JSON object with new user info
     /*
         {
-          "username": "string", 
-          "firstname": "string", 
-          "lastname": "string", 
-          "email": "string", 
+          "username": "string",
+          "firstname": "string",
+          "lastname": "string",
+          "email": "string",
           "password": "string",
           organization: string
         }
@@ -151,6 +150,18 @@ export default class AuthRouteHandler {
         } else {
           responder.unauthorized();
         }
+      } catch (e) {
+        responder.sendOperationError(e);
+      }
+    });
+
+    router.get('/users/:collectionName/reviewers', async (req, res) => {
+      const responder = this.responseFactory.buildResponder(res);
+      try {
+        const user = req.user;
+        const collectionName = req.params.collectionName;
+        const reviewers = await UserInteractor.fetchReviewers(this.dataStore, user, collectionName);
+        responder.sendObject(reviewers);
       } catch (e) {
         responder.sendOperationError(e);
       }
