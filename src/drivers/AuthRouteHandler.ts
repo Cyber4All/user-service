@@ -155,6 +155,26 @@ export default class AuthRouteHandler {
       }
     });
 
+    router.post('/users/:collectionName/curators', async (req, res) => {
+      const responder = this.responseFactory.buildResponder(res);
+      try {
+        const user = req.user;
+        const collectionName = req.params.collectionName;
+        const username = req.body.username;
+        const reviewers = await UserInteractor.assignAccessGroup(
+          this.dataStore,
+          user,
+          collectionName,
+          username,
+        );
+        responder.sendObject(reviewers);
+      } catch (e) {
+        responder.sendOperationError(e);
+      }
+    });
+
+    rout
+
     router.get('/users/:collectionName/reviewers', async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {

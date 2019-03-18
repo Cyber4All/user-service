@@ -305,6 +305,16 @@ export default class MongoDriver implements DataStore {
     }
   }
 
+  async assignCuratorAccess(username: string, accessGroup: string) {
+    await this.client
+      .db()
+      .collection(COLLECTIONS.USERS)
+      .updateOne(
+      { username },
+      { $set: { accessGroups: [accessGroup] }
+      });
+  }
+
   async insertOTACode(otaCode: OTACode): Promise<void> {
     try {
       await this.client.db().collection(COLLECTIONS.OTA_CODES).insertOne(otaCode);

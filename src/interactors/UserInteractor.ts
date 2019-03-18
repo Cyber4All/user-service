@@ -63,6 +63,20 @@ export class UserInteractor {
     throw new Error('Invalid Access');
   }
 
+  static async assignCuratorAccess(
+    dataStore: DataStore,
+    user: UserToken,
+    collection: string,
+    username: string,
+  ): Promise<void> {
+    if (this.verifyAdminAccess(user)) {
+      const formattedAccessGroup = `curator@${collection}`;
+      await dataStore.assignCuratorAccess(username, formattedAccessGroup);
+    } else {
+      throw new Error('Invalid Access');
+    }
+  }
+
   public static async verifyEmail(
     dataStore: DataStore,
     email: string
@@ -164,6 +178,12 @@ export class UserInteractor {
     collection: string,
   ): boolean {
     return user.accessGroups.includes(`curator@${collection}`);
+  }
+
+  private static verifyAdminAccess(
+    user: UserToken,
+  ): boolean {
+    return user.accessGroups.includes('admin');
   }
 }
 
