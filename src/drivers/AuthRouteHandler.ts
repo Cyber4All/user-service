@@ -2,7 +2,7 @@ import * as express from 'express';
 type Router = express.Router;
 import { DataStore, HashInterface } from '../interfaces/interfaces';
 import { passwordMatch } from '../interactors/AuthenticationInteractor';
-import { UserResponseFactory, RouteResponder } from './drivers';
+import { UserResponseFactory } from './drivers';
 import { UserInteractor } from '../interactors/interactors';
 import { reportError } from './SentryConnector';
 import * as AuthInteractor from '../interactors/AuthenticationInteractor';
