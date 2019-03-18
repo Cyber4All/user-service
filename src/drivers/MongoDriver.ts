@@ -311,7 +311,7 @@ export default class MongoDriver implements DataStore {
       .collection(COLLECTIONS.USERS)
       .updateOne(
       { username },
-      { $set: { accessGroups: [accessGroup] }
+      { $push: { accessGroups: [accessGroup] }
       });
   }
 
