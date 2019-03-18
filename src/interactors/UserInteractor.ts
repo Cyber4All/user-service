@@ -77,6 +77,20 @@ export class UserInteractor {
     }
   }
 
+  static async removeCuratorAccess(
+    dataStore: DataStore,
+    user: UserToken,
+    collection: string,
+    curatorId: string,
+  ): Promise<void> {
+    if (this.verifyAdminAccess(user)) {
+      const formattedAccessGroup = `curator@${collection}`;
+      await dataStore.assignCuratorAccess(curatorId, formattedAccessGroup);
+    } else {
+      throw new Error('Invalid Access');
+    }
+  }
+
   public static async verifyEmail(
     dataStore: DataStore,
     email: string

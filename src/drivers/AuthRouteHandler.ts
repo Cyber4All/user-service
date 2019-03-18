@@ -2,7 +2,7 @@ import * as express from 'express';
 type Router = express.Router;
 import { DataStore, HashInterface } from '../interfaces/interfaces';
 import { passwordMatch } from '../interactors/AuthenticationInteractor';
-import { UserResponseFactory } from './drivers';
+import { UserResponseFactory, RouteResponder } from './drivers';
 import { UserInteractor } from '../interactors/interactors';
 import { reportError } from './SentryConnector';
 import * as AuthInteractor from '../interactors/AuthenticationInteractor';
@@ -161,19 +161,35 @@ export default class AuthRouteHandler {
         const user = req.user;
         const collectionName = req.params.collectionName;
         const username = req.body.username;
-        const reviewers = await UserInteractor.assignAccessGroup(
+        await UserInteractor.assignCuratorAccess(
           this.dataStore,
           user,
           collectionName,
           username,
         );
-        responder.sendObject(reviewers);
+        responder.sendOperationSuccess();
       } catch (e) {
         responder.sendOperationError(e);
       }
     });
 
-    rout
+    router.delete('/users/:collectionName/curators/:curatorId', async (req, res) => {
+      const responder = this.responseFactory.buildResponder(res);
+      try {
+        const user = req.user;
+        const collectionName = req.params.collectionName;
+        const curatorId = req.params.curatorId;
+        await UserInteractor.removeCuratorAccess(
+          this.dataStore,
+          user,
+          collectionName,
+          curatorId,
+        );
+        responder.sendOperationSuccess();
+      } catch (error) {
+        responder.sendOperationError(error);
+      }
+    });
 
     router.get('/users/:collectionName/reviewers', async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);

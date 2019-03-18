@@ -16,4 +16,6 @@ export interface DataStore extends UserStatDatastore {
   searchUsers(query: UserQuery): Promise<{ users: AuthUser[]; total: number }>;
   findOrganizations(query: string): Promise<any[]>;
   fetchReviewers(collection: string): Promise<any[]>;
+  assignCuratorAccess(username: string, accessGroup: string): Promise<void>;
+  removeCuratorAccess(username: string, accessGroup: string): Promise<void>;
 }
