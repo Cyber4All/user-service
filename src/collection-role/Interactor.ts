@@ -3,6 +3,7 @@ import { DataStore } from '../interfaces/interfaces';
 import { verifyAssignAccess } from './AuthManager';
 import { reportError } from '../drivers/SentryConnector';
 import { UserDocument } from '../types/user-document';
+import { ResourceError, ResourceErrorReason } from '../Error';
 
 const ROLE_ACTIONS = {
     ASSIGN: 'assign',
@@ -43,7 +44,10 @@ export async function modifyRoleAccess(
                         dataStore.assignAccessGroup(userId, formattedAccessGroup)
                             .catch(e => reportError(e));
                     } else {
-                        throw new Error('Access Group Already Exists on this User');
+                        throw new ResourceError(
+                            'Access Group Already Exists on this User',
+                            ResourceErrorReason.BAD_REQUEST,
+                        );
                     }
                     break;
                 case ROLE_ACTIONS.REMOVE:
@@ -51,17 +55,29 @@ export async function modifyRoleAccess(
                         dataStore.removeAccessGroup(userId, formattedAccessGroup)
                             .catch(e => reportError(e));
                     } else {
-                        throw new Error('Access Group Does Not Exist on User');
+                        throw new ResourceError(
+                            'Access Group Does Not Exist on User',
+                            ResourceErrorReason.BAD_REQUEST
+                        );
                     }
                     break;
                 default:
-                    throw new Error('Invalid Action Request');
+                    throw new ResourceError(
+                        'Invalid Action Request',
+                        ResourceErrorReason.BAD_REQUEST
+                    );
             }
         } else {
-            throw new Error('User Not Found');
+            throw new ResourceError(
+                'User Not Found',
+                ResourceErrorReason.NOT_FOUND
+            );
         }
   } else {
-    throw new Error('Invalid Access');
+    throw new ResourceError(
+        'Invalid Access',
+        ResourceErrorReason.INVALID_ACCESS
+    );
   }
 }
 

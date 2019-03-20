@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { modifyRoleAccess } from './Interactor';
 import { DataStore } from '../interfaces/DataStore';
+import { mapErrorToResponseData, ResourceError, ResourceErrorReason } from '../Error';
 
 export function initializePrivate({
     router,
@@ -14,6 +15,9 @@ export function initializePrivate({
     try {
         const user = req.user;
         const role = req.body.role;
+        if (role !== null && typeof(role) !== 'undefined') {
+          throw new ResourceError('Must Provide a Role', ResourceErrorReason.BAD_REQUEST);
+        }
         const collectionName = req.params.collectionName;
         const userId = req.params.userId;
         await modifyRoleAccess(
@@ -26,7 +30,8 @@ export function initializePrivate({
         );
         res.status(200).json({message: 'You did it!'});
     } catch (e) {
-        res.status(500).json({message: e.message});
+      const { code, message } = mapErrorToResponseData(e);
+      res.status(code).json({ message });
     }
   };
 
