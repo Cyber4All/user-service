@@ -35,7 +35,7 @@ export async function modifyRoleAccess(
   if (verifyAssignAccess(role, user, collection)) {
     const userDocument = await dataStore.findUserById(userId)
         .catch(e => reportError(e));
-    if (userDocument !== null && typeof(userDocument) !== 'undefined') {
+    if (userDocument) {
       const formattedAccessGroup = `${role}@${collection}`;
       switch (action) {
         case ROLE_ACTIONS.ASSIGN:

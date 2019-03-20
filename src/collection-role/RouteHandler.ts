@@ -15,7 +15,7 @@ export function initializePrivate({
     try {
       const user = req.user;
       const role = req.body.role;
-      if (role !== null && typeof(role) !== 'undefined') {
+      if (!role) {
         throw new ResourceError('Must Provide a Role', ResourceErrorReason.BAD_REQUEST);
       }
       const collectionName = req.params.collectionName;
