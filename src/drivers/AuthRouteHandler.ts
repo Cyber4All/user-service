@@ -161,7 +161,7 @@ export default class AuthRouteHandler {
         const user = req.user;
         const collectionName = req.params.collectionName;
         const reviewers = await UserInteractor.fetchReviewers(this.dataStore, user, collectionName);
-        responder.sendObject(reviewers);
+        responder.sendObject(reviewers.map(user => user.toPlainObject()));
       } catch (e) {
         responder.sendOperationError(e);
       }
