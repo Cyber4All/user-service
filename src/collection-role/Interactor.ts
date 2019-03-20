@@ -22,7 +22,7 @@ const ROLE_ACTIONS = {
  * @property { string } collection the name of the collection
  * @property { string } userId the id of the user being modified
  * @property { string } role the name of the role to modify (reviewer/curator)
- * @property { string } action tells the function whether to assign or remove a role
+ * @property { string } action tells the function whether to assign or remove a role (assign/remove)
  * @returns { Promise<void> }
  */
 export async function modifyRoleAccess(
