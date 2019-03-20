@@ -1,10 +1,15 @@
 import { UserToken } from '../types/user-token';
+import { UserDocument } from '../types/user-document';
 
 const ROLES = {
   ADMIN: 'admin',
   CURATOR: 'curator',
   REVIEWER: 'reviewer'
 };
+
+export function hasAccessGroup(formattedAccessGroup: string, user: UserDocument): boolean {
+  return user.accessGroups.includes(formattedAccessGroup);
+}
 
 export function verifyCollectionName(
     user: UserToken,

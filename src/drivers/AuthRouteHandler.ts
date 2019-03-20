@@ -157,18 +157,6 @@ export default class AuthRouteHandler {
         responder.sendOperationError(e);
       }
     });
-
-    router.get('/users/:collectionName/reviewers', async (req, res) => {
-      const responder = this.responseFactory.buildResponder(res);
-      try {
-        const user = req.user;
-        const collectionName = req.params.collectionName;
-        const reviewers = await UserInteractor.fetchReviewers(this.dataStore, user, collectionName);
-        responder.sendObject(reviewers);
-      } catch (e) {
-        responder.sendOperationError(e);
-      }
-    });
   }
 
   private hasAccess(token: any, propName: string, value: any): boolean {

@@ -1,8 +1,7 @@
 import { UserToken } from '../types/user-token';
 import { DataStore } from '../interfaces/interfaces';
-import { verifyAssignAccess } from './AuthManager';
+import { verifyAssignAccess, verifyCollectionName, hasAccessGroup } from './AuthManager';
 import { reportError } from '../drivers/SentryConnector';
-import { UserDocument } from '../types/user-document';
 import { ResourceError, ResourceErrorReason, ServiceError, ServiceErrorReason } from '../Error';
 
 const ROLE_ACTIONS = {
@@ -79,6 +78,25 @@ export async function modifyRoleAccess(
   }
 }
 
-function hasAccessGroup(formattedAccessGroup: string, user: UserDocument): boolean {
-  return user.accessGroups.includes(formattedAccessGroup);
+/**
+ * Finds all reviewers for a specified collection
+ * @Authorization
+ * *** Must be curator  ***
+ * @export
+ * @param params
+ * @property { DataStore } dataStore instance of DataStore
+ * @property { UserToken } user the user who made the request
+ * @property { string } collection the name of the collection
+ * @returns { Promise<any[]> }
+ */
+export async function fetchReviewers(
+  dataStore: DataStore,
+  user: UserToken,
+  collection: string,
+): Promise<any[]> {
+  if (verifyCollectionName(user, collection)) {
+    const reviewers = await dataStore.fetchReviewers(collection);
+    return reviewers;
+  }
+  throw new ResourceError('Invalid Access', ResourceErrorReason.INVALID_ACCESS);
 }

@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { modifyRoleAccess } from './Interactor';
+import { modifyRoleAccess, fetchReviewers } from './Interactor';
 import { DataStore } from '../interfaces/DataStore';
 import { mapErrorToResponseData, ResourceError, ResourceErrorReason } from '../Error';
 
@@ -35,6 +35,21 @@ export function initializePrivate({
     }
   };
 
+
+  const fetchCollectionReviewers = async (req: Request, res: Response) => {
+    try {
+      const user = req.user;
+      const collectionName = req.params.collectionName;
+      const reviewers = await fetchReviewers(this.dataStore, user, collectionName);
+      res.status(200).json(reviewers);
+    } catch (e) {
+      const { code, message } = mapErrorToResponseData(e);
+      res.status(code).json({ message });;
+    }
+  };
+
+  router.get('/users/:collectionName/reviewers',
+             (req, res) => fetchCollectionReviewers(req, res));
   router.patch('/collections/:collectionName/users/:userId/assign',
                (req, res) => modifyCollectionRole(req, res, 'assign'));
   router.patch('/collections/:collectionName/users/:userId/remove',

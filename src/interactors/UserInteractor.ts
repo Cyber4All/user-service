@@ -51,18 +51,6 @@ export class UserInteractor {
     }
   }
 
-  static async fetchReviewers(
-    dataStore: DataStore,
-    user: UserToken,
-    collection: string,
-  ): Promise<any[] | Error> {
-    if (this.verifyCollectionName(user, collection)) {
-      const reviewers = await dataStore.fetchReviewers(collection);
-      return reviewers;
-    }
-    throw new Error('Invalid Access');
-  }
-
   public static async verifyEmail(
     dataStore: DataStore,
     email: string
@@ -157,13 +145,6 @@ export class UserInteractor {
     } catch (e) {
       return Promise.reject(`Unable to delete user. Error: ${e}`);
     }
-  }
-
-  private static verifyCollectionName(
-    user: UserToken,
-    collection: string,
-  ): boolean {
-    return user.accessGroups.includes(`curator@${collection}`);
   }
 }
 
