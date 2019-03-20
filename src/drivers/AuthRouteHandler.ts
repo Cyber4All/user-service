@@ -169,24 +169,6 @@ export default class AuthRouteHandler {
         responder.sendOperationError(e);
       }
     });
-
-  //   router.delete('/users/:collectionName/reviewers/:reviewerId', async (req, res) => {
-  //     const responder = this.responseFactory.buildResponder(res);
-  //     try {
-  //       const user = req.user;
-  //       const collectionName = req.params.collectionName;
-  //       const reviewerId = req.params.reviewerId;
-  //       await UserInteractor.deleteReviewer(
-  //         this.dataStore,
-  //         user,
-  //         collectionName,
-  //         reviewerId
-  //       );
-  //       responder.sendOperationSuccess();
-  //     } catch (e) {
-  //       responder.sendOperationError(e);
-  //     }
-  //   });
   }
 
   private hasAccess(token: any, propName: string, value: any): boolean {

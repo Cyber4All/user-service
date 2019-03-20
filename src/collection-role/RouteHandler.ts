@@ -28,7 +28,7 @@ export function initializePrivate({
             role,
             action,
         );
-      res.status(200).json({ message: 'You did it!' });
+      res.sendStatus(200);
     } catch (e) {
       const { code, message } = mapErrorToResponseData(e);
       res.status(code).json({ message });
