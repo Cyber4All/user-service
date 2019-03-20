@@ -309,10 +309,10 @@ export default class MongoDriver implements DataStore {
   }
 
   /**
-   * query for user by id
+   * retrieve user document by id
    * @param params
    * @property { string } userId the id of the user to search for
-   * @returns { Promise<void> }
+   * @returns { Promise<UserDocument> }
    */
   async findUserById(userId: string): Promise<UserDocument> {
     const user = await this.client

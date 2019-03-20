@@ -3,7 +3,7 @@ import { DataStore } from '../interfaces/interfaces';
 import { verifyAssignAccess } from './AuthManager';
 import { reportError } from '../drivers/SentryConnector';
 import { UserDocument } from '../types/user-document';
-import { ResourceError, ResourceErrorReason } from '../Error';
+import { ResourceError, ResourceErrorReason, ServiceError, ServiceErrorReason } from '../Error';
 
 const ROLE_ACTIONS = {
   ASSIGN: 'assign',
@@ -52,8 +52,7 @@ export async function modifyRoleAccess(
           break;
         case ROLE_ACTIONS.REMOVE:
           if (hasAccessGroup(formattedAccessGroup, userDocument)) {
-            dataStore.removeAccessGroup(userId, formattedAccessGroup)
-                            .catch(e => reportError(e));
+            await dataStore.removeAccessGroup(userId, formattedAccessGroup)
           } else {
             throw new ResourceError(
                             'Access Group Does Not Exist on User',
@@ -62,9 +61,8 @@ export async function modifyRoleAccess(
           }
           break;
         default:
-          throw new ResourceError(
-                        'Invalid Action Request',
-                        ResourceErrorReason.BAD_REQUEST
+          throw new ServiceError(
+                        ServiceErrorReason.INTERNAL
                     );
       }
     } else {
