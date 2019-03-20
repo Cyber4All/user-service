@@ -13,14 +13,14 @@ export function initializePrivate({
 
   const modifyCollectionRole = async (req: Request, res: Response, action: string) => {
     try {
-        const user = req.user;
-        const role = req.body.role;
-        if (role !== null && typeof(role) !== 'undefined') {
-          throw new ResourceError('Must Provide a Role', ResourceErrorReason.BAD_REQUEST);
-        }
-        const collectionName = req.params.collectionName;
-        const userId = req.params.userId;
-        await modifyRoleAccess(
+      const user = req.user;
+      const role = req.body.role;
+      if (role !== null && typeof(role) !== 'undefined') {
+        throw new ResourceError('Must Provide a Role', ResourceErrorReason.BAD_REQUEST);
+      }
+      const collectionName = req.params.collectionName;
+      const userId = req.params.userId;
+      await modifyRoleAccess(
             dataStore,
             user,
             collectionName,
@@ -28,14 +28,16 @@ export function initializePrivate({
             role,
             action,
         );
-        res.status(200).json({message: 'You did it!'});
+      res.status(200).json({ message: 'You did it!' });
     } catch (e) {
       const { code, message } = mapErrorToResponseData(e);
       res.status(code).json({ message });
     }
   };
 
-  router.patch('/collections/:collectionName/users/:userId/assign', (req, res) => modifyCollectionRole(req, res, 'assign'));
-  router.patch('/collections/:collectionName/users/:userId/remove', (req, res) => modifyCollectionRole(req, res, 'remove'));
+  router.patch('/collections/:collectionName/users/:userId/assign',
+               (req, res) => modifyCollectionRole(req, res, 'assign'));
+  router.patch('/collections/:collectionName/users/:userId/remove',
+               (req, res) => modifyCollectionRole(req, res, 'remove'));
   return router;
 }

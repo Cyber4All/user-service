@@ -187,7 +187,7 @@ export default class AuthRouteHandler {
   //       responder.sendOperationError(e);
   //     }
   //   });
-     }
+  }
 
   private hasAccess(token: any, propName: string, value: any): boolean {
     return token[propName] === value;

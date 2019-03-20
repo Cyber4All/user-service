@@ -18,7 +18,7 @@ export const COLLECTIONS = {
 };
 
 export default class MongoDriver implements DataStore {
-  
+
   private client: MongoClient;
   private db: Db;
 
@@ -191,7 +191,8 @@ export default class MongoDriver implements DataStore {
 
       objectCursor = orderBy
         ? objectCursor.sort(orderBy, sortType ? sortType : 1)
-        : objectCursor.sort({ score: { $meta: 'textScore' }}).project({ score: { $meta: 'textScore' } } );
+        : objectCursor.sort({ score: { $meta: 'textScore' } })
+                      .project({ score: { $meta: 'textScore' } });
 
       const userDocs = await objectCursor.toArray();
 
@@ -267,11 +268,11 @@ export default class MongoDriver implements DataStore {
         .collection(COLLECTIONS.USERS)
         .update(
           { _id: id },
-          {
-            $set: object
-          }
+        {
+          $set: object
+        }
       );
-       
+
       return await this.loadUser(id);
     } catch (e) {
       return Promise.reject(e);

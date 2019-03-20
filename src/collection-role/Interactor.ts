@@ -6,8 +6,8 @@ import { UserDocument } from '../types/user-document';
 import { ResourceError, ResourceErrorReason } from '../Error';
 
 const ROLE_ACTIONS = {
-    ASSIGN: 'assign',
-    REMOVE: 'remove',
+  ASSIGN: 'assign',
+  REMOVE: 'remove',
 };
 
 /**
@@ -36,43 +36,43 @@ export async function modifyRoleAccess(
   if (verifyAssignAccess(role, user, collection)) {
     const userDocument = await dataStore.findUserById(userId)
         .catch(e => reportError(e));
-        if (userDocument !== null && typeof(userDocument) !== 'undefined') {
-            const formattedAccessGroup = `${role}@${collection}`;
-            switch (action) {
-                case ROLE_ACTIONS.ASSIGN:
-                    if (!hasAccessGroup(formattedAccessGroup, userDocument)) {
-                        dataStore.assignAccessGroup(userId, formattedAccessGroup)
+    if (userDocument !== null && typeof(userDocument) !== 'undefined') {
+      const formattedAccessGroup = `${role}@${collection}`;
+      switch (action) {
+        case ROLE_ACTIONS.ASSIGN:
+          if (!hasAccessGroup(formattedAccessGroup, userDocument)) {
+            dataStore.assignAccessGroup(userId, formattedAccessGroup)
                             .catch(e => reportError(e));
-                    } else {
-                        throw new ResourceError(
+          } else {
+            throw new ResourceError(
                             'Access Group Already Exists on this User',
                             ResourceErrorReason.BAD_REQUEST,
                         );
-                    }
-                    break;
-                case ROLE_ACTIONS.REMOVE:
-                    if (hasAccessGroup(formattedAccessGroup, userDocument)) {
-                        dataStore.removeAccessGroup(userId, formattedAccessGroup)
+          }
+          break;
+        case ROLE_ACTIONS.REMOVE:
+          if (hasAccessGroup(formattedAccessGroup, userDocument)) {
+            dataStore.removeAccessGroup(userId, formattedAccessGroup)
                             .catch(e => reportError(e));
-                    } else {
-                        throw new ResourceError(
+          } else {
+            throw new ResourceError(
                             'Access Group Does Not Exist on User',
                             ResourceErrorReason.BAD_REQUEST
                         );
-                    }
-                    break;
-                default:
-                    throw new ResourceError(
+          }
+          break;
+        default:
+          throw new ResourceError(
                         'Invalid Action Request',
                         ResourceErrorReason.BAD_REQUEST
                     );
-            }
-        } else {
-            throw new ResourceError(
+      }
+    } else {
+      throw new ResourceError(
                 'User Not Found',
                 ResourceErrorReason.NOT_FOUND
             );
-        }
+    }
   } else {
     throw new ResourceError(
         'Invalid Access',
@@ -82,5 +82,5 @@ export async function modifyRoleAccess(
 }
 
 function hasAccessGroup(formattedAccessGroup: string, user: UserDocument): boolean {
-    return user.accessGroups.includes(formattedAccessGroup);
+  return user.accessGroups.includes(formattedAccessGroup);
 }
