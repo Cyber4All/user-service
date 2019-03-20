@@ -33,8 +33,7 @@ export async function modifyRoleAccess(
     action: string,
   ): Promise<void> {
   if (verifyAssignAccess(role, user, collection)) {
-    const userDocument = await dataStore.findUserById(userId)
-        .catch(e => reportError(e));
+    const userDocument = await dataStore.findUserById(userId);
     if (userDocument) {
       const formattedAccessGroup = `${role}@${collection}`;
       switch (action) {
@@ -51,7 +50,7 @@ export async function modifyRoleAccess(
           break;
         case ROLE_ACTIONS.REMOVE:
           if (hasAccessGroup(formattedAccessGroup, userDocument)) {
-            await dataStore.removeAccessGroup(userId, formattedAccessGroup)
+            await dataStore.removeAccessGroup(userId, formattedAccessGroup);
           } else {
             throw new ResourceError(
                             'Access Group Does Not Exist on User',
