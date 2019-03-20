@@ -9,6 +9,21 @@ const ROLE_ACTIONS = {
     REMOVE: 'remove',
 };
 
+/**
+ * modifies the role of a specific user in a collection
+ * @Authorization
+ * *** Must be curator to modify reviewer ***
+ * *** Admins can modify reviewer and curator roles ***
+ * @export
+ * @param params
+ * @property { DataStore } dataStore instance of DataStore
+ * @property { UserToken } user the user who made the request
+ * @property { string } collection the name of the collection
+ * @property { string } userId the id of the user being modified
+ * @property { string } role the name of the role to modify (reviewer/curator)
+ * @property { string } action tells the function whether to assign or remove a role
+ * @returns { Promise<void> }
+ */
 export async function modifyRoleAccess(
     dataStore: DataStore,
     user: UserToken,

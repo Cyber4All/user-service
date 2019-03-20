@@ -63,45 +63,6 @@ export class UserInteractor {
     throw new Error('Invalid Access');
   }
 
-  // public static async addReviewer(
-  //   dataStore: DataStore,
-  //   collection: string,
-  //   user: UserToken,
-  //   username: string
-  // ): Promise<void> {
-  //   if (this.verifyCollectionName(user, collection)) {
-  //     return dataStore.addReviewer(username, reviewerId);
-  //   }
-  //   throw new Error('Invalid Access');
-  // }
-
-  // public static async deleteReviewer(
-  //   dataStore: DataStore,
-  //   collection: string,
-  //   user: UserToken,
-  //   username: string
-  // ): Promise<void> {
-  //   if (this.verifyCollectionName(user, collection)) {
-  //     const reviewerId = await this.findUser(dataStore, collection);
-  //     return dataStore.deleteReviewer(username, reviewerId);
-  //   }
-  //   throw new Error('Invalid Access');
-  // }
-
-  static async removeRoleAccess(
-    dataStore: DataStore,
-    user: UserToken,
-    collection: string,
-    userId: string,
-  ): Promise<void> {
-    if (this.verifyCollectionName(user, collection)) {
-      const formattedAccessGroup = `curator@${collection}`;
-      await dataStore.assignRoleAccess(userId, formattedAccessGroup);
-    } else {
-      throw new Error('Invalid Access');
-    }
-  }
-
   public static async verifyEmail(
     dataStore: DataStore,
     email: string

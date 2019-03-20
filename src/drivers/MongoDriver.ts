@@ -307,6 +307,12 @@ export default class MongoDriver implements DataStore {
     }
   }
 
+  /**
+   * query for user by id
+   * @param params
+   * @property { string } userId the id of the user to search for
+   * @returns { Promise<void> }
+   */
   async findUserById(userId: string): Promise<UserDocument> {
     const user = await this.client
       .db()
@@ -315,6 +321,13 @@ export default class MongoDriver implements DataStore {
     return user;
   }
 
+  /**
+   * push new access group to accessGroups array
+   * @param params
+   * @property { string } userId the id of the user to search for
+   * @property { string } formattedAccessGroup access group to push to array
+   * @returns { Promise<void> }
+   */
   async assignAccessGroup(userId: string, formattedAccessGroup: string): Promise<void> {
     await this.client
       .db()
@@ -325,6 +338,13 @@ export default class MongoDriver implements DataStore {
       );
   }
 
+  /**
+   * pull access group from accessGroups array
+   * @param params
+   * @property { string } userId the id of the user to search for
+   * @property { string } formattedAccessGroup access group to pull from array
+   * @returns { Promise<void> }
+   */
   async removeAccessGroup(userId: string, formattedAccessGroup: string): Promise<void> {
     await this.client
       .db()
@@ -333,42 +353,6 @@ export default class MongoDriver implements DataStore {
         { _id: userId },
         { $pull: { accessGroups: formattedAccessGroup } }
       );
-  }
-
-  // async addReviewer(username: string, accessGroup: string): Promise<void> {
-  //   await this.client
-  //     .db()
-  //     .collection(COLLECTIONS.USERS)
-  //     .updateOne({ username },
-  //       { $addToSet { }
-  //       );
-  // }
-
-  // async deleteReviewer(reviewerId: string): Promise<void> {
-  //   await this.client
-  //     .db()
-  //     .collection(COLLECTIONS.USERS)
-  //     .remove({ _id: reviewerId });
-  // }
-
-  async assignRoleAccess(username: string, accessGroup: string) {
-    await this.client
-      .db()
-      .collection(COLLECTIONS.USERS)
-      .updateOne(
-      { username },
-      { $addToSet: { accessGroups: accessGroup }
-      });
-  }
-
-  async removeRoleAccess(userId: string, accessGroup: string) {
-    await this.client
-      .db()
-      .collection(COLLECTIONS.USERS)
-      .updateOne(
-      { _id: userId },
-      { $pull: { accessGroups: accessGroup }
-      });
   }
 
   async insertOTACode(otaCode: OTACode): Promise<void> {
