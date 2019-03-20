@@ -309,7 +309,7 @@ export default class MongoDriver implements DataStore {
   }
 
   /**
-   * retrieve user document by id
+   * retrieve user document for a specifed id
    * @param params
    * @property { string } userId the id of the user to search for
    * @returns { Promise<UserDocument> }
