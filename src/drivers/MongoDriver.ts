@@ -7,6 +7,7 @@ import { UserDocument } from '../types/user-document';
 import { UserStats } from '../UserStats/UserStatsInteractor';
 import { UserStatStore } from '../UserStats/UserStatStore';
 import { OTACode } from './OTACodeManager';
+import { User } from '@cyber4all/clark-entity';
 dotenv.config();
 
 export const COLLECTIONS = {
@@ -17,6 +18,7 @@ export const COLLECTIONS = {
 };
 
 export default class MongoDriver implements DataStore {
+  
   private client: MongoClient;
   private db: Db;
 
@@ -303,6 +305,70 @@ export default class MongoDriver implements DataStore {
     } catch (e) {
       return Promise.reject(e);
     }
+  }
+
+  async findUserById(userId: string): Promise<UserDocument> {
+    const user = await this.client
+      .db()
+      .collection(COLLECTIONS.USERS)
+      .findOne<UserDocument>({ _id: userId });
+    return user;
+  }
+
+  async assignAccessGroup(userId: string, formattedAccessGroup: string): Promise<void> {
+    await this.client
+      .db()
+      .collection(COLLECTIONS.USERS)
+      .updateOne(
+        { _id: userId },
+        { $addToSet: { accessGroups: formattedAccessGroup } }
+      );
+  }
+
+  async removeAccessGroup(userId: string, formattedAccessGroup: string): Promise<void> {
+    await this.client
+      .db()
+      .collection(COLLECTIONS.USERS)
+      .updateOne(
+        { _id: userId },
+        { $pull: { accessGroups: formattedAccessGroup } }
+      );
+  }
+
+  // async addReviewer(username: string, accessGroup: string): Promise<void> {
+  //   await this.client
+  //     .db()
+  //     .collection(COLLECTIONS.USERS)
+  //     .updateOne({ username },
+  //       { $addToSet { }
+  //       );
+  // }
+
+  // async deleteReviewer(reviewerId: string): Promise<void> {
+  //   await this.client
+  //     .db()
+  //     .collection(COLLECTIONS.USERS)
+  //     .remove({ _id: reviewerId });
+  // }
+
+  async assignRoleAccess(username: string, accessGroup: string) {
+    await this.client
+      .db()
+      .collection(COLLECTIONS.USERS)
+      .updateOne(
+      { username },
+      { $addToSet: { accessGroups: accessGroup }
+      });
+  }
+
+  async removeRoleAccess(userId: string, accessGroup: string) {
+    await this.client
+      .db()
+      .collection(COLLECTIONS.USERS)
+      .updateOne(
+      { _id: userId },
+      { $pull: { accessGroups: accessGroup }
+      });
   }
 
   async insertOTACode(otaCode: OTACode): Promise<void> {

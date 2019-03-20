@@ -2,6 +2,7 @@ import { OTACode } from '../drivers/OTACodeManager';
 import { UserQuery } from './Query';
 import { UserStatDatastore } from '../UserStats/UserStatsInteractor';
 import { AuthUser } from '../types/auth-user';
+import { UserDocument } from '../types/user-document';
 
 export interface DataStore extends UserStatDatastore {
   identifierInUse(username: string): Promise<boolean>;
@@ -16,4 +17,9 @@ export interface DataStore extends UserStatDatastore {
   searchUsers(query: UserQuery): Promise<{ users: AuthUser[]; total: number }>;
   findOrganizations(query: string): Promise<any[]>;
   fetchReviewers(collection: string): Promise<any[]>;
+  removeRoleAccess(username:string, reviewerId: string): Promise<void>;
+  assignRoleAccess(username: string, reviewerId: string): Promise<void>;
+  findUserById(userId: string): Promise<UserDocument>;
+  assignAccessGroup(userId: string, formattedAccessGroup: string): Promise<void>;
+  removeAccessGroup(userId: string, formattedAccessGroup: string): Promise<void>;
 }
