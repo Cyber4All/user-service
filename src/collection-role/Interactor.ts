@@ -31,6 +31,10 @@ abstract class RoleActions {
     this.role = role;
   }
 
+  /**
+   * Template function for modifying a user's collection role
+   * @returns { Promise<void> }
+   */
   async modifyCollectionRole(): Promise<void> {
     if (verifyAssignAccess(this.role, this.user, this.collection)) {
       const userDocument = await this.dataStore.findUserById(this.userId);
@@ -59,7 +63,7 @@ abstract class RoleActions {
   ): Promise<void>;
 }
 
-// Cannot assign if user already has a role in the given collection
+
 export class Assign extends RoleActions {
 
   static async start(
@@ -79,6 +83,19 @@ export class Assign extends RoleActions {
     await assign.modifyCollectionRole();
   }
 
+  /**
+   * Concrete implementation of performRoleAction function from RoleActions class
+   * Assigns a user as a member to a collection
+   * @Authorization
+   * *** Cannot assign if user already has a role in the given collection  ***
+   * *** Must have curator relationship with specified collection to assign reviewer  ***
+   * *** Admins can assign reviewers and curators to any collection ***
+   * @export
+   * @param params
+   * @property { string } formattedAccessGroup accessGroup string formatted as `role@collection`
+   * @property { UserDocument } userDocument user object fetched from database
+   * @returns { Promise<void> }
+   */
   async performRoleAction(
     formattedAccessGroup: string,
     userDocument: UserDocument,
@@ -94,7 +111,6 @@ export class Assign extends RoleActions {
   }
 }
 
-// Cannot edit role in collection if user is not already member of the collection
 export class Edit extends RoleActions {
 
   static async start(
@@ -114,6 +130,19 @@ export class Edit extends RoleActions {
     await edit.modifyCollectionRole();
   }
 
+  /**
+   * Concrete implementation of performRoleAction function from RoleActions class
+   * Edits an already existing collection membership
+   * @Authorization
+   * *** Cannot edit role in collection if user is not already member of the collection ***
+   * *** Must have curator relationship with specified collection to grant reviewer access  ***
+   * *** Admins can grant reviewer and curator access to any collection ***
+   * @export
+   * @param params
+   * @property { string } formattedAccessGroup accessGroup string formatted as `role@collection`
+   * @property { UserDocument } userDocument user object fetched from database
+   * @returns { Promise<void> }
+   */
   async performRoleAction(
     formattedAccessGroup: string,
     userDocument: UserDocument,
@@ -129,7 +158,6 @@ export class Edit extends RoleActions {
   }
 }
 
-// Cannot remove role is role does not exist
 export class Remove extends RoleActions {
 
   static async start(
@@ -149,6 +177,19 @@ export class Remove extends RoleActions {
     await remove.modifyCollectionRole();
   }
 
+  /**
+   * Concrete implementation of performRoleAction function from RoleActions class
+   * Removes an already existing collection membership
+   * @Authorization
+   * *** Cannot remove role if role does not exist ***
+   * *** Must have curator relationship with specified collection to remove reviewer access  ***
+   * *** Admins can remove reviewer and curator access to any collection ***
+   * @export
+   * @param params
+   * @property { string } formattedAccessGroup accessGroup string formatted as `role@collection`
+   * @property { UserDocument } userDocument user object fetched from database
+   * @returns { Promise<void> }
+   */
   async performRoleAction(
     formattedAccessGroup: string,
     userDocument: UserDocument,
