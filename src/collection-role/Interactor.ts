@@ -1,6 +1,11 @@
 import { UserToken } from '../types/user-token';
 import { DataStore } from '../interfaces/interfaces';
-import { verifyAssignAccess, verifyCollectionName, isCollectionMember, hasAccessGroup } from './AuthManager';
+import {
+  verifyAssignAccess,
+  verifyCollectionName,
+  isCollectionMember,
+  hasAccessGroup,
+} from './AuthManager';
 import { ResourceError, ResourceErrorReason, ServiceError, ServiceErrorReason } from '../Error';
 import { UserDocument } from '../types/user-document';
 
@@ -82,7 +87,7 @@ export class Assign extends RoleActions {
       await this.dataStore.assignAccessGroup(this.userId, formattedAccessGroup);
     } else {
       throw new ResourceError(
-        'Access Group Already Exists on this User',
+        `${this.user.name} is already a member of the ${this.collection} collection.`,
         ResourceErrorReason.BAD_REQUEST,
       );
     }
@@ -114,10 +119,10 @@ export class Edit extends RoleActions {
     userDocument: UserDocument,
   ): Promise<void> {
     if (isCollectionMember(formattedAccessGroup, userDocument)) {
-      await this.dataStore.removeAccessGroup(this.userId, formattedAccessGroup);
+      await this.dataStore.editAccessGroup(this.userId, formattedAccessGroup);
     } else {
       throw new ResourceError(
-        'Access Group Does Not Exist on User',
+        `${this.user.name} is not a member of the ${this.collection} collection.`,
         ResourceErrorReason.BAD_REQUEST
       );
     }
@@ -152,7 +157,7 @@ export class Remove extends RoleActions {
       await this.dataStore.removeAccessGroup(this.userId, formattedAccessGroup);
     } else {
       throw new ResourceError(
-        'Access Group Does Not Exist on User',
+        `${this.user.name} does not have the specified role`,
         ResourceErrorReason.BAD_REQUEST
       );
     }
@@ -165,9 +170,9 @@ export class Remove extends RoleActions {
  * *** Must be curator  ***
  * @export
  * @param params
- * @property { DataStore } dataStore instance of DataStore
- * @property { UserToken } user the user who made the request
- * @property { string } collection the name of the collection
+ * @property { DataStore } dataStore [instance of DataStore]
+ * @property { UserToken } user [the user who made the request]
+ * @property { string } collection [the name of the collection]
  * @returns { Promise<any[]> }
  */
 export async function fetchReviewers(

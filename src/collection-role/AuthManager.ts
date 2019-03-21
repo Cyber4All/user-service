@@ -1,6 +1,5 @@
 import { UserToken } from '../types/user-token';
 import { UserDocument } from '../types/user-document';
-import { access } from 'fs';
 import { ServiceError, ServiceErrorReason } from '../Error';
 
 const ROLES = {

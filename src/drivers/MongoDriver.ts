@@ -7,7 +7,6 @@ import { UserDocument } from '../types/user-document';
 import { UserStats } from '../UserStats/UserStatsInteractor';
 import { UserStatStore } from '../UserStats/UserStatStore';
 import { OTACode } from './OTACodeManager';
-import { User } from '@cyber4all/clark-entity';
 dotenv.config();
 
 export const COLLECTIONS = {
@@ -336,6 +335,23 @@ export default class MongoDriver implements DataStore {
       .updateOne(
         { _id: userId },
         { $addToSet: { accessGroups: formattedAccessGroup } }
+      );
+  }
+
+  /**
+   * push new access group to accessGroups array
+   * @param params
+   * @property { string } userId the id of the user to search for
+   * @property { string } formattedAccessGroup access group to push to array
+   * @returns { Promise<void> }
+   */
+  async editAccessGroup(userId: string, formattedAccessGroup: string): Promise<void> {
+    await this.client
+      .db()
+      .collection(COLLECTIONS.USERS)
+      .updateOne(
+        { _id: userId, accessGroups: formattedAccessGroup },
+        { $set: { 'accessGroups.$': formattedAccessGroup } }
       );
   }
 

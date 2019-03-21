@@ -19,5 +19,6 @@ export interface DataStore extends UserStatDatastore {
   fetchReviewers(collection: string): Promise<any[]>;
   findUserById(userId: string): Promise<UserDocument>;
   assignAccessGroup(userId: string, formattedAccessGroup: string): Promise<void>;
+  editAccessGroup(userId: string, formattedAccessGroup: string): Promise<void>;
   removeAccessGroup(userId: string, formattedAccessGroup: string): Promise<void>;
 }
