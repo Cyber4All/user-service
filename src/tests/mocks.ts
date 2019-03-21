@@ -9,6 +9,7 @@ export const MOCK_OBJECTS = {
   PASSWORD: 'Clarktesting1!',
   EMAIL: 'test@test.com',
   COLLECTION: 'nccp',
+  COLLECTION_C5: 'c5',
   ROLE: 'curator',
   EMPTY_STRING: '',
   LONG_USERNAME: 'abcdefghijklmnopqrstuvwxyz',
@@ -27,7 +28,19 @@ export const MOCK_OBJECTS = {
     bio: '',
     createdAt: '',
     emailVerified: false,
-    accessGroups: ['']
+    accessGroups: ['admin']
+  },
+  MODIFY_ROLE_USER: {
+    username: 'cypress',
+    _id: 'testId',
+    name: 'Clark Can2',
+    email: 'test@test.com',
+    organization: 'towson university',
+    password: '',
+    bio: '',
+    createdAt: '',
+    emailVerified: false,
+    accessGroups: ['curator@nccp']
   },
   OTACODE_ID: '5ba3dd816623db8690d7f0f7',
   SEARCH_COUNT: 1,

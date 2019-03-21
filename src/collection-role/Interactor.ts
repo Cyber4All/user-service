@@ -104,7 +104,7 @@ export class Assign extends RoleActions {
       await this.dataStore.assignAccessGroup(this.userId, formattedAccessGroup);
     } else {
       throw new ResourceError(
-        `${this.user.name} is already a member of the ${this.collection} collection.`,
+        `${userDocument.name} is already a member of the ${this.collection} collection.`,
         ResourceErrorReason.BAD_REQUEST,
       );
     }
@@ -151,7 +151,7 @@ export class Edit extends RoleActions {
       await this.dataStore.editAccessGroup(this.userId, formattedAccessGroup);
     } else {
       throw new ResourceError(
-        `${this.user.name} is not a member of the ${this.collection} collection.`,
+        `${userDocument.name} is not a member of the ${this.collection} collection.`,
         ResourceErrorReason.BAD_REQUEST
       );
     }

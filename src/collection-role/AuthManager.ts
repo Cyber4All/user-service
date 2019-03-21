@@ -83,10 +83,10 @@ export function verifyAssignAccess(
  * @returns { string }
  */
 function parseCollection(accessGroup: string): string {
-  if (accessGroup.includes('@')) {
+  if (!(accessGroup.includes('@'))) {
     throw new ServiceError(ServiceErrorReason.INTERNAL);
   }
-  return accessGroup.split('@')[0];
+  return accessGroup.split('@')[1];
 }
 
 /**
