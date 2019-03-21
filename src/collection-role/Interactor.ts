@@ -3,77 +3,102 @@ import { DataStore } from '../interfaces/interfaces';
 import { verifyAssignAccess, verifyCollectionName, hasAccessGroup } from './AuthManager';
 import { reportError } from '../drivers/SentryConnector';
 import { ResourceError, ResourceErrorReason, ServiceError, ServiceErrorReason } from '../Error';
+import { UserDocument } from '../types/user-document';
 
-const ROLE_ACTIONS = {
-  ASSIGN: 'assign',
-  REMOVE: 'remove',
-};
+abstract class RoleActions {
 
-/**
- * modifies the role of a specific user in a collection
- * @Authorization
- * *** Must be curator to modify reviewer ***
- * *** Admins can modify reviewer and curator roles ***
- * @export
- * @param params
- * @property { DataStore } dataStore instance of DataStore
- * @property { UserToken } user the user who made the request
- * @property { string } collection the name of the collection
- * @property { string } userId the id of the user being modified
- * @property { string } role the name of the role to modify (reviewer/curator)
- * @property { string } action tells the function whether to assign or remove a role (assign/remove)
- * @returns { Promise<void> }
- */
-export async function modifyRoleAccess(
+  dataStore: DataStore;
+  user: UserToken;
+  collection: string;
+  userId: string;
+  role: string;
+
+  constructor(
     dataStore: DataStore,
     user: UserToken,
     collection: string,
     userId: string,
     role: string,
-    action: string,
-  ): Promise<void> {
-  if (verifyAssignAccess(role, user, collection)) {
-    const userDocument = await dataStore.findUserById(userId);
-    if (userDocument) {
-      const formattedAccessGroup = `${role}@${collection}`;
-      switch (action) {
-        case ROLE_ACTIONS.ASSIGN:
-          if (!hasAccessGroup(formattedAccessGroup, userDocument)) {
-            dataStore.assignAccessGroup(userId, formattedAccessGroup)
-                            .catch(e => reportError(e));
-          } else {
-            throw new ResourceError(
-                            'Access Group Already Exists on this User',
-                            ResourceErrorReason.BAD_REQUEST,
-                        );
-          }
-          break;
-        case ROLE_ACTIONS.REMOVE:
-          if (hasAccessGroup(formattedAccessGroup, userDocument)) {
-            await dataStore.removeAccessGroup(userId, formattedAccessGroup);
-          } else {
-            throw new ResourceError(
-                            'Access Group Does Not Exist on User',
-                            ResourceErrorReason.BAD_REQUEST
-                        );
-          }
-          break;
-        default:
-          throw new ServiceError(
-                        ServiceErrorReason.INTERNAL
-                    );
+  ) {
+    this.dataStore = dataStore;
+    this.user = user;
+    this.collection = collection;
+    this.userId = userId;
+    this.role = role;
+  }
+
+  async template(): Promise<void> {
+    if (verifyAssignAccess(this.role, this.user, this.collection)) {
+      const userDocument = await this.dataStore.findUserById(this.userId);
+      if (userDocument) {
+        const formattedAccessGroup = `${this.role}@${this.collection}`;
+        await this.performRoleAction(
+          formattedAccessGroup,
+          userDocument,
+        );
+      } else {
+        throw new ResourceError(
+          'User Not Found',
+          ResourceErrorReason.NOT_FOUND
+        );
       }
     } else {
       throw new ResourceError(
-                'User Not Found',
-                ResourceErrorReason.NOT_FOUND
-            );
-    }
-  } else {
-    throw new ResourceError(
         'Invalid Access',
         ResourceErrorReason.INVALID_ACCESS
-    );
+      );
+    }
+  }
+  abstract performRoleAction(
+    formattedAccessGroup: string,
+    userDocument: UserDocument,
+  ): Promise<void>;
+}
+
+export class Assign extends RoleActions {
+  async performRoleAction(
+    formattedAccessGroup: string,
+    userDocument: UserDocument,
+  ): Promise<void> {
+    if (!hasAccessGroup(formattedAccessGroup, userDocument)) {
+      await this.dataStore.assignAccessGroup(this.userId, formattedAccessGroup);
+    } else {
+      throw new ResourceError(
+        'Access Group Already Exists on this User',
+        ResourceErrorReason.BAD_REQUEST,
+      );
+    }
+  }
+}
+export class Edit extends RoleActions {
+  async performRoleAction(
+    formattedAccessGroup: string,
+    userDocument: UserDocument,
+  ): Promise<void> {
+    if (hasAccessGroup(formattedAccessGroup, userDocument)) {
+      await this.dataStore.removeAccessGroup(this.userId, formattedAccessGroup);
+    } else {
+      throw new ResourceError(
+        'Access Group Does Not Exist on User',
+        ResourceErrorReason.BAD_REQUEST
+      );
+    }
+  }
+}
+
+export class Remove extends RoleActions {
+  async performRoleAction(
+    formattedAccessGroup: string,
+    userDocument: UserDocument,
+  ): Promise<void> {
+    if (hasAccessGroup(formattedAccessGroup, userDocument)) {
+      await this.dataStore.removeAccessGroup(this.userId, formattedAccessGroup);
+    } else {
+      throw new ResourceError(
+        'Access Group Does Not Exist on User',
+        ResourceErrorReason.BAD_REQUEST
+      );
+    }
   }
 }
 
