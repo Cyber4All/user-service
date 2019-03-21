@@ -1,7 +1,6 @@
 import { UserToken } from '../types/user-token';
 import { DataStore } from '../interfaces/interfaces';
-import { verifyAssignAccess, verifyCollectionName, hasAccessGroup } from './AuthManager';
-import { reportError } from '../drivers/SentryConnector';
+import { verifyAssignAccess, verifyCollectionName, isCollectionMember, hasAccessGroup } from './AuthManager';
 import { ResourceError, ResourceErrorReason, ServiceError, ServiceErrorReason } from '../Error';
 import { UserDocument } from '../types/user-document';
 
@@ -55,6 +54,7 @@ abstract class RoleActions {
   ): Promise<void>;
 }
 
+// Cannot assign if user already has a role in the given collection
 export class Assign extends RoleActions {
 
   static async start(
@@ -78,7 +78,7 @@ export class Assign extends RoleActions {
     formattedAccessGroup: string,
     userDocument: UserDocument,
   ): Promise<void> {
-    if (!hasAccessGroup(formattedAccessGroup, userDocument)) {
+    if (!isCollectionMember(formattedAccessGroup, userDocument)) {
       await this.dataStore.assignAccessGroup(this.userId, formattedAccessGroup);
     } else {
       throw new ResourceError(
@@ -88,6 +88,8 @@ export class Assign extends RoleActions {
     }
   }
 }
+
+// Cannot edit role in collection if user is not already member of the collection
 export class Edit extends RoleActions {
 
   static async start(
@@ -111,7 +113,7 @@ export class Edit extends RoleActions {
     formattedAccessGroup: string,
     userDocument: UserDocument,
   ): Promise<void> {
-    if (hasAccessGroup(formattedAccessGroup, userDocument)) {
+    if (isCollectionMember(formattedAccessGroup, userDocument)) {
       await this.dataStore.removeAccessGroup(this.userId, formattedAccessGroup);
     } else {
       throw new ResourceError(
@@ -122,6 +124,7 @@ export class Edit extends RoleActions {
   }
 }
 
+// Cannot remove role is role does not exist
 export class Remove extends RoleActions {
 
   static async start(
