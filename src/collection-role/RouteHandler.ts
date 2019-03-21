@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { fetchReviewers, Assign, Edit, Remove } from './Interactor';
 import { DataStore } from '../interfaces/DataStore';
 import { mapErrorToResponseData, ResourceError, ResourceErrorReason } from '../Error';
+import { UserToken } from '../types/user-token';
 
 export function initializePrivate({
     router,
@@ -19,41 +20,38 @@ export function initializePrivate({
 
   const modifyCollectionRole = async (req: Request, res: Response, action: string) => {
     try {
-      const user = req.user;
-      const role = req.body.role;
+      const user: UserToken = req.user;
+      const role: string = req.body.role;
       if (!role) {
         throw new ResourceError('Must provide a role', ResourceErrorReason.BAD_REQUEST);
       }
-      const collection = req.params.collectionName;
-      const userId = req.params.userId;
+      const collection: string = req.params.collectionName;
+      const userId: string = req.params.userId;
       switch (action) {
         case ROLE_ACTIONS.ASSIGN:
-          const assign = new Assign(
-            this.dataStore,
+          await Assign.start(
+            dataStore,
             user,
             collection,
             userId,
             role,
           );
-          await assign.template();
         case ROLE_ACTIONS.EDIT:
-          const edit = new Edit(
-            this.dataStore,
+          await Edit.start(
+            dataStore,
             user,
             collection,
             userId,
             role,
           );
-          await edit.template();
         case ROLE_ACTIONS.REMOVE:
-          const remove = new Remove(
-            this.dataStore,
+          await Remove.start(
+            dataStore,
             user,
             collection,
             userId,
             role,
           );
-          await remove.template();
       }
       res.sendStatus(200);
     } catch (e) {

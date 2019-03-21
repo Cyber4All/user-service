@@ -27,7 +27,7 @@ abstract class RoleActions {
     this.role = role;
   }
 
-  async template(): Promise<void> {
+  async modifyCollectionRole(): Promise<void> {
     if (verifyAssignAccess(this.role, this.user, this.collection)) {
       const userDocument = await this.dataStore.findUserById(this.userId);
       if (userDocument) {
@@ -56,6 +56,24 @@ abstract class RoleActions {
 }
 
 export class Assign extends RoleActions {
+
+  static async start(
+    dataStore: DataStore,
+    user: UserToken,
+    collection: string,
+    userId: string,
+    role: string,
+  ): Promise<void> {
+    const assign = new Assign(
+      dataStore,
+      user,
+      collection,
+      userId,
+      role,
+    );
+    await assign.modifyCollectionRole();
+  }
+
   async performRoleAction(
     formattedAccessGroup: string,
     userDocument: UserDocument,
@@ -71,6 +89,24 @@ export class Assign extends RoleActions {
   }
 }
 export class Edit extends RoleActions {
+
+  static async start(
+    dataStore: DataStore,
+    user: UserToken,
+    collection: string,
+    userId: string,
+    role: string,
+  ): Promise<void> {
+    const edit = new Edit(
+      dataStore,
+      user,
+      collection,
+      userId,
+      role,
+    );
+    await edit.modifyCollectionRole();
+  }
+
   async performRoleAction(
     formattedAccessGroup: string,
     userDocument: UserDocument,
@@ -87,6 +123,24 @@ export class Edit extends RoleActions {
 }
 
 export class Remove extends RoleActions {
+
+  static async start(
+    dataStore: DataStore,
+    user: UserToken,
+    collection: string,
+    userId: string,
+    role: string,
+  ): Promise<void> {
+    const remove = new Remove(
+      dataStore,
+      user,
+      collection,
+      userId,
+      role,
+    );
+    await remove.modifyCollectionRole();
+  }
+
   async performRoleAction(
     formattedAccessGroup: string,
     userDocument: UserDocument,
