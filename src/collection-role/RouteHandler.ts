@@ -29,7 +29,7 @@ export function initializePrivate({
         );
       }
       const collection: string = req.params.collectionName;
-      const userId: string = req.params.userId;
+      const userId: string = req.params.memberId;
       switch (action) {
         case ROLE_ACTIONS.ASSIGN:
           await Assign.start(
