@@ -339,7 +339,7 @@ export default class MongoDriver implements DataStore {
   }
 
   /**
-   * push new access group to accessGroups array
+   * replace access group in accessGroups array
    * @param params
    * @property { string } userId the id of the user to search for
    * @property { string } formattedAccessGroup access group to push to array

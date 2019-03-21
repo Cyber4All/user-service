@@ -8,10 +8,26 @@ const ROLES = {
   REVIEWER: 'reviewer'
 };
 
+/**
+ * Checks if the user has a specified access group string
+ * @export
+ * @param params
+ * @property { string } formattedAccessGroup accessGroup string formatted as `role@collection`
+ * @property { UserDocument } user user object fetched from database
+ * @returns { boolean }
+ */
 export function hasAccessGroup(formattedAccessGroup: string, user: UserDocument): boolean {
   return user.accessGroups.includes(formattedAccessGroup);
 }
 
+/**
+ * Checks if the user is a member of a specifed collection
+ * @export
+ * @param params
+ * @property { string } collection name of a collection
+ * @property { UserDocument } user user object fetched from database
+ * @returns { boolean }
+ */
 export function isCollectionMember(collection: string, user: UserDocument): boolean {
   const filteredAccessGroups = user.accessGroups.filter(group => group.includes('@'));
   if (!(filteredAccessGroups.length > 0)) {
@@ -21,6 +37,14 @@ export function isCollectionMember(collection: string, user: UserDocument): bool
   return collections.includes(collection);
 }
 
+/**
+ * Checks if a user is a curator of a specified collection
+ * @export
+ * @param params
+ * @property { UserToken } user user to verify
+ * @property { collection } collection name of a collection
+ * @returns { boolean }
+ */
 export function verifyCollectionName(
     user: UserToken,
     collection: string,
@@ -28,6 +52,15 @@ export function verifyCollectionName(
   return user.accessGroups.includes(`${ROLES.CURATOR}@${collection}`);
 }
 
+/**
+ * Checks if a user has the privilege to modify another user's collection roles
+ * @export
+ * @param params
+ * @property { string } role role to modify
+ * @property { UserToken } user user to check
+ * @property { string } collection name of a collection
+ * @returns { boolean }
+ */
 export function verifyAssignAccess(
     role: string,
     user: UserToken,
@@ -43,6 +76,12 @@ export function verifyAssignAccess(
   }
 }
 
+/**
+ * Given a formatted access group string (`role@collection`), parse the collection
+ * @param params
+ * @property { string } accessGroup formatted accessGroup string to be parsed
+ * @returns { string }
+ */
 function parseCollection(accessGroup: string): string {
   if (accessGroup.includes('@')) {
     throw new ServiceError(ServiceErrorReason.INTERNAL);
@@ -50,10 +89,23 @@ function parseCollection(accessGroup: string): string {
   return accessGroup.split('@')[0];
 }
 
-function isAdmin(user: UserToken) {
+/**
+ * Checks if a user has admin privilege
+ * @param params
+ * @property { UserToken } user user to check privilege on
+ * @returns { boolean }
+ */
+function isAdmin(user: UserToken): boolean {
   return user.accessGroups.includes(ROLES.ADMIN);
 }
 
+/**
+ * Checks if a user has curator privilege
+ * @param params
+ * @property { UserToken } user user to check privilege on
+ * @property { string } collection collection that user is curator of
+ * @returns { boolean }
+ */
 function isCurator(user: UserToken, collection: string): boolean {
   return user.accessGroups.includes(`${ROLES.CURATOR}@${collection}`);
 }

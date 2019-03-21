@@ -100,7 +100,7 @@ export class Assign extends RoleActions {
     formattedAccessGroup: string,
     userDocument: UserDocument,
   ): Promise<void> {
-    if (!isCollectionMember(formattedAccessGroup, userDocument)) {
+    if (!isCollectionMember(this.collection, userDocument)) {
       await this.dataStore.assignAccessGroup(this.userId, formattedAccessGroup);
     } else {
       throw new ResourceError(
@@ -147,7 +147,7 @@ export class Edit extends RoleActions {
     formattedAccessGroup: string,
     userDocument: UserDocument,
   ): Promise<void> {
-    if (isCollectionMember(formattedAccessGroup, userDocument)) {
+    if (isCollectionMember(this.collection, userDocument)) {
       await this.dataStore.editAccessGroup(this.userId, formattedAccessGroup);
     } else {
       throw new ResourceError(
