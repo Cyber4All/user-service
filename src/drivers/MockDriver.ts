@@ -4,10 +4,26 @@ import { OTACode } from './OTACodeManager';
 import { UserQuery } from '../interfaces/Query';
 import { MOCK_OBJECTS } from '../tests/mocks';
 import { UserStats } from '../UserStats/UserStatsInteractor';
+import { UserDocument } from '../types/user-document';
 
 export default class MockDriver implements DataStore {
+  fetchReviewers(collection: string): Promise<any[]> {
+    return Promise.resolve([MOCK_OBJECTS.USER]);
+  }
+  findUserById(userId: string): Promise<UserDocument> {
+    return Promise.resolve(MOCK_OBJECTS.USER);
+  }
+  assignAccessGroup(userId: string, formattedAccessGroup: string): Promise<void> {
+    return Promise.resolve();
+  }
+  editAccessGroup(userId: string, formattedAccessGroup: string): Promise<void> {
+    return Promise.resolve();
+  }
+  removeAccessGroup(userId: string, formattedAccessGroup: string): Promise<void> {
+    return Promise.resolve();
+  }
   fetchStats(params: { query: any; }): Promise<UserStats> {
-    throw new Error('Method not implemented.');
+    return Promise.resolve(MOCK_OBJECTS.USER_STATS);
   }
 
   connect(dbURI: string): Promise<void> {

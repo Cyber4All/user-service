@@ -8,6 +8,8 @@ export const MOCK_OBJECTS = {
   USERNAME: 'cypress',
   PASSWORD: 'Clarktesting1!',
   EMAIL: 'test@test.com',
+  COLLECTION: 'nccp',
+  ROLE: 'curator',
   EMPTY_STRING: '',
   LONG_USERNAME: 'abcdefghijklmnopqrstuvwxyz',
   SHORT_USERNAME: '12',
@@ -17,11 +19,15 @@ export const MOCK_OBJECTS = {
   USER_ID: '5a70fb5ed45bde3f9d65a88c',
   USER: {
     username: 'cypress',
+    _id: 'testId',
     name: 'Clark Can',
     email: 'test@test.com',
     organization: 'towson university',
     password: '',
-    bio: ''
+    bio: '',
+    createdAt: '',
+    emailVerified: false,
+    accessGroups: ['']
   },
   OTACODE_ID: '5ba3dd816623db8690d7f0f7',
   SEARCH_COUNT: 1,
@@ -32,5 +38,9 @@ export const MOCK_OBJECTS = {
     data: 'test',
     action: ACCOUNT_ACTIONS.VERIFY_EMAIL
   },
-  HASHED_PASSWORD: 'password'
+  HASHED_PASSWORD: 'password',
+  USER_STATS: {
+    accounts: 0,
+    organizations: 0,
+  }
 };
