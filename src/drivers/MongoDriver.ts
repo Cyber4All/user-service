@@ -306,7 +306,11 @@ export default class MongoDriver implements DataStore {
       .collection(COLLECTIONS.USERS)
       .find<UserDocument>({ accessGroups: `reviewer@${collection}` })
       .toArray();
-    return users;
+
+    const reviewers: AuthUser[] = users.map((user: UserDocument) =>
+      this.generateUser(user)
+    );
+    return reviewers;
   }
 
   /**
@@ -321,7 +325,11 @@ export default class MongoDriver implements DataStore {
       .collection(COLLECTIONS.USERS)
       .find<UserDocument>({ accessGroups: `curator@${collection}` })
       .toArray();
-    return users;
+
+    const curators: AuthUser[] = users.map((user: UserDocument) =>
+      this.generateUser(user)
+    );
+    return curators;
   }
 
   /**
@@ -341,7 +349,11 @@ export default class MongoDriver implements DataStore {
         ]
       })
       .toArray();
-    return users;
+
+    const members: AuthUser[] = users.map((user: UserDocument) =>
+      this.generateUser(user)
+    );
+    return members;
   }
 
   /**

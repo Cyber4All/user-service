@@ -100,7 +100,7 @@ export function initializePrivate({
           );
           break;
       }
-      res.status(200).json(members);
+      res.status(200).json(members.map(user => user.toPlainObject()));
     } catch (e) {
       const { code, message } = mapErrorToResponseData(e);
       res.status(code).json({ message });

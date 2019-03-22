@@ -10,6 +10,7 @@ import {
 } from './AuthManager';
 import { ResourceError, ResourceErrorReason, ServiceError, ServiceErrorReason } from '../Error';
 import { UserDocument } from '../types/user-document';
+import { User } from '@cyber4all/clark-entity';
 
 abstract class RoleActions {
 
@@ -223,7 +224,11 @@ export async function fetchReviewers(
   collection: string,
 ): Promise<any[]> {
   if (verifyReadReviewerAccess(user, collection)) {
-    return await dataStore.fetchReviewers(collection);
+    const users = await dataStore.fetchReviewers(collection);
+    const reviewers = users.map(user => {
+      return new User(user);
+    });
+    return reviewers;
   }
   throw new ResourceError('Invalid Access', ResourceErrorReason.INVALID_ACCESS);
 }
@@ -245,7 +250,11 @@ export async function fetchCurators(
   collection: string,
 ): Promise<any[]> {
   if (isAdmin(user)) {
-    return await dataStore.fetchCurators(collection);
+    const users = await dataStore.fetchCurators(collection);
+    const curators = users.map(user => {
+      return new User(user);
+    });
+    return curators;
   }
   throw new ResourceError('Invalid Access', ResourceErrorReason.INVALID_ACCESS);
 }
@@ -267,7 +276,11 @@ export async function fetchMembers(
   collection: string,
 ): Promise<any[]> {
   if (isAdmin(user)) {
-    return await dataStore.fetchCollectionMembers(collection);
+    const users = await dataStore.fetchCollectionMembers(collection);
+    const members = users.map(user => {
+      return new User(user);
+    });
+    return members;
   }
   throw new ResourceError('Invalid Access', ResourceErrorReason.INVALID_ACCESS);
 }
