@@ -5,6 +5,8 @@ import {
   verifyCollectionName,
   isCollectionMember,
   hasAccessGroup,
+  isAdmin,
+  verifyReadReviewerAccess,
 } from './AuthManager';
 import { ResourceError, ResourceErrorReason, ServiceError, ServiceErrorReason } from '../Error';
 import { UserDocument } from '../types/user-document';
@@ -213,7 +215,7 @@ export class Remove extends RoleActions {
 /**
  * Finds all reviewers for a specified collection
  * @Authorization
- * *** Must be curator  ***
+ * *** Must be curator of collection or admin  ***
  * @export
  * @param params
  * @property { DataStore } dataStore [instance of DataStore]
@@ -226,9 +228,52 @@ export async function fetchReviewers(
   user: UserToken,
   collection: string,
 ): Promise<any[]> {
-  if (verifyCollectionName(user, collection)) {
-    const reviewers = await dataStore.fetchReviewers(collection);
-    return reviewers;
+  if (verifyReadReviewerAccess(user, collection)) {
+    return await dataStore.fetchReviewers(collection);
+  }
+  throw new ResourceError('Invalid Access', ResourceErrorReason.INVALID_ACCESS);
+}
+
+/**
+ * Finds all curators for a specified collection
+ * @Authorization
+ * *** Must be admin ***
+ * @export
+ * @param params
+ * @property { DataStore } dataStore [instance of DataStore]
+ * @property { UserToken } user [the user who made the request]
+ * @property { string } collection [the name of the collection]
+ * @returns { Promise<any[]> }
+ */
+export async function fetchCurators(
+  dataStore: DataStore,
+  user: UserToken,
+  collection: string,
+): Promise<any[]> {
+  if (isAdmin(user)) {
+    return await dataStore.fetchCurators(collection);
+  }
+  throw new ResourceError('Invalid Access', ResourceErrorReason.INVALID_ACCESS);
+}
+
+/**
+ * Finds all members for a specified collection
+ * @Authorization
+ * *** Must be admin ***
+ * @export
+ * @param params
+ * @property { DataStore } dataStore [instance of DataStore]
+ * @property { UserToken } user [the user who made the request]
+ * @property { string } collection [the name of the collection]
+ * @returns { Promise<any[]> }
+ */
+export async function fetchMembers(
+  dataStore: DataStore,
+  user: UserToken,
+  collection: string,
+): Promise<any[]> {
+  if (isAdmin(user)) {
+    return await dataStore.fetchCollectionMembers(collection);
   }
   throw new ResourceError('Invalid Access', ResourceErrorReason.INVALID_ACCESS);
 }

@@ -294,21 +294,58 @@ export default class MongoDriver implements DataStore {
       .deleteOne({ _id: id });
   }
 
+ /**
+  * Retrieve reviewers of a collection
+  * @param params
+  * @property { string } collection name of the collection
+  * @returns { Promise<any[]> }
+  */
   async fetchReviewers(collection: string): Promise<any[]> {
-    try {
-      const users = await this.client
-        .db()
-        .collection(COLLECTIONS.USERS)
-        .find<UserDocument>({ accessGroups: `reviewer@${collection}` })
-        .toArray();
-      return users;
-    } catch (e) {
-      return Promise.reject(e);
-    }
+    const users = await this.client
+      .db()
+      .collection(COLLECTIONS.USERS)
+      .find<UserDocument>({ accessGroups: `reviewer@${collection}` })
+      .toArray();
+    return users;
   }
 
   /**
-   * retrieve user document for a specifed id
+   * Retrieve curators of a collection
+   * @param params
+   * @property { string } collection name of the collection
+   * @returns { Promise<any[]> }
+   */
+  async fetchCurators(collection: string): Promise<any[]> {
+    const users = await this.client
+      .db()
+      .collection(COLLECTIONS.USERS)
+      .find<UserDocument>({ accessGroups: `curator@${collection}` })
+      .toArray();
+    return users;
+  }
+
+  /**
+   * Retrieve members of a collection (curators and reviewers)
+   * @param params
+   * @property { string } collection name of the collection
+   * @returns { Promise<any[]> }
+   */
+  async fetchCollectionMembers(collection: string): Promise<any[]> {
+    const users = await this.client
+      .db()
+      .collection(COLLECTIONS.USERS)
+      .find<UserDocument>(
+        { $or: [
+          { accessGroups: `reviewer@${collection}` },
+          { accessGroups: `curator@${collection}` },
+        ]
+      })
+      .toArray();
+    return users;
+  }
+
+  /**
+   * Retrieve user document for a specifed id
    * @param params
    * @property { string } userId the id of the user to search for
    * @returns { Promise<UserDocument> }

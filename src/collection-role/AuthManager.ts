@@ -77,6 +77,21 @@ export function verifyAssignAccess(
 }
 
 /**
+ * Checks if a user has the privilege to read reviewers of a collection
+ * @export
+ * @param params
+ * @property { UserToken } user user to check
+ * @property { string } collection name of a collection
+ * @returns { boolean }
+ */
+export function verifyReadReviewerAccess(
+  user: UserToken,
+  collection: string,
+): boolean {
+  return isAdmin(user) || isCurator(user, collection);
+}
+
+/**
  * Given a formatted access group string (`role@collection`), parse the collection
  * @param params
  * @property { string } accessGroup formatted accessGroup string to be parsed
@@ -95,7 +110,7 @@ function parseCollection(accessGroup: string): string {
  * @property { UserToken } user user to check privilege on
  * @returns { boolean }
  */
-function isAdmin(user: UserToken): boolean {
+export function isAdmin(user: UserToken): boolean {
   return user.accessGroups.includes(ROLES.ADMIN);
 }
 

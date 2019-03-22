@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { fetchReviewers, Assign, Edit, Remove } from './Interactor';
+import { fetchReviewers, Assign, Edit, Remove, fetchCurators, fetchMembers } from './Interactor';
 import { DataStore } from '../interfaces/DataStore';
 import { mapErrorToResponseData, ResourceError, ResourceErrorReason } from '../Error';
 import { UserToken } from '../types/user-token';
@@ -16,6 +16,11 @@ export function initializePrivate({
     ASSIGN: 'assign',
     EDIT: 'edit',
     REMOVE: 'remove',
+  };
+
+  const ACCESS_GROUP = {
+    CURATOR: 'curator',
+    REVIEWER: 'reviewer',
   };
 
   const modifyCollectionRole = async (req: Request, res: Response, action: string) => {
@@ -68,17 +73,41 @@ export function initializePrivate({
 
   const fetchCollectionReviewers = async (req: Request, res: Response) => {
     try {
-      const user = req.user;
-      const collectionName = req.params.collectionName;
-      const reviewers = await fetchReviewers(this.dataStore, user, collectionName);
-      res.status(200).json(reviewers);
+      const user: UserToken = req.user;
+      const role: string = req.query.role;
+      const collectionName: string = req.params.collectionName;
+      let members;
+      switch (role) {
+        case ACCESS_GROUP.CURATOR:
+          members = await fetchCurators(
+            dataStore,
+            user,
+            collectionName
+          );
+          break;
+        case ACCESS_GROUP.REVIEWER:
+          members = await fetchReviewers(
+            dataStore,
+            user,
+            collectionName
+          );
+          break;
+        default:
+          members = await fetchMembers(
+            dataStore,
+            user,
+            collectionName
+          );
+          break;
+      }
+      res.status(200).json(members);
     } catch (e) {
       const { code, message } = mapErrorToResponseData(e);
       res.status(code).json({ message });
     }
   };
 
-  router.get('/users/:collectionName/members',
+  router.get('/collections/:collectionName/members',
              (req, res) => fetchCollectionReviewers(req, res));
 
   router.put('/collections/:collectionName/members/:memberId',
