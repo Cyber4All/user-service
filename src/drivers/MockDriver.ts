@@ -70,7 +70,11 @@ export default class MockDriver implements DataStore {
     return Promise.resolve();
   }
 
-  editAccessGroup(userId: string, formattedAccessGroup: string): Promise<void> {
+  editAccessGroup(
+    userId: string,
+    formattedAccessGroup: string,
+    currentAccessGroup: string
+  ): Promise<void> {
     return Promise.resolve();
   }
 
