@@ -30,7 +30,7 @@ describe('Edit.start', () => {
 });
 
 describe('Remove.start', () => {
-  it('should add the role of a user in a collection', async () => {
+  it('should remove the role of a user in a collection', async () => {
     expect.assertions(1);
     await expect(Remove.start(
         driver,
