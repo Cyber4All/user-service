@@ -6,7 +6,7 @@ import { ResourceError } from '../Error';
 const driver = new MockDriver();
 
 describe('Assign.start', () => {
-  it('admin - c5 - can assign curator role to user who is not member of collection', async () => {
+  it('allows an admin assign a curator role to a user who is not a member of the collection', async () => {
     expect.assertions(1);
     await expect(Assign.start(
         driver,
@@ -16,7 +16,7 @@ describe('Assign.start', () => {
         COLLECTION_ROLE_MOCK_OBJECTS.ROLE_CURATOR,
     )).resolves.toBe(undefined);
   });
-  it('admin - c5 - can assign reviewer role to user who is not member of collection', async () => {
+  it('allows an admin assign a reviewer role to a user who is not a member of the collection', async () => {
     expect.assertions(1);
     await expect(Assign.start(
         driver,
@@ -26,7 +26,7 @@ describe('Assign.start', () => {
         COLLECTION_ROLE_MOCK_OBJECTS.ROLE_REVIEWER,
     )).resolves.toBe(undefined);
   });
-  it('admin - secj - can assign curator role to user who is not member of collection', async () => {
+  it('allows an admin assign a curator role to a user who is not a member of the collection', async () => {
     expect.assertions(1);
     await expect(Assign.start(
         driver,
@@ -36,7 +36,7 @@ describe('Assign.start', () => {
         COLLECTION_ROLE_MOCK_OBJECTS.ROLE_CURATOR,
     )).resolves.toBe(undefined);
   });
-  it('admin - secj - can assign reviewer role to user who is not member of collection', async () => {
+  it('allows an admin assign a reviewer role to a user who is not a member of the collection', async () => {
     expect.assertions(1);
     await expect(Assign.start(
         driver,
@@ -46,7 +46,7 @@ describe('Assign.start', () => {
         COLLECTION_ROLE_MOCK_OBJECTS.ROLE_REVIEWER,
     )).resolves.toBe(undefined);
   });
-  it('admin - cannot assign curator role to user who is already member of collection', async () => {
+  it('allows an admin cannot assign curator role to a user who is already a member of the collection', async () => {
     expect.assertions(1);
     await expect(Assign.start(
         driver,
@@ -56,7 +56,7 @@ describe('Assign.start', () => {
         COLLECTION_ROLE_MOCK_OBJECTS.ROLE_CURATOR,
     )).rejects.toBeInstanceOf(ResourceError);
   });
-  it('admin - cannot assign reviewer role to user who is already member of collection', async () => {
+  it('prevents an admin from assigning a reviewer role to a user who is already a member of the collection', async () => {
     expect.assertions(1);
     await expect(Assign.start(
         driver,
@@ -66,7 +66,7 @@ describe('Assign.start', () => {
         COLLECTION_ROLE_MOCK_OBJECTS.ROLE_REVIEWER,
     )).rejects.toBeInstanceOf(ResourceError);
   });
-  it('curator - can assign reviewer role to user who is not member of collection', async () => {
+  it('allows a curator to assign a reviewer role to a user who is not a member of the collection', async () => {
     expect.assertions(1);
     await expect(Assign.start(
         driver,
@@ -76,7 +76,7 @@ describe('Assign.start', () => {
         COLLECTION_ROLE_MOCK_OBJECTS.ROLE_REVIEWER,
     )).resolves.toBe(undefined);
   });
-  it('curator - cannot assign curator role to user who is not member of collection', async () => {
+  it('prevents a curator from assigning a curator role to a user who is not a member of the collection', async () => {
     expect.assertions(1);
     await expect(Assign.start(
         driver,
@@ -86,7 +86,7 @@ describe('Assign.start', () => {
         COLLECTION_ROLE_MOCK_OBJECTS.ROLE_CURATOR,
     )).rejects.toBeInstanceOf(ResourceError);
   });
-  it('curator - cannot assign curator role to user who is already member of collection', async () => {
+  it('prevents a curator from assigning a curator role to a user who is already a member of the collection', async () => {
     expect.assertions(1);
     await expect(Assign.start(
         driver,
@@ -96,7 +96,7 @@ describe('Assign.start', () => {
         COLLECTION_ROLE_MOCK_OBJECTS.ROLE_CURATOR,
     )).rejects.toBeInstanceOf(ResourceError);
   });
-  it('curator - cannot assign reviewer role to user who is already member of collection', async () => {
+  it('prevents a curator from assigning a reviewer role to a user who is already a member of the collection', async () => {
     expect.assertions(1);
     await expect(Assign.start(
         driver,
@@ -106,7 +106,7 @@ describe('Assign.start', () => {
         COLLECTION_ROLE_MOCK_OBJECTS.ROLE_REVIEWER,
     )).rejects.toBeInstanceOf(ResourceError);
   });
-  it('curator - cannot assign curator role to user who is not member of different collection', async () => {
+  it('prevents a curator from assigning a curator role to a user who is not a member of a different collection', async () => {
     expect.assertions(1);
     await expect(Assign.start(
         driver,
@@ -116,7 +116,7 @@ describe('Assign.start', () => {
         COLLECTION_ROLE_MOCK_OBJECTS.ROLE_CURATOR,
     )).rejects.toBeInstanceOf(ResourceError);
   });
-  it('curator - cannot assign reviewer role to user who is not member of different collection', async () => {
+  it('prevents a curator from assigning a reviewer role to a user who is not a member of a different collection', async () => {
     expect.assertions(1);
     await expect(Assign.start(
         driver,
@@ -126,7 +126,7 @@ describe('Assign.start', () => {
         COLLECTION_ROLE_MOCK_OBJECTS.ROLE_REVIEWER,
     )).rejects.toBeInstanceOf(ResourceError);
   });
-  it('curator - cannot assign curator role to user who is member of different collection', async () => {
+  it('prevents a curator from assigning a curator role to a user who is a member of a different collection', async () => {
     expect.assertions(1);
     await expect(Assign.start(
         driver,
@@ -136,7 +136,7 @@ describe('Assign.start', () => {
         COLLECTION_ROLE_MOCK_OBJECTS.ROLE_CURATOR,
     )).rejects.toBeInstanceOf(ResourceError);
   });
-  it('curator - cannot assign reviewer role to user who is member of different collection', async () => {
+  it('prevents a curator from assigning a reviewer role to a user who is a member of a different collection', async () => {
     expect.assertions(1);
     await expect(Assign.start(
         driver,
