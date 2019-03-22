@@ -87,7 +87,7 @@ export class Assign extends RoleActions {
   /**
    * Concrete implementation of performRoleAction function from RoleActions class
    * Assigns a user as a member to a collection
-   * @Authorization
+   * Authorization:
    * *** Cannot assign if user already has a role in the given collection  ***
    * *** Must have curator relationship with specified collection to assign reviewer  ***
    * *** Admins can assign reviewers and curators to any collection ***
@@ -134,7 +134,7 @@ export class Edit extends RoleActions {
   /**
    * Concrete implementation of performRoleAction function from RoleActions class
    * Edits an already existing collection membership
-   * @Authorization
+   * Authorization:
    * *** Cannot edit role in collection if user is not already member of the collection ***
    * *** Must have curator relationship with specified collection to grant reviewer access  ***
    * *** Admins can grant reviewer and curator access to any collection ***
@@ -181,7 +181,7 @@ export class Remove extends RoleActions {
   /**
    * Concrete implementation of performRoleAction function from RoleActions class
    * Removes an already existing collection membership
-   * @Authorization
+   * Authorization:
    * *** Cannot remove role if role does not exist ***
    * *** Must have curator relationship with specified collection to remove reviewer access  ***
    * *** Admins can remove reviewer and curator access to any collection ***
@@ -208,7 +208,7 @@ export class Remove extends RoleActions {
 
 /**
  * Finds all reviewers for a specified collection
- * @Authorization
+ * Authorization:
  * *** Must be curator of collection or admin  ***
  * @export
  * @param params
@@ -230,7 +230,7 @@ export async function fetchReviewers(
 
 /**
  * Finds all curators for a specified collection
- * @Authorization
+ * Authorization:
  * *** Must be admin ***
  * @export
  * @param params
@@ -252,7 +252,7 @@ export async function fetchCurators(
 
 /**
  * Finds all members for a specified collection
- * @Authorization
+ * Authorization:
  * *** Must be admin ***
  * @export
  * @param params
