@@ -24,7 +24,7 @@ export interface DataStore extends UserStatDatastore {
   editAccessGroup(
     userId: string,
     formattedAccessGroup: string,
-    currentAccessGroup: string
+    collection: string
   ): Promise<void>;
   removeAccessGroup(userId: string, formattedAccessGroup: string): Promise<void>;
 }

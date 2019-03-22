@@ -65,7 +65,7 @@ export default class MockDriver implements DataStore {
   fetchCurators(collection: string): Promise<any[]> {
     return Promise.resolve([MOCK_OBJECTS.USER]);
   }
-  
+
   fetchCollectionMembers(collection: string): Promise<any[]> {
     return Promise.resolve([MOCK_OBJECTS.USER]);
   }
@@ -81,7 +81,7 @@ export default class MockDriver implements DataStore {
   editAccessGroup(
     userId: string,
     formattedAccessGroup: string,
-    currentAccessGroup: string
+    collection: string
   ): Promise<void> {
     return Promise.resolve();
   }
@@ -89,7 +89,7 @@ export default class MockDriver implements DataStore {
   removeAccessGroup(userId: string, formattedAccessGroup: string): Promise<void> {
     return Promise.resolve();
   }
- 
+
   fetchStats(params: { query: any; }): Promise<UserStats> {
     return Promise.resolve(MOCK_OBJECTS.USER_STATS);
   }

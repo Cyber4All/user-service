@@ -149,13 +149,7 @@ export class Edit extends RoleActions {
     userDocument: UserDocument,
   ): Promise<void> {
     if (isCollectionMember(this.collection, userDocument)) {
-      let currentAccessGroup;
-      if (formattedAccessGroup.includes('curator')) {
-        currentAccessGroup = formattedAccessGroup.replace('curator', 'reviewer');
-      } else {
-        currentAccessGroup = formattedAccessGroup.replace('reviewer', 'curator');
-      }
-      await this.dataStore.editAccessGroup(this.userId, formattedAccessGroup, currentAccessGroup);
+      await this.dataStore.editAccessGroup(this.userId, formattedAccessGroup, this.collection);
     } else {
       throw new ResourceError(
         `${userDocument.name} is not a member of the ${this.collection} collection.`,

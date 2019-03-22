@@ -380,18 +380,19 @@ export default class MongoDriver implements DataStore {
    * @param params
    * @property { string } userId the id of the user to search for
    * @property { string } formattedAccessGroup access group to push to array
+   * @property { string } collection name of collection
    * @returns { Promise<void> }
    */
   async editAccessGroup(
     userId: string,
     formattedAccessGroup: string,
-    currentAccessGroup: string
+    collection: string
   ): Promise<void> {
     await this.client
       .db()
       .collection(COLLECTIONS.USERS)
       .updateOne(
-        { _id: userId, accessGroups: currentAccessGroup },
+        { _id: userId, accessGroups: { $regex: collection } },
         { $set: { 'accessGroups.$': formattedAccessGroup } }
       );
   }
