@@ -51,8 +51,6 @@ export default class AuthRouteHandler {
       }
       next();
     });
-
-    router.use(initializePrivate({ router, dataStore: this.dataStore }));
     // Register
     // POST: provide JSON object with new user info
     /*
@@ -157,7 +155,11 @@ export default class AuthRouteHandler {
         responder.sendOperationError(e);
       }
     });
+
+    router.use(initializePrivate({ router, dataStore: this.dataStore }));
   }
+
+  
 
   private hasAccess(token: any, propName: string, value: any): boolean {
     return token[propName] === value;
