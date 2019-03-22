@@ -39,6 +39,7 @@ export function initializePrivate({
             userId,
             role,
           );
+          break;
         case ROLE_ACTIONS.EDIT:
           await Edit.start(
             dataStore,
@@ -47,6 +48,7 @@ export function initializePrivate({
             userId,
             role,
           );
+          break;
         case ROLE_ACTIONS.REMOVE:
           await Remove.start(
             dataStore,
@@ -55,6 +57,7 @@ export function initializePrivate({
             userId,
             role,
           );
+          break;
       }
       res.sendStatus(200);
     } catch (e) {
@@ -75,7 +78,7 @@ export function initializePrivate({
     }
   };
 
-  router.get('/users/:collectionName/reviewers',
+  router.get('/users/:collectionName/members',
              (req, res) => fetchCollectionReviewers(req, res));
 
   router.put('/collections/:collectionName/members/:memberId',

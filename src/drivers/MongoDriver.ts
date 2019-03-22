@@ -345,12 +345,16 @@ export default class MongoDriver implements DataStore {
    * @property { string } formattedAccessGroup access group to push to array
    * @returns { Promise<void> }
    */
-  async editAccessGroup(userId: string, formattedAccessGroup: string): Promise<void> {
+  async editAccessGroup(
+    userId: string,
+    formattedAccessGroup: string,
+    currentAccessGroup: string
+  ): Promise<void> {
     await this.client
       .db()
       .collection(COLLECTIONS.USERS)
       .updateOne(
-        { _id: userId, accessGroups: formattedAccessGroup },
+        { _id: userId, accessGroups: currentAccessGroup },
         { $set: { 'accessGroups.$': formattedAccessGroup } }
       );
   }

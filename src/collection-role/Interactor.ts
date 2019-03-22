@@ -63,7 +63,6 @@ abstract class RoleActions {
   ): Promise<void>;
 }
 
-
 export class Assign extends RoleActions {
 
   static async start(
@@ -148,7 +147,13 @@ export class Edit extends RoleActions {
     userDocument: UserDocument,
   ): Promise<void> {
     if (isCollectionMember(this.collection, userDocument)) {
-      await this.dataStore.editAccessGroup(this.userId, formattedAccessGroup);
+      let currentAccessGroup;
+      if (formattedAccessGroup.includes('curator')) {
+        currentAccessGroup = formattedAccessGroup.replace('curator', 'reviewer');
+      } else {
+        currentAccessGroup = formattedAccessGroup.replace('reviewer', 'curator');
+      }
+      await this.dataStore.editAccessGroup(this.userId, formattedAccessGroup, currentAccessGroup);
     } else {
       throw new ResourceError(
         `${userDocument.name} is not a member of the ${this.collection} collection.`,
