@@ -62,6 +62,14 @@ export default class MockDriver implements DataStore {
     return Promise.resolve([MOCK_OBJECTS.USER]);
   }
 
+  fetchCurators(collection: string): Promise<any[]> {
+    return Promise.resolve([MOCK_OBJECTS.USER]);
+  }
+  
+  fetchCollectionMembers(collection: string): Promise<any[]> {
+    return Promise.resolve([MOCK_OBJECTS.USER]);
+  }
+
   findUserById(userId: string): Promise<UserDocument> {
     return Promise.resolve(MOCK_OBJECTS.MODIFY_ROLE_USER);
   }

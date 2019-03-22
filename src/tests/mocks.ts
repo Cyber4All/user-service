@@ -55,5 +55,6 @@ export const MOCK_OBJECTS = {
   USER_STATS: {
     accounts: 0,
     organizations: 0,
-  }
+  },
+
 };

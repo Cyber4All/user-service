@@ -465,7 +465,6 @@ export default class MongoDriver implements DataStore {
         ])
         .sort({ score: { $meta: 'textScore' } });
       const arr = await organizations.toArray();
-      console.log(arr);
       return arr;
     } catch (e) {
       console.log(e);
