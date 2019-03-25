@@ -2,10 +2,11 @@ import * as express from 'express';
 type Router = express.Router;
 import { DataStore, HashInterface } from '../interfaces/interfaces';
 import { passwordMatch } from '../interactors/AuthenticationInteractor';
-import { UserResponseFactory } from './drivers';
+import { UserResponseFactory, RouteHandler } from './drivers';
 import { UserInteractor } from '../interactors/interactors';
 import { reportError } from './SentryConnector';
 import * as AuthInteractor from '../interactors/AuthenticationInteractor';
+import { initializePrivate } from '../collection-role/RouteHandler';
 export default class AuthRouteHandler {
   constructor(
     private dataStore: DataStore,
@@ -155,18 +156,10 @@ export default class AuthRouteHandler {
       }
     });
 
-    router.get('/users/:collectionName/reviewers', async (req, res) => {
-      const responder = this.responseFactory.buildResponder(res);
-      try {
-        const user = req.user;
-        const collectionName = req.params.collectionName;
-        const reviewers = await UserInteractor.fetchReviewers(this.dataStore, user, collectionName);
-        responder.sendObject(reviewers.map(user => user.toPlainObject()));
-      } catch (e) {
-        responder.sendOperationError(e);
-      }
-    });
+    router.use(initializePrivate({ router, dataStore: this.dataStore }));
   }
+
+  
 
   private hasAccess(token: any, propName: string, value: any): boolean {
     return token[propName] === value;

@@ -4,11 +4,9 @@ import { OTACode } from './OTACodeManager';
 import { UserQuery } from '../interfaces/Query';
 import { MOCK_OBJECTS } from '../tests/mocks';
 import { UserStats } from '../UserStats/UserStatsInteractor';
+import { UserDocument } from '../types/user-document';
 
 export default class MockDriver implements DataStore {
-  fetchStats(params: { query: any; }): Promise<UserStats> {
-    throw new Error('Method not implemented.');
-  }
 
   connect(dbURI: string): Promise<void> {
     return Promise.resolve();
@@ -58,6 +56,42 @@ export default class MockDriver implements DataStore {
     query: UserQuery
   ): Promise<{ users: any[]; total: number; }> {
     return Promise.resolve({ users: [MOCK_OBJECTS.USER], total: MOCK_OBJECTS.SEARCH_COUNT });
+  }
+
+  fetchReviewers(collection: string): Promise<any[]> {
+    return Promise.resolve([MOCK_OBJECTS.USER]);
+  }
+
+  fetchCurators(collection: string): Promise<any[]> {
+    return Promise.resolve([MOCK_OBJECTS.USER]);
+  }
+
+  fetchCollectionMembers(collection: string): Promise<any[]> {
+    return Promise.resolve([MOCK_OBJECTS.USER]);
+  }
+
+  findUserById(userId: string): Promise<UserDocument> {
+    return Promise.resolve(MOCK_OBJECTS.MODIFY_ROLE_USER);
+  }
+
+  assignAccessGroup(userId: string, formattedAccessGroup: string): Promise<void> {
+    return Promise.resolve();
+  }
+
+  editAccessGroup(
+    userId: string,
+    formattedAccessGroup: string,
+    collection: string
+  ): Promise<void> {
+    return Promise.resolve();
+  }
+
+  removeAccessGroup(userId: string, formattedAccessGroup: string): Promise<void> {
+    return Promise.resolve();
+  }
+
+  fetchStats(params: { query: any; }): Promise<UserStats> {
+    return Promise.resolve(MOCK_OBJECTS.USER_STATS);
   }
 
   async findOrganizations(query: string): Promise<any[]> {

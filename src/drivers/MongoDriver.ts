@@ -17,6 +17,7 @@ export const COLLECTIONS = {
 };
 
 export default class MongoDriver implements DataStore {
+
   private client: MongoClient;
   private db: Db;
 
@@ -189,7 +190,8 @@ export default class MongoDriver implements DataStore {
 
       objectCursor = orderBy
         ? objectCursor.sort(orderBy, sortType ? sortType : 1)
-        : objectCursor.sort({ score: { $meta: 'textScore' }}).project({ score: { $meta: 'textScore' } } );
+        : objectCursor.sort({ score: { $meta: 'textScore' } })
+                      .project({ score: { $meta: 'textScore' } });
 
       const userDocs = await objectCursor.toArray();
 
@@ -265,11 +267,11 @@ export default class MongoDriver implements DataStore {
         .collection(COLLECTIONS.USERS)
         .update(
           { _id: id },
-          {
-            $set: object
-          }
+        {
+          $set: object
+        }
       );
-       
+
       return await this.loadUser(id);
     } catch (e) {
       return Promise.reject(e);
@@ -292,21 +294,136 @@ export default class MongoDriver implements DataStore {
       .deleteOne({ _id: id });
   }
 
+ /**
+  * Retrieve reviewers of a collection
+  * @param params
+  * @property { string } collection name of the collection
+  * @returns { Promise<any[]> }
+  */
   async fetchReviewers(collection: string): Promise<any[]> {
-    try {
-      const users = await this.client
-        .db()
-        .collection(COLLECTIONS.USERS)
-        .find<UserDocument>({ accessGroups: `reviewer@${collection}` })
-        .toArray();
+    const users = await this.client
+      .db()
+      .collection(COLLECTIONS.USERS)
+      .find<UserDocument>({ accessGroups: `reviewer@${collection}` })
+      .toArray();
 
-      const reviewers: AuthUser[] = users.map((user: UserDocument) =>
-        this.generateUser(user)
+    const reviewers: AuthUser[] = users.map((user: UserDocument) =>
+      this.generateUser(user)
+    );
+    return reviewers;
+  }
+
+  /**
+   * Retrieve curators of a collection
+   * @param params
+   * @property { string } collection name of the collection
+   * @returns { Promise<any[]> }
+   */
+  async fetchCurators(collection: string): Promise<any[]> {
+    const users = await this.client
+      .db()
+      .collection(COLLECTIONS.USERS)
+      .find<UserDocument>({ accessGroups: `curator@${collection}` })
+      .toArray();
+
+    const curators: AuthUser[] = users.map((user: UserDocument) =>
+      this.generateUser(user)
+    );
+    return curators;
+  }
+
+  /**
+   * Retrieve members of a collection (curators and reviewers)
+   * @param params
+   * @property { string } collection name of the collection
+   * @returns { Promise<any[]> }
+   */
+  async fetchCollectionMembers(collection: string): Promise<any[]> {
+    const users = await this.client
+      .db()
+      .collection(COLLECTIONS.USERS)
+      .find<UserDocument>(
+        { $or: [
+          { accessGroups: `reviewer@${collection}` },
+          { accessGroups: `curator@${collection}` },
+        ]
+      })
+      .toArray();
+
+    const members: AuthUser[] = users.map((user: UserDocument) =>
+      this.generateUser(user)
+    );
+    return members;
+  }
+
+  /**
+   * Retrieve user document for a specifed id
+   * @param params
+   * @property { string } userId the id of the user to search for
+   * @returns { Promise<UserDocument> }
+   */
+  async findUserById(userId: string): Promise<UserDocument> {
+    const user = await this.client
+      .db()
+      .collection(COLLECTIONS.USERS)
+      .findOne<UserDocument>({ _id: userId });
+    return user;
+  }
+
+  /**
+   * push new access group to accessGroups array
+   * @param params
+   * @property { string } userId the id of the user to search for
+   * @property { string } formattedAccessGroup access group to push to array
+   * @returns { Promise<void> }
+   */
+  async assignAccessGroup(userId: string, formattedAccessGroup: string): Promise<void> {
+    await this.client
+      .db()
+      .collection(COLLECTIONS.USERS)
+      .updateOne(
+        { _id: userId },
+        { $addToSet: { accessGroups: formattedAccessGroup } }
       );
-      return reviewers;
-    } catch (e) {
-      return Promise.reject(e);
-    }
+  }
+
+  /**
+   * replace access group in accessGroups array
+   * @param params
+   * @property { string } userId the id of the user to search for
+   * @property { string } formattedAccessGroup access group to push to array
+   * @property { string } collection name of collection
+   * @returns { Promise<void> }
+   */
+  async editAccessGroup(
+    userId: string,
+    formattedAccessGroup: string,
+    collection: string
+  ): Promise<void> {
+    await this.client
+      .db()
+      .collection(COLLECTIONS.USERS)
+      .updateOne(
+        { _id: userId, accessGroups: { $regex: collection } },
+        { $set: { 'accessGroups.$': formattedAccessGroup } }
+      );
+  }
+
+  /**
+   * pull access group from accessGroups array
+   * @param params
+   * @property { string } userId the id of the user to search for
+   * @property { string } formattedAccessGroup access group to pull from array
+   * @returns { Promise<void> }
+   */
+  async removeAccessGroup(userId: string, formattedAccessGroup: string): Promise<void> {
+    await this.client
+      .db()
+      .collection(COLLECTIONS.USERS)
+      .updateOne(
+        { _id: userId },
+        { $pull: { accessGroups: formattedAccessGroup } }
+      );
   }
 
   async insertOTACode(otaCode: OTACode): Promise<void> {
@@ -361,7 +478,6 @@ export default class MongoDriver implements DataStore {
         ])
         .sort({ score: { $meta: 'textScore' } });
       const arr = await organizations.toArray();
-      console.log(arr);
       return arr;
     } catch (e) {
       console.log(e);
