@@ -156,10 +156,8 @@ export default class AuthRouteHandler {
       }
     });
 
-    router.use(initializePrivate({ router, dataStore: this.dataStore }));
+    router.use(initializePrivate({ dataStore: this.dataStore }));
   }
-
-  
 
   private hasAccess(token: any, propName: string, value: any): boolean {
     return token[propName] === value;
