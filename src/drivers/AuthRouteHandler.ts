@@ -4,9 +4,9 @@ import { DataStore, HashInterface } from '../interfaces/interfaces';
 import { passwordMatch } from '../interactors/AuthenticationInteractor';
 import { UserResponseFactory, RouteHandler } from './drivers';
 import { UserInteractor } from '../interactors/interactors';
-import { reportError } from './SentryConnector';
 import * as AuthInteractor from '../interactors/AuthenticationInteractor';
 import { initializePrivate } from '../collection-role/RouteHandler';
+import { reportError } from '../shared/SentryConnector';
 export default class AuthRouteHandler {
   constructor(
     private dataStore: DataStore,
