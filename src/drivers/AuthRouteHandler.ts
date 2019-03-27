@@ -2,7 +2,7 @@ import * as express from 'express';
 type Router = express.Router;
 import { DataStore, HashInterface } from '../interfaces/interfaces';
 import { passwordMatch } from '../interactors/AuthenticationInteractor';
-import { UserResponseFactory, RouteHandler } from './drivers';
+import { UserResponseFactory } from './drivers';
 import { UserInteractor } from '../interactors/interactors';
 import * as AuthInteractor from '../interactors/AuthenticationInteractor';
 import { initializePrivate } from '../collection-role/RouteHandler';
@@ -44,7 +44,6 @@ export default class AuthRouteHandler {
             } was retrieved from the token. Should be lowercase`
           );
         } catch (e) {
-          console.log(e.message);
           reportError(e);
         }
         req.user.username = req.user.username.toLowerCase();

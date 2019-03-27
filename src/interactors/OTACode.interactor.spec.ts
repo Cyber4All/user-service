@@ -1,8 +1,4 @@
-import {
-  UserInteractor,
-  MailerInteractor,
-  OTACodeInteractor
-} from '../interactors/interactors';
+import { OTACodeInteractor } from '../interactors/interactors';
 import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
 import MockDriver from '../drivers/MockDriver';
 import { MOCK_OBJECTS } from '../tests/mocks';
@@ -26,5 +22,3 @@ describe('generateOTACode', () => {
       });
   });
 });
-
-

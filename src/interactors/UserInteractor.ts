@@ -2,7 +2,6 @@ import { DataStore, Responder, HashInterface } from '../interfaces/interfaces';
 import { User } from '@cyber4all/clark-entity';
 import { TokenManager } from '../drivers/drivers';
 import { UserQuery } from '../interfaces/Query';
-import { UserToken } from '../types/user-token';
 
 export class UserInteractor {
   public static async searchUsers(
