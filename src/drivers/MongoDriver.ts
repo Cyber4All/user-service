@@ -1,5 +1,4 @@
-import * as dotenv from 'dotenv';
-import { Db, MongoClient, ObjectID } from 'mongodb';
+import { Db, ObjectID } from 'mongodb';
 import { DataStore } from '../interfaces/interfaces';
 import { UserQuery } from '../interfaces/Query';
 import { AuthUser } from '../types/auth-user';
@@ -7,7 +6,7 @@ import { UserDocument } from '../types/user-document';
 import { UserStats } from '../UserStats/UserStatsInteractor';
 import { UserStatStore } from '../UserStats/UserStatStore';
 import { OTACode } from './OTACodeManager';
-dotenv.config();
+import { MongoConnectionManager } from '../config/mongodb';
 
 export const COLLECTIONS = {
   USERS: 'users',
@@ -17,54 +16,36 @@ export const COLLECTIONS = {
 };
 
 export default class MongoDriver implements DataStore {
-
-  private client: MongoClient;
   private db: Db;
+  private static instance: MongoDriver;
 
   private statStore: UserStatStore;
 
-  constructor(dburi: string) {
-    this.connect(dburi);
+  private constructor() {
+    this.db = MongoConnectionManager.getDbClient();
+    this.initializeModules();
+  }
+  /**
+   * Returns an instance of MongoDriver
+   *
+   * @static
+   * @returns {DataStore}
+   * @memberof MongoDriver
+   */
+  static getInstance(): MongoDriver {
+    if (!this.instance) {
+      this.instance = new MongoDriver();
+    }
+    return this.instance;
   }
 
   /**
-   * Connect to the database. Must be called before any other functions.
-   * @async
+   * Initializes module stores
    *
-   * NOTE: This function will attempt to connect to the database every
-   *       time it is called, but since it assigns the result to a local
-   *       variable which can only ever be created once, only one
-   *       connection will ever be active at a time.
-   *
-   * TODO: Verify that connections are automatically closed
-   *       when they no longer have a reference.
-   *
-   * @param {string} dbIP the host and port on which mongodb is running
+   * @memberof MongoDriver
    */
-  async connect(dbURI: string, retryAttempt?: number): Promise<void> {
-    try {
-      this.client = await MongoClient.connect(dbURI);
-      this.statStore = new UserStatStore(this.client.db('onion'));
-    } catch (e) {
-      if (!retryAttempt) {
-        this.connect(
-          dbURI,
-          1
-        );
-      } else {
-        return Promise.reject(
-          'Problem connecting to database at ' + dbURI + ':\n\t' + e
-        );
-      }
-    }
-  }
-  /**
-   * Close the database. Note that this will affect all services
-   * and scripts using the database, so only do this if it's very
-   * important or if you are sure that *everything* is finished.
-   */
-  disconnect(): void {
-    this.client.close();
+  initializeModules() {
+    this.statStore = new UserStatStore(this.db);
   }
 
   /**
@@ -93,8 +74,7 @@ export default class MongoDriver implements DataStore {
       } else {
         query.username = username;
       }
-      const exists = await this.client
-        .db()
+      const exists = await this.db
         .collection(COLLECTIONS.USERS)
         .findOne<UserDocument>(query, { fields: { _id: 1 } });
       if (exists) {
@@ -117,10 +97,7 @@ export default class MongoDriver implements DataStore {
   async insertUser(user: AuthUser): Promise<string> {
     try {
       const userDoc = this.documentUser(user, true);
-      await this.client
-        .db()
-        .collection(COLLECTIONS.USERS)
-        .insertOne(userDoc);
+      await this.db.collection(COLLECTIONS.USERS).insertOne(userDoc);
       return userDoc._id;
     } catch (e) {
       return Promise.reject(e);
@@ -143,8 +120,7 @@ export default class MongoDriver implements DataStore {
       } else {
         query.username = username;
       }
-      const userRecord: { _id: string } = await this.client
-        .db()
+      const userRecord: { _id: string } = await this.db
         .collection(COLLECTIONS.USERS)
         .findOne(query, { projection: { _id: 1 } });
       if (!userRecord) {
@@ -174,8 +150,7 @@ export default class MongoDriver implements DataStore {
 
       const mongoQuery = this.buildUserQuery(query);
 
-      let objectCursor = await this.client
-        .db()
+      let objectCursor = await this.db
         .collection(COLLECTIONS.USERS)
         .find<UserDocument>(mongoQuery);
 
@@ -190,8 +165,9 @@ export default class MongoDriver implements DataStore {
 
       objectCursor = orderBy
         ? objectCursor.sort(orderBy, sortType ? sortType : 1)
-        : objectCursor.sort({ score: { $meta: 'textScore' } })
-                      .project({ score: { $meta: 'textScore' } });
+        : objectCursor
+            .sort({ score: { $meta: 'textScore' } })
+            .project({ score: { $meta: 'textScore' } });
 
       const userDocs = await objectCursor.toArray();
 
@@ -244,8 +220,7 @@ export default class MongoDriver implements DataStore {
    */
   async loadUser(id: string): Promise<AuthUser> {
     try {
-      const userRecord = await this.client
-        .db()
+      const userRecord = await this.db
         .collection(COLLECTIONS.USERS)
         .findOne<UserDocument>({ _id: id });
       const user = this.generateUser(userRecord);
@@ -262,11 +237,8 @@ export default class MongoDriver implements DataStore {
       if (object.name) {
         object.name = object.name.trim();
       }
-      await this.client
-        .db()
-        .collection(COLLECTIONS.USERS)
-        .update(
-          { _id: id },
+      await this.db.collection(COLLECTIONS.USERS).update(
+        { _id: id },
         {
           $set: object
         }
@@ -284,25 +256,20 @@ export default class MongoDriver implements DataStore {
    * @param {UserID} id which document to delete
    */
   async deleteUser(id: string): Promise<void> {
-    await this.client
-      .db()
+    await this.db
       .collection(COLLECTIONS.LEARNING_OBJECTS)
       .deleteOne({ authorID: id });
-    await this.client
-      .db()
-      .collection(COLLECTIONS.USERS)
-      .deleteOne({ _id: id });
+    await this.db.collection(COLLECTIONS.USERS).deleteOne({ _id: id });
   }
 
- /**
-  * Retrieve reviewers of a collection
-  * @param params
-  * @property { string } collection name of the collection
-  * @returns { Promise<any[]> }
-  */
+  /**
+   * Retrieve reviewers of a collection
+   * @param params
+   * @property { string } collection name of the collection
+   * @returns { Promise<any[]> }
+   */
   async fetchReviewers(collection: string): Promise<any[]> {
-    const users = await this.client
-      .db()
+    const users = await this.db
       .collection(COLLECTIONS.USERS)
       .find<UserDocument>({ accessGroups: `reviewer@${collection}` })
       .toArray();
@@ -320,8 +287,7 @@ export default class MongoDriver implements DataStore {
    * @returns { Promise<any[]> }
    */
   async fetchCurators(collection: string): Promise<any[]> {
-    const users = await this.client
-      .db()
+    const users = await this.db
       .collection(COLLECTIONS.USERS)
       .find<UserDocument>({ accessGroups: `curator@${collection}` })
       .toArray();
@@ -339,13 +305,12 @@ export default class MongoDriver implements DataStore {
    * @returns { Promise<any[]> }
    */
   async fetchCollectionMembers(collection: string): Promise<any[]> {
-    const users = await this.client
-      .db()
+    const users = await this.db
       .collection(COLLECTIONS.USERS)
-      .find<UserDocument>(
-        { $or: [
+      .find<UserDocument>({
+        $or: [
           { accessGroups: `reviewer@${collection}` },
-          { accessGroups: `curator@${collection}` },
+          { accessGroups: `curator@${collection}` }
         ]
       })
       .toArray();
@@ -363,8 +328,7 @@ export default class MongoDriver implements DataStore {
    * @returns { Promise<UserDocument> }
    */
   async findUserById(userId: string): Promise<UserDocument> {
-    const user = await this.client
-      .db()
+    const user = await this.db
       .collection(COLLECTIONS.USERS)
       .findOne<UserDocument>({ _id: userId });
     return user;
@@ -377,9 +341,11 @@ export default class MongoDriver implements DataStore {
    * @property { string } formattedAccessGroup access group to push to array
    * @returns { Promise<void> }
    */
-  async assignAccessGroup(userId: string, formattedAccessGroup: string): Promise<void> {
-    await this.client
-      .db()
+  async assignAccessGroup(
+    userId: string,
+    formattedAccessGroup: string
+  ): Promise<void> {
+    await this.db
       .collection(COLLECTIONS.USERS)
       .updateOne(
         { _id: userId },
@@ -400,8 +366,7 @@ export default class MongoDriver implements DataStore {
     formattedAccessGroup: string,
     collection: string
   ): Promise<void> {
-    await this.client
-      .db()
+    await this.db
       .collection(COLLECTIONS.USERS)
       .updateOne(
         { _id: userId, accessGroups: { $regex: collection } },
@@ -416,9 +381,11 @@ export default class MongoDriver implements DataStore {
    * @property { string } formattedAccessGroup access group to pull from array
    * @returns { Promise<void> }
    */
-  async removeAccessGroup(userId: string, formattedAccessGroup: string): Promise<void> {
-    await this.client
-      .db()
+  async removeAccessGroup(
+    userId: string,
+    formattedAccessGroup: string
+  ): Promise<void> {
+    await this.db
       .collection(COLLECTIONS.USERS)
       .updateOne(
         { _id: userId },
@@ -428,7 +395,7 @@ export default class MongoDriver implements DataStore {
 
   async insertOTACode(otaCode: OTACode): Promise<void> {
     try {
-      await this.client.db().collection(COLLECTIONS.OTA_CODES).insertOne(otaCode);
+      await this.db.collection(COLLECTIONS.OTA_CODES).insertOne(otaCode);
     } catch (e) {
       return Promise.reject(e);
     }
@@ -436,8 +403,7 @@ export default class MongoDriver implements DataStore {
 
   async findOTACode(code: string): Promise<string> {
     try {
-      const otaCodeRecord = await this.client
-        .db()
+      const otaCodeRecord = await this.db
         .collection(COLLECTIONS.OTA_CODES)
         .findOne<OTACode>({ code });
       return otaCodeRecord
@@ -450,10 +416,7 @@ export default class MongoDriver implements DataStore {
 
   async deleteOTACode(id: string): Promise<void> {
     try {
-      await this.client
-        .db()
-        .collection(COLLECTIONS.OTA_CODES)
-        .deleteOne({ id });
+      await this.db.collection(COLLECTIONS.OTA_CODES).deleteOne({ id });
     } catch (e) {
       return Promise.reject(e);
     }
@@ -464,7 +427,7 @@ export default class MongoDriver implements DataStore {
       // Match the entire phrase instead of individual words
       const search = '"' + query + '"';
       const text: any = { $text: { $search: search } };
-      const organizations = await this.client.db()
+      const organizations = await this.db
         .collection(COLLECTIONS.ORGANIZATIONS)
         .aggregate([
           { $match: text },
