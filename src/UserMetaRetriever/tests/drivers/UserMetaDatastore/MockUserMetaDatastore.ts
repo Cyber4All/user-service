@@ -1,6 +1,6 @@
-import { RoleDatastore } from '../../../interfaces';
+import { UserMetaDatastore } from '../../../interfaces';
 import { userRoles } from '../../MockStore';
-export class MockRoleDatastore implements RoleDatastore {
+export class MockUserMetaDatastore implements UserMetaDatastore {
   fetchUserRoles(_: string): Promise<string[]> {
     return Promise.resolve(userRoles);
   }

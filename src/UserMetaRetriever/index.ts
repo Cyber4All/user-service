@@ -2,8 +2,8 @@ import {
   ExpressServiceModule,
   expressServiceModule
 } from '../shared/ExpressServiceModule';
-import { RoleDatastore } from './interfaces';
-import { MongoRoleDatastore } from './drivers';
+import { UserMetaDatastore } from './interfaces';
+import { MongoUserMetaDatastore } from './drivers';
 import { ModuleAdapter, ExpressRouterAdapter } from './adapters';
 
 /**
@@ -12,12 +12,12 @@ import { ModuleAdapter, ExpressRouterAdapter } from './adapters';
  * functionality of this module can be access through it's ModuleAdapter or the ExpressRouterAdapter
  *
  * @export
- * @class RoleManager
+ * @class UserMetaRetriever
  * @extends {ExpressServiceModule}
  */
 @expressServiceModule({
   adapter: ModuleAdapter,
   expressRouter: ExpressRouterAdapter.buildRouter(),
-  providers: [{ provide: RoleDatastore, useClass: MongoRoleDatastore }]
+  providers: [{ provide: UserMetaDatastore, useClass: MongoUserMetaDatastore }]
 })
-export class RoleManager extends ExpressServiceModule {}
+export class UserMetaRetriever extends ExpressServiceModule {}

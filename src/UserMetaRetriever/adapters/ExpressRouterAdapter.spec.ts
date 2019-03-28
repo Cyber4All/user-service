@@ -5,28 +5,28 @@ import {
   processToken,
   enforceAuthenticatedAccess
 } from '../../middleware';
-import { RoleManager } from '../index';
-import { RoleDatastore } from '../interfaces';
-import { MockRoleDatastore } from '../tests/drivers/RoleDatastore/MockRoleDatastore';
+import { UserMetaRetriever } from '../index';
+import { UserMetaDatastore } from '../interfaces';
+import { MockUserMetaDatastore } from '../tests/drivers/UserMetaDatastore/MockUserMetaDatastore';
 import { userToken } from '../tests/MockStore';
 import { encodeToken } from '../../shared/TokenEncoder';
 
-describe('RoleManager: ExpressRouterAdapter', () => {
+describe('UserMetaRetriever: ExpressRouterAdapter', () => {
   let request: supertest.SuperTest<supertest.Test>;
   const validToken = encodeToken(userToken);
   beforeAll(() => {
-    RoleManager.providers = [
+    UserMetaRetriever.providers = [
       {
-        provide: RoleDatastore,
-        useClass: MockRoleDatastore
+        provide: UserMetaDatastore,
+        useClass: MockUserMetaDatastore
       }
     ];
-    RoleManager.initialize();
+    UserMetaRetriever.initialize();
 
     const app = express();
     app.use(processToken, handleProcessTokenError);
     app.use(enforceAuthenticatedAccess);
-    app.use(RoleManager.expressRouter);
+    app.use(UserMetaRetriever.expressRouter);
     request = supertest(app);
   });
 
@@ -101,6 +101,6 @@ describe('RoleManager: ExpressRouterAdapter', () => {
   });
 
   afterAll(() => {
-    RoleManager.destroy();
+    UserMetaRetriever.destroy();
   });
 });

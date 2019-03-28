@@ -1,14 +1,14 @@
-import { RoleManager as Module } from '.';
+import { UserMetaRetriever as Module } from '.';
 import { UserToken } from './typings';
 import { authorizeRequest, requesterIsAdmin } from './AuthorizationManager';
 import { handleError, ResourceError, ResourceErrorReason } from '../Error';
-import { RoleDatastore } from './interfaces';
+import { UserMetaDatastore } from './interfaces';
 
 /**
  * Encapsulates Drivers used within this interactor in a namespace
  */
 namespace Drivers {
-  export const datastore = () => Module.resolveDependency(RoleDatastore);
+  export const datastore = () => Module.resolveDependency(UserMetaDatastore);
 }
 
 /**

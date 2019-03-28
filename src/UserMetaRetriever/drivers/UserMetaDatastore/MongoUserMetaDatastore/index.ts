@@ -1,26 +1,26 @@
 import { Db } from 'mongodb';
-import { RoleDatastore } from '../../../interfaces';
+import { UserMetaDatastore } from '../../../interfaces';
 import { MongoConnectionManager } from '../../../../config/mongodb';
 
 const USER_COLLECTION = 'users';
 
-export class MongoRoleDatastore implements RoleDatastore {
+export class MongoUserMetaDatastore implements UserMetaDatastore {
   private db: Db;
-  private static instance: MongoRoleDatastore;
+  private static instance: MongoUserMetaDatastore;
 
   private constructor() {
     this.db = MongoConnectionManager.getDbClient();
   }
   /**
-   * Returns an instance of MongoRoleDatastore
+   * Returns an instance of MongoUserMetaDatastore
    *
    * @static
-   * @returns {MongoRoleDatastore}
-   * @memberof MongoRoleDatastore
+   * @returns {MongoUserMetaDatastore}
+   * @memberof MongoUserMetaDatastore
    */
-  static getInstance(): MongoRoleDatastore {
+  static getInstance(): MongoUserMetaDatastore {
     if (!this.instance) {
-      this.instance = new MongoRoleDatastore();
+      this.instance = new MongoUserMetaDatastore();
     }
     return this.instance;
   }
@@ -30,7 +30,7 @@ export class MongoRoleDatastore implements RoleDatastore {
    *
    * @param {string} id
    * @returns {Promise<string[]>}
-   * @memberof MongoRoleDatastore
+   * @memberof MongoUserMetaDatastore
    */
   async fetchUserRoles(id: string): Promise<string[]> {
     const doc = await this.db

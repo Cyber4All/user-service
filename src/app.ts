@@ -18,7 +18,7 @@ import {
   enforceAdminAccess
 } from './middleware';
 import { MongoConnectionManager } from './config/mongodb';
-import { RoleManager } from './RoleManager';
+import { UserMetaRetriever } from './UserMetaRetriever';
 import {
   reportError,
   sentryRequestHandler,
@@ -53,7 +53,7 @@ async function startApp() {
  *
  */
 function initModules() {
-  RoleManager.initialize();
+  UserMetaRetriever.initialize();
 }
 
 /**
@@ -133,7 +133,7 @@ function attachAuthenticatedRouters(app: express.Express) {
       responseFactory
     )
   );
-  app.use(RoleManager.expressRouter);
+  app.use(UserMetaRetriever.expressRouter);
 
   // TODO: Deprecate admin router and middleware in favor of default router with proper authorization logic in interactors
   app.use(enforceAdminAccess);
