@@ -7,7 +7,7 @@ import { MongoUserMetaDatastore } from './drivers';
 import { ModuleAdapter, ExpressRouterAdapter } from './adapters';
 
 /**
- * Module encapsulating all things related to user Role Management
+ * Module encapsulating all things related to user fetching metadata for users
  * Since this module is an extension of `ExpressServiceModule`
  * functionality of this module can be access through it's ModuleAdapter or the ExpressRouterAdapter
  *
