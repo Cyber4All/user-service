@@ -30,7 +30,7 @@ export function requesterIsAdmin(userToken: UserToken): boolean {
  * @export
  * @param {boolean[]} authorizationCases [List of boolean values from the result of an authorization check]
  */
-export function authorizeRequest(authorizationCases: boolean[]) {
+export function authorizeRequest(authorizationCases: boolean[]): never | void {
   if (!authorizationCases.includes(true)) {
     throw new ResourceError(
       'Invalid access',
