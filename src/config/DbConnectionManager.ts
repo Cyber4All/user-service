@@ -1,5 +1,7 @@
 /**
  * Abstract representation of a DbConnectionManager
+ * This is class is meant to be extended.
+ * All subclasses of this class should serve to be the single source for managing connections to the database and storing references to the database clients.
  */
 export abstract class DbConnectionManager {
   protected constructor() {}
