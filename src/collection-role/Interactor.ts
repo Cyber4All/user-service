@@ -285,3 +285,41 @@ export async function fetchMembers(
   }
   throw new ResourceError('Invalid Access', ResourceErrorReason.INVALID_ACCESS);
 }
+
+/**
+ * Validates all required values are provided for request
+ *
+ * @param {any[]} params
+ * @param {string[]} [mustProvide]
+ * @returns {(void | never)}
+ */
+function validateRequestParams({
+  params,
+  mustProvide
+}: {
+  params: any[];
+  mustProvide?: string[];
+}): void | never {
+  const values = [...params].map(val => {
+    if (typeof val === 'string') {
+      val = val.trim();
+    }
+    return val;
+  });
+  if (
+    values.includes(null) ||
+    values.includes('null') ||
+    values.includes(undefined) ||
+    values.includes('undefined') ||
+    values.includes('')
+  ) {
+    const multipleParams = mustProvide.length > 1;
+    let message = 'Invalid parameters provided';
+    if (Array.isArray(mustProvide)) {
+      message = `Must provide ${multipleParams ? '' : 'a'} valid value${
+        multipleParams ? 's' : ''
+      } for ${mustProvide}`;
+    }
+    throw new ResourceError(message, ResourceErrorReason.BAD_REQUEST);
+  }
+}
