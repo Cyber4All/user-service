@@ -127,7 +127,7 @@ export default class RouteHandler {
           responder.invalidLogin();
         } else if (typeof userPayload !== 'boolean') {
           responder.setCookie('presence', userPayload.token);
-          responder.sendUser(userPayload.user);
+          res.status(200).json({ ...userPayload.user, token: userPayload.token });
         }
       } catch (e) {
         responder.sendOperationError(e);
