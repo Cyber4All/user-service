@@ -9,7 +9,13 @@ import {
   verifyReadReviewerAccess,
   authorizeRequest
 } from './AuthManager';
-import { ResourceError, ResourceErrorReason, ServiceError, ServiceErrorReason } from '../Error';
+import {
+  ResourceError,
+  ResourceErrorReason,
+  ServiceError,
+  ServiceErrorReason,
+  handleError
+} from '../Error';
 import { UserDocument } from '../types/user-document';
 import { User } from '@cyber4all/clark-entity';
 
@@ -152,50 +158,50 @@ export class Edit extends RoleActions {
   }
 }
 
-export class Remove extends RoleActions {
-
-  static async start(
-    dataStore: DataStore,
-    user: UserToken,
-    collection: string,
-    userId: string,
-    role: string,
-  ): Promise<void> {
-    const remove = new Remove(
-      dataStore,
-      user,
-      collection,
-      userId,
-      role,
-    );
-    await remove.modifyCollectionRole();
-  }
-
   /**
-   * Concrete implementation of performRoleAction function from RoleActions class
-   * Removes an already existing collection membership
+ * Removes an existing collection membership
    * Authorization:
    * *** Cannot remove role if role does not exist ***
    * *** Must have curator relationship with specified collection to remove reviewer access  ***
    * *** Admins can remove reviewer and curator access to any collection ***
    * @export
-   * @param params
-   * @property { string } formattedAccessGroup accessGroup string formatted as `role@collection`
-   * @property { UserDocument } userDocument user object fetched from database
+ * @param {DataStore} dataStore [Driver for the datastore]
+ * @param {UserToken} requester [Token containing info about the requester and their privileges]
+ * @param {string} userId [Id of the user to remove membership from]
+ * @param {string} collection [Collection to remove membership from]
    * @returns { Promise<void> }
    */
-  async performRoleAction(
-    formattedAccessGroup: string,
-    userDocument: UserDocument,
-  ): Promise<void> {
-    if (hasAccessGroup(formattedAccessGroup, userDocument)) {
-      await this.dataStore.removeAccessGroup(this.userId, formattedAccessGroup);
-    } else {
+export async function removeRole({
+  dataStore,
+  requester,
+  userId,
+  collection
+}: {
+  dataStore: DataStore;
+  requester: UserToken;
+  userId: string;
+  collection: string;
+}): Promise<void> {
+  try {
+    validateRequestParams({
+      params: [userId, collection],
+      mustProvide: ['id', 'collection']
+    });
+    const privilege = await dataStore.fetchUserCollectionRole({
+      userId,
+      collection
+    });
+    if (!privilege) {
       throw new ResourceError(
-        `${this.user.name} does not have the specified role`,
-        ResourceErrorReason.BAD_REQUEST
+        `No user ${userId} found with role within ${collection}`,
+        ResourceErrorReason.NOT_FOUND
       );
     }
+    const [role] = privilege.split('@');
+    authorizeRequest([hasRoleModAccess(role, requester, collection)]);
+    await dataStore.removeAccessGroup(userId, privilege);
+  } catch (e) {
+    handleError(e);
   }
 }
 
