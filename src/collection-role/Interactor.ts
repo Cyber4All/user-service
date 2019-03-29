@@ -2,9 +2,7 @@ import { UserToken } from '../types/user-token';
 import { DataStore } from '../interfaces/interfaces';
 import {
   hasRoleModAccess,
-  verifyCollectionName,
   isCollectionMember,
-  hasAccessGroup,
   isAdmin,
   verifyReadReviewerAccess,
   authorizeRequest
@@ -12,8 +10,6 @@ import {
 import {
   ResourceError,
   ResourceErrorReason,
-  ServiceError,
-  ServiceErrorReason,
   handleError
 } from '../Error';
 import { UserDocument } from '../types/user-document';
