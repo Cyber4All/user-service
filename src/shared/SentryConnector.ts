@@ -3,7 +3,7 @@ import * as express from 'express';
 
 const environment = process.env.NODE_ENV;
 
-let _reportError: (e: Error) => void;
+let _reportError: (e: Error) => void = _ => {};
 
 switch (environment) {
   case 'development':
