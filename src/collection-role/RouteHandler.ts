@@ -21,12 +21,6 @@ export function initializePrivate({ dataStore }: { dataStore: DataStore }) {
     try {
       const user: UserToken = req.user;
       const role: string = req.body.role;
-      if (!role) {
-        throw new ResourceError(
-          'Must provide a role',
-          ResourceErrorReason.BAD_REQUEST
-        );
-      }
       const collection: string = req.params.collectionName;
       const userId: string = req.params.memberId;
       switch (action) {
