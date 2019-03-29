@@ -1,7 +1,14 @@
 import { Router, Request, Response } from 'express';
-import { fetchReviewers, Assign, Edit, Remove, fetchCurators, fetchMembers } from './Interactor';
+import {
+  fetchReviewers,
+  Assign,
+  Edit,
+  fetchCurators,
+  fetchMembers,
+  removeRole
+} from './Interactor';
 import { DataStore } from '../interfaces/DataStore';
-import { mapErrorToResponseData, ResourceError, ResourceErrorReason } from '../Error';
+import { mapErrorToResponseData } from '../Error';
 import { UserToken } from '../types/user-token';
 
 export function initializePrivate({ dataStore }: { dataStore: DataStore }) {
@@ -17,39 +24,30 @@ export function initializePrivate({ dataStore }: { dataStore: DataStore }) {
     REVIEWER: 'reviewer',
   };
 
-  const modifyCollectionRole = async (req: Request, res: Response, action: string) => {
+  const modifyCollectionRole = async (
+    req: Request,
+    res: Response,
+    action: string
+  ) => {
     try {
-      const user: UserToken = req.user;
+      const userToken: UserToken = req.user;
       const role: string = req.body.role;
       const collection: string = req.params.collectionName;
       const userId: string = req.params.memberId;
       switch (action) {
         case ROLE_ACTIONS.ASSIGN:
-          await Assign.start(
-            dataStore,
-            user,
-            collection,
-            userId,
-            role,
-          );
+          await Assign.start(dataStore, userToken, collection, userId, role);
           break;
         case ROLE_ACTIONS.EDIT:
-          await Edit.start(
-            dataStore,
-            user,
-            collection,
-            userId,
-            role,
-          );
+          await Edit.start(dataStore, userToken, collection, userId, role);
           break;
         case ROLE_ACTIONS.REMOVE:
-          await Remove.start(
+          await removeRole({
             dataStore,
-            user,
-            collection,
             userId,
-            role,
-          );
+            collection,
+            requester: userToken
+          });
           break;
       }
       res.sendStatus(200);
