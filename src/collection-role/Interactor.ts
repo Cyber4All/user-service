@@ -40,27 +40,18 @@ abstract class RoleActions {
    * @returns { Promise<void> }
    */
   async modifyCollectionRole(): Promise<void> {
+    validateRequestParams({
+      params: [this.userId, this.role, this.collection],
+      mustProvide: ['id', 'role', 'collection']
+    });
     authorizeRequest([hasRoleModAccess(this.role, this.user, this.collection)]);
       const userDocument = await this.dataStore.findUserById(this.userId);
-      if (userDocument) {
-        const formattedAccessGroup = `${this.role}@${this.collection}`;
-        await this.performRoleAction(
-          formattedAccessGroup,
-          userDocument,
-        );
-      } else {
-        throw new ResourceError(
-          'User Not Found',
-          ResourceErrorReason.NOT_FOUND
-        );
-      }
-    } else {
-      throw new ResourceError(
-        'Invalid Access',
-        ResourceErrorReason.INVALID_ACCESS
-      );
+    if (!userDocument) {
+      throw new ResourceError('User Not Found', ResourceErrorReason.NOT_FOUND);
     }
-  }
+        const formattedAccessGroup = `${this.role}@${this.collection}`;
+    await this.performRoleAction(formattedAccessGroup, userDocument);
+      }
   abstract performRoleAction(
     formattedAccessGroup: string,
     userDocument: UserDocument,
