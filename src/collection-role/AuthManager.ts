@@ -66,10 +66,10 @@ export function verifyCollectionName(
  * @property { string } collection name of a collection
  * @returns { boolean }
  */
-export function verifyAssignAccess(
+export function hasRoleModAccess(
     role: string,
     user: UserToken,
-    collection: string,
+  collection: string
 ): boolean {
   switch (role) {
     case ROLES.CURATOR:
