@@ -1,12 +1,13 @@
 import { UserToken } from '../types/user-token';
 import { DataStore } from '../interfaces/interfaces';
 import {
-  verifyAssignAccess,
+  hasRoleModAccess,
   verifyCollectionName,
   isCollectionMember,
   hasAccessGroup,
   isAdmin,
   verifyReadReviewerAccess,
+  authorizeRequest
 } from './AuthManager';
 import { ResourceError, ResourceErrorReason, ServiceError, ServiceErrorReason } from '../Error';
 import { UserDocument } from '../types/user-document';
@@ -39,7 +40,7 @@ abstract class RoleActions {
    * @returns { Promise<void> }
    */
   async modifyCollectionRole(): Promise<void> {
-    if (verifyAssignAccess(this.role, this.user, this.collection)) {
+    authorizeRequest([hasRoleModAccess(this.role, this.user, this.collection)]);
       const userDocument = await this.dataStore.findUserById(this.userId);
       if (userDocument) {
         const formattedAccessGroup = `${this.role}@${this.collection}`;
