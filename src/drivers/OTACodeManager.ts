@@ -1,5 +1,4 @@
 import * as jwt from 'jsonwebtoken';
-import * as util from 'util';
 import { ObjectID } from 'mongodb';
 import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
 import * as dotenv from 'dotenv';

@@ -4,14 +4,8 @@ import { DataStore } from '../interfaces/DataStore';
 import { mapErrorToResponseData, ResourceError, ResourceErrorReason } from '../Error';
 import { UserToken } from '../types/user-token';
 
-export function initializePrivate({
-    router,
-    dataStore
-}: {
-  router: Router
-  dataStore: DataStore
-}) {
-
+export function initializePrivate({ dataStore }: { dataStore: DataStore }) {
+  const router: Router = Router();
   const ROLE_ACTIONS = {
     ASSIGN: 'assign',
     EDIT: 'edit',

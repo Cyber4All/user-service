@@ -1,4 +1,4 @@
-import { reportError } from './drivers/SentryConnector';
+import { reportError } from './shared/SentryConnector';
 
 /**
  * The reasons for which a ServiceError may be thrown.
@@ -54,6 +54,9 @@ export function mapErrorToResponseData(error: Error): { code: number, message: s
     message: error.message,
   };
   switch (error.name) {
+    case ResourceErrorReason.BAD_REQUEST:
+      status.code = 400;
+      break;
     case ResourceErrorReason.INVALID_ACCESS:
       status.code = 401;
       break;
@@ -69,4 +72,18 @@ export function mapErrorToResponseData(error: Error): { code: number, message: s
       status.message = 'Internal Service Error';
   }
   return status;
+}
+
+/**
+ * Handles errors by throwing if handled, otherwise the error is reported and a ServiceError is thrown
+ *
+ * @param {Error} error
+ * @returns {never}
+ */
+export function handleError(error: Error): never {
+  if (error instanceof ResourceError || error instanceof ServiceError) {
+    throw error;
+  }
+  reportError(error);
+  throw new ServiceError(ServiceErrorReason.INTERNAL);
 }

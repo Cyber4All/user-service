@@ -25,7 +25,7 @@ RUN mkdir -p /opt/app
 
 # install dependencies in a different location for easier app bind mounting for local development
 WORKDIR /opt
-COPY package.json package-lock.json* ./
+COPY package.json package-lock.json* jest.config.js tsconfig.json ./
 RUN npm install && npm cache clean --force
 ENV PATH /opt/node_modules/.bin:$PATH
 

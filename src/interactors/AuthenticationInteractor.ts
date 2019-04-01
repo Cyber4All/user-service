@@ -3,8 +3,8 @@ import { TokenManager } from '../drivers/drivers';
 import { User } from '@cyber4all/clark-entity';
 import { sanitizeText } from './UserInteractor';
 import { AuthUser } from '../types/auth-user';
-import { reportError } from '../drivers/SentryConnector';
 import { UserToken } from '../types/user-token';
+import { reportError } from '../shared/SentryConnector';
 
 /**
  * Attempts user login via datastore and issues JWT access token

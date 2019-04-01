@@ -1,13 +1,7 @@
-import {
-  DataStore,
-  Responder,
-  MailerInteractorInterface
-} from '../interfaces/interfaces';
+import { DataStore } from '../interfaces/interfaces';
 import { OTACodeManager } from '../drivers/drivers';
 import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
-import { REDIRECT_ROUTES } from '../environment/routes';
-import { DecodedOTACode, OTACode } from '../drivers/OTACodeManager';
-import * as request from 'request';
+import { DecodedOTACode } from '../drivers/OTACodeManager';
 
 export class OTACodeInteractor {
   public static async generateOTACode(
