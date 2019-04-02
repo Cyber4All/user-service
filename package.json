@@ -29,7 +29,7 @@
     "@cyber4all/clark-schema": "^1.0.2",
     "@cyber4all/clark-taxonomy": "^2.0.0",
     "@sendgrid/mail": "^6.2.1",
-    "@sentry/node": "^4.4.1",
+    "@sentry/node": "^5.0.3",
     "bcrypt": "^3.0.3",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
