@@ -21,7 +21,10 @@ const ROLES = {
  * @property { UserDocument } user user object fetched from database
  * @returns { boolean }
  */
-export function hasAccessGroup(formattedAccessGroup: string, user: UserDocument): boolean {
+export function hasAccessGroup(
+  formattedAccessGroup: string,
+  user: UserDocument
+): boolean {
   return user.accessGroups.includes(formattedAccessGroup);
 }
 
@@ -33,8 +36,13 @@ export function hasAccessGroup(formattedAccessGroup: string, user: UserDocument)
  * @property { UserDocument } user user object fetched from database
  * @returns { boolean }
  */
-export function isCollectionMember(collection: string, user: UserDocument): boolean {
-  const filteredAccessGroups = user.accessGroups.filter(group => group.includes('@'));
+export function isCollectionMember(
+  collection: string,
+  user: UserDocument
+): boolean {
+  const filteredAccessGroups = user.accessGroups
+    ? user.accessGroups.filter(group => group.includes('@'))
+    : [];
   if (!(filteredAccessGroups.length > 0)) {
     return false;
   }
@@ -51,9 +59,9 @@ export function isCollectionMember(collection: string, user: UserDocument): bool
  * @returns { boolean }
  */
 export function verifyCollectionName(
-    user: UserToken,
-    collection: string,
-  ): boolean {
+  user: UserToken,
+  collection: string
+): boolean {
   return user.accessGroups.includes(`${ROLES.CURATOR}@${collection}`);
 }
 
@@ -67,8 +75,8 @@ export function verifyCollectionName(
  * @returns { boolean }
  */
 export function hasRoleModAccess(
-    role: string,
-    user: UserToken,
+  role: string,
+  user: UserToken,
   collection: string
 ): boolean {
   switch (role) {
@@ -91,7 +99,7 @@ export function hasRoleModAccess(
  */
 export function verifyReadReviewerAccess(
   user: UserToken,
-  collection: string,
+  collection: string
 ): boolean {
   return isAdmin(user) || isCurator(user, collection);
 }
@@ -103,7 +111,7 @@ export function verifyReadReviewerAccess(
  * @returns { string }
  */
 function parseCollection(accessGroup: string): string {
-  if (!(accessGroup.includes('@'))) {
+  if (!accessGroup.includes('@')) {
     throw new ServiceError(ServiceErrorReason.INTERNAL);
   }
   return accessGroup.split('@')[1];
