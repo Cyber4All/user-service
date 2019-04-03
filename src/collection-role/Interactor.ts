@@ -1,7 +1,7 @@
 import { UserToken } from '../types/user-token';
 import { DataStore } from '../interfaces/interfaces';
 import {
-  hasRoleModAccess,
+  hasRoleModificationAccess,
   isCollectionMember,
   isAdmin,
   verifyReadReviewerAccess,
@@ -46,7 +46,7 @@ abstract class RoleActions {
       params: [this.userId, this.role, this.collection],
       mustProvide: ['id', 'role', 'collection']
     });
-    authorizeRequest([hasRoleModAccess(this.role, this.user, this.collection)]);
+    authorizeRequest([hasRoleModificationAccess(this.role, this.user, this.collection)]);
       const userDocument = await this.dataStore.findUserById(this.userId);
     if (!userDocument) {
       throw new ResourceError('User Not Found', ResourceErrorReason.NOT_FOUND);
@@ -194,7 +194,7 @@ export async function removeRole({
       );
     }
     const [role] = privilege.split('@');
-    authorizeRequest([hasRoleModAccess(role, requester, collection)]);
+    authorizeRequest([hasRoleModificationAccess(role, requester, collection)]);
     await dataStore.removeAccessGroup(userId, privilege);
   } catch (e) {
     handleError(e);

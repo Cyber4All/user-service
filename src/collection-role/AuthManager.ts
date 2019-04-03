@@ -74,7 +74,7 @@ export function verifyCollectionName(
  * @property { string } collection name of a collection
  * @returns { boolean }
  */
-export function hasRoleModAccess(
+export function hasRoleModificationAccess(
   role: string,
   user: UserToken,
   collection: string
