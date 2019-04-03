@@ -7,6 +7,12 @@ import { UserStats } from '../UserStats/UserStatsInteractor';
 import { UserDocument } from '../types/user-document';
 
 export default class MockDriver implements DataStore {
+  fetchUserCollectionRole(params: {
+    userId: string;
+    collection: string;
+  }): Promise<string> {
+    return Promise.resolve(MOCK_OBJECTS.ROLE);
+  }
 
   connect(dbURI: string): Promise<void> {
     return Promise.resolve();
@@ -52,10 +58,11 @@ export default class MockDriver implements DataStore {
     return Promise.resolve();
   }
 
-  searchUsers(
-    query: UserQuery
-  ): Promise<{ users: any[]; total: number; }> {
-    return Promise.resolve({ users: [MOCK_OBJECTS.USER], total: MOCK_OBJECTS.SEARCH_COUNT });
+  searchUsers(query: UserQuery): Promise<{ users: any[]; total: number }> {
+    return Promise.resolve({
+      users: [MOCK_OBJECTS.USER],
+      total: MOCK_OBJECTS.SEARCH_COUNT
+    });
   }
 
   fetchReviewers(collection: string): Promise<any[]> {
@@ -74,7 +81,10 @@ export default class MockDriver implements DataStore {
     return Promise.resolve(MOCK_OBJECTS.MODIFY_ROLE_USER);
   }
 
-  assignAccessGroup(userId: string, formattedAccessGroup: string): Promise<void> {
+  assignAccessGroup(
+    userId: string,
+    formattedAccessGroup: string
+  ): Promise<void> {
     return Promise.resolve();
   }
 
@@ -86,11 +96,14 @@ export default class MockDriver implements DataStore {
     return Promise.resolve();
   }
 
-  removeAccessGroup(userId: string, formattedAccessGroup: string): Promise<void> {
+  removeAccessGroup(
+    userId: string,
+    formattedAccessGroup: string
+  ): Promise<void> {
     return Promise.resolve();
   }
 
-  fetchStats(params: { query: any; }): Promise<UserStats> {
+  fetchStats(params: { query: any }): Promise<UserStats> {
     return Promise.resolve(MOCK_OBJECTS.USER_STATS);
   }
 
