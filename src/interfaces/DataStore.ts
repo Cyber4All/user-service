@@ -20,6 +20,7 @@ export interface DataStore extends UserStatDatastore {
   fetchCurators(collection: string): Promise<any[]>;
   fetchCollectionMembers(collection: string): Promise<any[]>;
   findUserById(userId: string): Promise<UserDocument>;
+  fetchUserCollectionRole(params: {userId: string, collection: string}): Promise<string>;
   assignAccessGroup(userId: string, formattedAccessGroup: string): Promise<void>;
   editAccessGroup(
     userId: string,

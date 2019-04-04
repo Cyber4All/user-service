@@ -1,6 +1,11 @@
 import { UserToken } from '../types/user-token';
 import { UserDocument } from '../types/user-document';
-import { ServiceError, ServiceErrorReason } from '../Error';
+import {
+  ServiceError,
+  ServiceErrorReason,
+  ResourceError,
+  ResourceErrorReason
+} from '../Error';
 
 const ROLES = {
   ADMIN: 'admin',
@@ -69,7 +74,7 @@ export function verifyCollectionName(
  * @property { string } collection name of a collection
  * @returns { boolean }
  */
-export function verifyAssignAccess(
+export function hasRoleModificationAccess(
   role: string,
   user: UserToken,
   collection: string
@@ -131,4 +136,19 @@ export function isAdmin(user: UserToken): boolean {
  */
 function isCurator(user: UserToken, collection: string): boolean {
   return user.accessGroups.includes(`${ROLES.CURATOR}@${collection}`);
+}
+
+/**
+ * Checks if request should be authorized by checking if `authorizationCases` contains `true`.
+ *
+ * @export
+ * @param {boolean[]} authorizationCases [List of boolean values from the result of an authorization check]
+ */
+export function authorizeRequest(authorizationCases: boolean[]): never | void {
+  if (!authorizationCases.includes(true)) {
+    throw new ResourceError(
+      'Invalid access',
+      ResourceErrorReason.INVALID_ACCESS
+    );
+  }
 }

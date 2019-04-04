@@ -49,6 +49,39 @@ export default class MongoDriver implements DataStore {
   }
 
   /**
+   * Fetches user's role for a collection
+   *
+   * @param {string} userId [Id of the user to fetch collection role for]
+   * @param {string} collection [Name of the collection to find role for]
+   * @returns {Promise<string>}
+   * @memberof MongoDriver
+   */
+  async fetchUserCollectionRole({
+    userId,
+    collection
+  }: {
+    userId: string;
+    collection: string;
+  }): Promise<string> {
+    const doc = await this.db
+      .collection(COLLECTIONS.USERS)
+      .findOne<{ accessGroups: string[] }>(
+        { _id: userId, accessGroups: { $regex: new RegExp(collection, 'ig') } },
+        {
+          projection: {
+            _id: 0,
+            'accessGroups.$': 1
+          }
+        }
+      );
+    if (doc) {
+      return doc.accessGroups[0];
+    }
+
+    return null;
+  }
+
+  /**
    * Fetches Stats for User Accounts
    *
    * @param {{ query: any }} params
