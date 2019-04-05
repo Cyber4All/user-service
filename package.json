@@ -4,7 +4,9 @@
   "description": "A microservice for handling user account actions in the CLARK platform.",
   "main": "app.js",
   "scripts": {
-    "start": "npm run gulp-tsc",
+    "start": "nodemon",
+    "serve": "node -r ts-node/register ./src/app.ts",
+    "serve:debug": "node --inspect=5858 -r ts-node/register ./src/app.ts",
     "build": "node_modules/.bin/gulp tsc",
     "gulp-tsc": "node_modules/.bin/gulp start",
     "lint": "node_modules/.bin/tslint --project ./src/**",
@@ -70,11 +72,25 @@
     "prettier": "1.14.1",
     "supertest": "^4.0.2",
     "ts-jest": "^24.0.0",
+    "ts-node": "^8.0.3",
     "tslint": "^5.9.1",
     "tslint-config-airbnb": "^5.7.0",
     "typescript": "^2.6.2"
   },
   "prettier": {
     "singleQuote": true
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "**/*.test.ts",
+      "**/*.spec.ts",
+      ".git",
+      "node_modules"
+    ],
+    "watch": [
+      "src"
+    ],
+    "exec": "npm run serve",
+    "ext": "ts"
   }
 }

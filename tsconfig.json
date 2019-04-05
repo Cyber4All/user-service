@@ -1,16 +1,24 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2017",
     "module": "commonjs",
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "dist",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "lib": ["es2017", "dom"],
+    "lib": [
+      "es7",
+      "dom"
+    ],
     "noImplicitAny": true,
     "suppressImplicitAnyIndexErrors": true,
     "downlevelIteration": true,
-    "allowUnusedLabels": false
-  }
+    "allowUnusedLabels": false,
+    "types": ["jest"]
+  },
+  "exclude": [
+    "node_modules",
+    "src/**/*.spec.ts"
+  ]
 }
