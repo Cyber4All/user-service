@@ -155,7 +155,7 @@ function attachAuthenticatedRouters(app: express.Express) {
 function startHttpServer(app: express.Express) {
   const server = http.createServer(app);
   server.listen(HTTP_SERVER_PORT, () => {
-    console.log(`User Service running on port ${HTTP_SERVER_PORT}`);
+    console.log(`User Service running at http://localhost:${HTTP_SERVER_PORT}`);
   });
 }
 
