@@ -26,7 +26,7 @@ export interface ClassProvider {
  * @class ServiceModule
  */
 export abstract class ServiceModule {
-  private static dependencies = new DependencyContainer();
+  private static dependencies: DependencyContainer;
   private static providerKeys: InjectionKey[] = [];
   private static _initialized: boolean = false;
 
@@ -114,6 +114,7 @@ export abstract class ServiceModule {
    * @memberof ServiceModule
    */
   static set providers(myProviders: ClassProvider[]) {
+    this.dependencies = new DependencyContainer();
     if (!this._initialized) {
       myProviders.forEach(provider => {
         let injectionKey = '';
