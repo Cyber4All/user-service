@@ -24,6 +24,7 @@ import {
   sentryRequestHandler,
   sentryErrorHandler
 } from './shared/SentryConnector';
+import { CognitoIdentityManager } from './CognitoIdentityManager';
 
 const HTTP_SERVER_PORT = process.env.PORT || 3000;
 
@@ -54,6 +55,7 @@ async function startApp() {
  */
 function initModules() {
   UserMetaRetriever.initialize();
+  CognitoIdentityManager.initialize();
 }
 
 /**
@@ -134,7 +136,7 @@ function attachAuthenticatedRouters(app: express.Express) {
     )
   );
   app.use(UserMetaRetriever.expressRouter);
-
+  app.use(CognitoIdentityManager.expressRouter);
   // TODO: Deprecate admin router and middleware in favor of default router with proper authorization logic in interactors
   app.use(enforceAdminAccess);
   app.use(
