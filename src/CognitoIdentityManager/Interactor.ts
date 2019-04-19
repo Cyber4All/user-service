@@ -29,7 +29,7 @@ const IDENTITY_POOL_ID = process.env.COGNITO_IDENTITY_POOL_ID;
  *
  * @returns {Promise<AWS.CognitoIdentity.GetOpenIdTokenForDeveloperIdentityResponse>}
  */
-export async function getOpenIdToken({
+export function getOpenIdToken({
   requester,
   userId
 }: {
@@ -48,7 +48,7 @@ export async function getOpenIdToken({
       Logins,
       IdentityPoolId: IDENTITY_POOL_ID
     };
-    return await Cognito.getOpenIdTokenForDeveloperIdentity(params).promise();
+    return Cognito.getOpenIdTokenForDeveloperIdentity(params).promise();
   } catch (e) {
     handleError(e);
   }
