@@ -7,6 +7,9 @@ import { UserInteractor } from '../interactors/interactors';
 import * as AuthInteractor from '../interactors/AuthenticationInteractor';
 import { initializePrivate } from '../collection-role/RouteHandler';
 import { reportError } from '../shared/SentryConnector';
+import { UserToken } from '../types/user-token';
+import { mapErrorToResponseData } from '../Error';
+import { CognitoIdentityManager } from '../CognitoIdentityManager';
 export default class AuthRouteHandler {
   constructor(
     private dataStore: DataStore,
@@ -110,6 +113,27 @@ export default class AuthRouteHandler {
           responder.sendOperationError('Invalid token');
         }
       });
+
+    router.get('/users/:id/tokens', async (req, res) => {
+      try {
+        const requester: UserToken = req.user;
+        const userId: string = req.params.userId;
+        const tokens: any = {};
+        if (req.params.openId) {
+          const openIdToken = await CognitoIdentityManager.adapter.getOpenIdToken(
+            {
+              requester,
+              userId
+            }
+          );
+          tokens.openIdToken = openIdToken;
+        }
+        res.send(tokens);
+      } catch (e) {
+        const { code, message } = mapErrorToResponseData(e);
+        res.status(code).json({ message });
+      }
+    });
 
     // refresh token
     router.get('/users/tokens/refresh', async (req, res) => {
