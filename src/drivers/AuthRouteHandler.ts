@@ -122,15 +122,24 @@ export default class AuthRouteHandler {
         const fields: string[] = req.query.fields
           ? req.query.fields.split(',')
           : [];
-        if (fields.includes('openId')) {
-          const openIdToken = await CognitoIdentityManager.adapter.getOpenIdToken(
-            {
-              requester,
-              userId
-            }
-          );
-          tokens.openId = openIdToken;
+        if (fields.length) {
+          // Grab selected token properties
+          if (fields.includes('openId')) {
+            tokens.openId = await CognitoIdentityManager.adapter.getOpenIdToken(
+              {
+                requester,
+                userId
+              }
+            );
+          }
+        } else {
+          // Grab all token properties
+          tokens.openId = await CognitoIdentityManager.adapter.getOpenIdToken({
+            requester,
+            userId
+          });
         }
+
         res.send(tokens);
       } catch (e) {
         const { code, message } = mapErrorToResponseData(e);
