@@ -136,7 +136,6 @@ function attachAuthenticatedRouters(app: express.Express) {
     )
   );
   app.use(UserMetaRetriever.expressRouter);
-  app.use(CognitoIdentityManager.expressRouter);
   // TODO: Deprecate admin router and middleware in favor of default router with proper authorization logic in interactors
   app.use(enforceAdminAccess);
   app.use(

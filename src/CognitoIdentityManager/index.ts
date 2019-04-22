@@ -1,26 +1,18 @@
-import {
-  expressServiceModule,
-  ExpressServiceModule,
-} from '../shared/ExpressServiceModule';
-import { ModuleAdapter, ExpressRouterAdapter } from './adapters';
+import { serviceModule, ServiceModule } from '../shared/ServiceModule';
+import { ModuleAdapter } from './adapters';
 
 /**
  * Module encapsulating all things related to managing Cognito Identities
- * Since this module is an extension of `ExpressServiceModule`
- * functionality of this module can be access through it's ModuleAdapter or the resolvers
+ * Since this module is an extension of `ServiceModule`
+ * functionality of this module can be access through it's ModuleAdapter
  *
  * @export
  * @class CognitoIdentityManager
- * @extends {ExpressServiceModule}
+ * @extends {ServiceModule}
  */
 
-@expressServiceModule({
+@serviceModule({
   adapter: ModuleAdapter,
-  expressRouter: ExpressRouterAdapter.buildRouter(),
-  /**
-   * Set module's providers
-   * Providers include concrete implementations for Drivers and Gateways that will be used at the interactor level
-   */
-  providers: [],
+  providers: []
 })
-export class CognitoIdentityManager extends ExpressServiceModule {}
+export class CognitoIdentityManager extends ServiceModule {}
