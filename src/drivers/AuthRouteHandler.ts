@@ -119,7 +119,10 @@ export default class AuthRouteHandler {
         const requester: UserToken = req.user;
         const userId: string = req.params.userId;
         const tokens: any = {};
-        if (req.params.openId) {
+        const fields: string[] = req.query.fields
+          ? req.query.fields.split(',')
+          : [];
+        if (fields.includes('openId')) {
           const openIdToken = await CognitoIdentityManager.adapter.getOpenIdToken(
             {
               requester,
