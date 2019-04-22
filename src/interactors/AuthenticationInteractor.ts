@@ -40,6 +40,7 @@ export async function login(
     if (authenticated) {
       const token = TokenManager.generateToken(user);
       const userResponse: UserToken = {
+        id: user.id,
         username: user.username,
         name: user.name,
         email: user.email,
