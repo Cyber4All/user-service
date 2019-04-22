@@ -126,7 +126,7 @@ export default class AuthRouteHandler {
               userId
             }
           );
-          tokens.openIdToken = openIdToken;
+          tokens.openId = openIdToken;
         }
         res.send(tokens);
       } catch (e) {
