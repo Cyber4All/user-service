@@ -117,7 +117,7 @@ export default class AuthRouteHandler {
     router.get('/users/:id/tokens', async (req, res) => {
       try {
         const requester: UserToken = req.user;
-        const userId: string = req.params.userId;
+        const userId: string = req.params.id;
         const tokens: any = {};
         const fields: string[] = req.query.fields
           ? req.query.fields.split(',')
