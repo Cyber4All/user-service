@@ -2,6 +2,11 @@ import 'dotenv/config';
 import * as AWS from 'aws-sdk';
 import { UserToken } from './typings';
 import { handleError, ResourceError, ResourceErrorReason } from '../Error';
+import {
+  authorizeRequest,
+  requesterIsOwner,
+  requesterIsAdminOrEditor
+} from './AuthorizationManager';
 
 const SDK_CONFIG = {
   credentials: {
@@ -37,7 +42,7 @@ export function getOpenIdToken({
   userId: string;
 }): Promise<AWS.CognitoIdentity.GetOpenIdTokenForDeveloperIdentityResponse> {
   try {
-    authorizeOwner({ requester, userId });
+    authorizeRequest([requesterIsOwner({ requester, userId })]);
     validateRequestParams({
       params: [userId],
       mustProvide: ['user id']
