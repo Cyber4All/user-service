@@ -18,7 +18,7 @@ describe('LearningObjectDownload: AuthorizationManager', () => {
   });
 
   describe('requesterIsOwner', () => {
-    it('should return true (Username matches)', () => {
+    it('should return true (Id matches)', () => {
       expect(
         auth.requesterIsOwner({
           userId: userToken.id,
@@ -26,7 +26,7 @@ describe('LearningObjectDownload: AuthorizationManager', () => {
         })
       ).toBe(true);
     });
-    it('should return false (Username does not match)', () => {
+    it('should return false (Id does not match)', () => {
       expect(
         auth.requesterIsOwner({
           userId: 'not requester',
