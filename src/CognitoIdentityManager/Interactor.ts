@@ -22,6 +22,7 @@ AWS.config.region = SDK_CONFIG.region;
 const Cognito = new AWS.CognitoIdentity();
 const DEVELOPER_PROVIDER = process.env.COGNITO_DEVELOPER_PROVIDER;
 const IDENTITY_POOL_ID = process.env.COGNITO_IDENTITY_POOL_ID;
+const ADMIN_IDENTITY_POOL_ID = process.env.COGNITO_ADMIN_IDENTITY_POOL_ID;
 
 /**
  * Retrieves OpenIdToken for user
@@ -49,9 +50,13 @@ export function getOpenIdToken({
     });
     const Logins = {};
     Logins[DEVELOPER_PROVIDER] = requester.username;
+
+    const IdentityPoolId = requesterIsAdminOrEditor(requester)
+      ? ADMIN_IDENTITY_POOL_ID
+      : IDENTITY_POOL_ID;
     const params = {
       Logins,
-      IdentityPoolId: IDENTITY_POOL_ID
+      IdentityPoolId
     };
     return Cognito.getOpenIdTokenForDeveloperIdentity(params).promise();
   } catch (e) {
