@@ -65,30 +65,6 @@ export function getOpenIdToken({
 }
 
 /**
- * Verifies requester is the owner of the resource requested.
- * Resource error is thrown if requester's id does not match user id
- *
- * @param {UserToken} requester [Data about the requester]
- * @param {string} userId [Id of the user to get OpenIdToken for]
- *
- * @returns {(never | void)}
- */
-function authorizeOwner({
-  requester,
-  userId
-}: {
-  requester: UserToken;
-  userId: string;
-}): never | void {
-  if (!requester || (requester && requester.id !== userId)) {
-    throw new ResourceError(
-      'Invalid access!',
-      ResourceErrorReason.INVALID_ACCESS
-    );
-  }
-}
-
-/**
  * Validates all required values are provided for request
  *
  * @param {any[]} params
