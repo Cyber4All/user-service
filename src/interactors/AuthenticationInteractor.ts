@@ -76,7 +76,7 @@ export async function register(
   datastore: DataStore,
   hasher: HashInterface,
   user: AuthUser
-): Promise<{ token: string; openId: OpenIdToken; user: AuthUser }> {
+): Promise<{ bearer: string; openId: OpenIdToken; user: AuthUser }> {
   try {
     if (
       isValidUsername(user.username) &&
@@ -88,7 +88,7 @@ export async function register(
       formattedUser.accessGroups = [];
       const id = await datastore.insertUser(formattedUser);
       user.id = id;
-      const token = TokenManager.generateToken(user);
+      const bearer = TokenManager.generateToken(user);
       const requester: UserToken = {
         id,
         username: user.username,
@@ -102,7 +102,7 @@ export async function register(
         requester
       });
       return {
-        token,
+        bearer,
         openId,
         user: new AuthUser(formattedUser.toPlainObject())
       };

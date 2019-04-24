@@ -81,11 +81,7 @@ export default class RouteHandler {
         const responder = this.responseFactory.buildResponder(res);
         const user = new AuthUser(req.body);
         try {
-          const registeredUser = await register(
-            this.dataStore,
-            this.hasher,
-            user
-          );
+          const token = await register(this.dataStore, this.hasher, user);
           try {
             const otaCode = await OTACodeInteractor.generateOTACode(
               this.dataStore,
@@ -97,8 +93,8 @@ export default class RouteHandler {
               user.email,
               otaCode
             );
-            responder.setCookie('presence', registeredUser.token);
-            responder.sendUser(registeredUser.user.toPlainObject());
+            responder.setCookie('presence', token.bearer);
+            responder.sendUser({ ...token, user: token.user.toPlainObject() });
           } catch (e) {
             console.log(e);
           }
