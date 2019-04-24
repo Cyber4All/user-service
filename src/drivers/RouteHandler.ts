@@ -2,12 +2,17 @@ import * as express from 'express';
 import * as request from 'request';
 import { REDIRECT_ROUTES } from '../environment/routes';
 import { login, register } from '../interactors/AuthenticationInteractor';
-import { MailerInteractor, OTACodeInteractor, UserInteractor } from '../interactors/interactors';
+import {
+  MailerInteractor,
+  OTACodeInteractor,
+  UserInteractor
+} from '../interactors/interactors';
 import { DataStore, HashInterface, Mailer } from '../interfaces/interfaces';
 import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
 import { AuthUser } from '../types/auth-user';
 import * as UserStatsRouteHandler from '../UserStats/UserStatsRouteHandler';
 import { UserResponseFactory } from './drivers';
+import { mapErrorToResponseData } from '../Error';
 type Router = express.Router;
 const version = require('../../package.json').version;
 
@@ -117,20 +122,17 @@ export default class RouteHandler {
     router.post('/users/tokens', async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
-        const userPayload = await login(
+        const token = await login(
           this.dataStore,
           this.hasher,
           req.body.username,
           req.body.password
         );
-        if (userPayload === false) {
-          responder.invalidLogin();
-        } else if (typeof userPayload !== 'boolean') {
-          responder.setCookie('presence', userPayload.token);
-          responder.sendUser(userPayload.user);
-        }
+        responder.setCookie('presence', token.bearer);
+        responder.sendUser({ ...token, user: token.user.toPlainObject() });
       } catch (e) {
-        responder.sendOperationError(e);
+        const { code, message } = mapErrorToResponseData(e);
+        res.status(code).json({ message });
       }
     });
 

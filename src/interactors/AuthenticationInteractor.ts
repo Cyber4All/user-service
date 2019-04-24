@@ -5,6 +5,9 @@ import { sanitizeText } from './UserInteractor';
 import { AuthUser } from '../types/auth-user';
 import { UserToken } from '../types/user-token';
 import { reportError } from '../shared/SentryConnector';
+import { CognitoIdentityManager } from '../CognitoIdentityManager';
+import { OpenIdToken } from '../CognitoIdentityManager/typings';
+import { ResourceError, ResourceErrorReason, handleError } from '../Error';
 
 /**
  * Attempts user login via datastore and issues JWT access token
@@ -22,38 +25,40 @@ export async function login(
   hasher: HashInterface,
   username: string,
   password: string
-): Promise<boolean | { token: string; user: UserToken }> {
+): Promise<{ bearer: string; openId: OpenIdToken; user: User }> {
+  const invalidCredentialsError = new ResourceError(
+    'Invalid username or password',
+    ResourceErrorReason.BAD_REQUEST
+  );
   try {
-    let id;
-    let authenticated = false;
     const userName = sanitizeText(username);
-    try {
-      id = await dataStore.findUser(userName);
-    } catch (e) {
-      console.error(e);
-      return authenticated;
+    const id = await dataStore.findUser(userName);
+    if (!id) {
+      throw invalidCredentialsError;
     }
 
     const user = await dataStore.loadUser(id);
-    authenticated = await hasher.verify(password, user.password);
-
-    if (authenticated) {
-      const token = TokenManager.generateToken(user);
-      const userResponse: UserToken = {
-        id: user.id,
-        username: user.username,
-        name: user.name,
-        email: user.email,
-        organization: user.organization,
-        emailVerified: user.emailVerified,
-        accessGroups: user.accessGroups
-      };
-      return {token, user: userResponse};
+    const authenticated = await hasher.verify(password, user.password);
+    if (!authenticated) {
+      throw invalidCredentialsError;
     }
-    return authenticated;
+    const bearer = TokenManager.generateToken(user);
+    const requester: UserToken = {
+      id: user.id,
+      username: user.username,
+      name: user.name,
+      email: user.email,
+      organization: user.organization,
+      emailVerified: user.emailVerified,
+      accessGroups: user.accessGroups
+    };
+    const openId = await CognitoIdentityManager.getOpenIdToken({
+      requester
+    });
+
+    return { bearer, openId, user };
   } catch (e) {
-    console.log(e);
-    return Promise.reject(`Problem while trying to login. Error:${e}`);
+    handleError(e);
   }
 }
 
@@ -87,9 +92,8 @@ export async function register(
     return Promise.reject(new Error('Invalid username provided'));
   } catch (e) {
     if (e.message.includes('email')) {
-      return Promise.reject(new Error('Duplicate/Invalid Email Found'))
-    }
-    else {
+      return Promise.reject(new Error('Duplicate/Invalid Email Found'));
+    } else {
       reportError(e);
       return Promise.reject(new Error('Internal Server Error'));
     }
