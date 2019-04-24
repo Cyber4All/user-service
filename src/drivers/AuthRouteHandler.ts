@@ -114,39 +114,6 @@ export default class AuthRouteHandler {
         }
       });
 
-    router.get('/users/:id/tokens', async (req, res) => {
-      try {
-        const requester: UserToken = req.user;
-        const userId: string = req.params.id;
-        const tokens: any = {};
-        const fields: string[] = req.query.fields
-          ? req.query.fields.split(',')
-          : [];
-        if (fields.length) {
-          // Grab selected token properties
-          if (fields.includes('openId')) {
-            tokens.openId = await CognitoIdentityManager.adapter.getOpenIdToken(
-              {
-                requester,
-                userId
-              }
-            );
-          }
-        } else {
-          // Grab all token properties
-          tokens.openId = await CognitoIdentityManager.adapter.getOpenIdToken({
-            requester,
-            userId
-          });
-        }
-
-        res.send(tokens);
-      } catch (e) {
-        const { code, message } = mapErrorToResponseData(e);
-        res.status(code).json({ message });
-      }
-    });
-
     // refresh token
     router.get('/users/tokens/refresh', async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
