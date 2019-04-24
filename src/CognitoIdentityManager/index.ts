@@ -1,6 +1,5 @@
 import { serviceModule, ServiceModule } from '../shared/ServiceModule';
-import { ModuleAdapter } from './adapters';
-
+import * as Interactor from './Interactor';
 /**
  * Module encapsulating all things related to managing Cognito Identities
  * Since this module is an extension of `ServiceModule`
@@ -12,7 +11,10 @@ import { ModuleAdapter } from './adapters';
  */
 
 @serviceModule({
-  adapter: ModuleAdapter,
   providers: []
 })
 export class CognitoIdentityManager extends ServiceModule {}
+
+export namespace CognitoIdentityManager {
+  export const getOpenIdToken = Interactor.getOpenIdToken;
+}
