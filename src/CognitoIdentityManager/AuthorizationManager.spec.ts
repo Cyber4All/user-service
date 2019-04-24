@@ -17,35 +17,6 @@ describe('LearningObjectDownload: AuthorizationManager', () => {
     };
   });
 
-  describe('requesterIsOwner', () => {
-    it('should return true (Id matches)', () => {
-      expect(
-        auth.requesterIsOwner({
-          userId: userToken.id,
-          requester: userToken
-        })
-      ).toBe(true);
-    });
-    it('should return false (Id does not match)', () => {
-      expect(
-        auth.requesterIsOwner({
-          userId: 'not requester',
-          requester: userToken
-        })
-      ).toBe(false);
-    });
-    it('should return false (userToken undefined)', () => {
-      // @ts-ignore
-      userToken = undefined;
-      expect(
-        auth.requesterIsOwner({
-          userId: 'not requester',
-          requester: userToken
-        })
-      ).toBe(false);
-    });
-  });
-
   describe('requesterIsAdmin', () => {
     it('should return true (Only admin accessGroup)', () => {
       userToken.accessGroups = ['admin'];

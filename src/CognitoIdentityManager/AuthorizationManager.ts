@@ -11,24 +11,6 @@ enum AccessGroup {
 }
 
 /**
- * Checks if the requester is the owner by comparing `userId` against requester's id
- *
- * @export
- * @param {string} userId [Id of the owner]
- * @param {UserToken} requester [Token data of the requester]
- * @returns {boolean}
- */
-export function requesterIsOwner({
-  userId,
-  requester
-}: {
-  userId: string;
-  requester: UserToken;
-}): boolean {
-  return requester != null && requester.id === userId;
-}
-
-/**
  * Checks if requester is an Admin by checking if their `accessGroups` contain the admin privilege
  *
  * @export
