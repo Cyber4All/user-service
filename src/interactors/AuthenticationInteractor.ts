@@ -78,43 +78,48 @@ export async function register(
   user: AuthUser
 ): Promise<{ bearer: string; openId: OpenIdToken; user: AuthUser }> {
   try {
-    if (
-      isValidUsername(user.username) &&
-      !(await datastore.identifierInUse(user.username))
-    ) {
-      const pwdhash = await hasher.hash(user.password);
-      user.password = pwdhash;
-      const formattedUser = sanitizeUser(user);
-      formattedUser.accessGroups = [];
-      const id = await datastore.insertUser(formattedUser);
-      user.id = id;
-      const bearer = TokenManager.generateToken(user);
-      const requester: UserToken = {
-        id,
-        username: user.username,
-        name: user.name,
-        email: user.email,
-        organization: user.organization,
-        emailVerified: user.emailVerified,
-        accessGroups: user.accessGroups
-      };
-      const openId = await CognitoIdentityManager.getOpenIdToken({
-        requester
-      });
-      return {
-        bearer,
-        openId,
-        user: new AuthUser(formattedUser.toPlainObject())
-      };
+    if (!isValidUsername(user.username)) {
+      throw new ResourceError(
+        'Invalid username provided.',
+        ResourceErrorReason.BAD_REQUEST
+      );
     }
-    return Promise.reject(new Error('Invalid username provided'));
+    if (await datastore.identifierInUse(user.username)) {
+      throw new ResourceError(
+        'Username is already in use',
+        ResourceErrorReason.BAD_REQUEST
+      );
+    }
+
+    const pwdhash = await hasher.hash(user.password);
+    user.password = pwdhash;
+
+    const formattedUser = sanitizeUser(user);
+    formattedUser.accessGroups = [];
+
+    const id = await datastore.insertUser(formattedUser);
+    user.id = id;
+
+    const bearer = TokenManager.generateToken(user);
+    const requester: UserToken = {
+      id,
+      username: user.username,
+      name: user.name,
+      email: user.email,
+      organization: user.organization,
+      emailVerified: user.emailVerified,
+      accessGroups: user.accessGroups
+    };
+    const openId = await CognitoIdentityManager.getOpenIdToken({
+      requester
+    });
+    return {
+      bearer,
+      openId,
+      user: new AuthUser(formattedUser.toPlainObject())
+    };
   } catch (e) {
-    if (e.message.includes('email')) {
-      return Promise.reject(new Error('Duplicate/Invalid Email Found'));
-    } else {
-      reportError(e);
-      return Promise.reject(new Error('Internal Server Error'));
-    }
+    handleError(e);
   }
 }
 
