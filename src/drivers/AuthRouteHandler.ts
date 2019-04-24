@@ -108,7 +108,7 @@ export default class AuthRouteHandler {
           dataStore: this.dataStore
         });
         responder.setCookie('presence', token.bearer);
-        responder.sendUser({ ...token, user: token.user.toPlainObject() });
+        res.send({ ...token, user: token.user.toPlainObject() });
       } catch (e) {
         const { code, message } = mapErrorToResponseData(e);
         res.status(code).json({ message });
@@ -125,7 +125,7 @@ export default class AuthRouteHandler {
           dataStore: this.dataStore
         });
         responder.setCookie('presence', token.bearer);
-        responder.sendUser({ ...token, user: token.user.toPlainObject() });
+        res.send({ ...token, user: token.user.toPlainObject() });
       } catch (error) {
         const { code, message } = mapErrorToResponseData(e);
         res.status(code).json({ message });

@@ -13,6 +13,7 @@ import { AuthUser } from '../types/auth-user';
 import * as UserStatsRouteHandler from '../UserStats/UserStatsRouteHandler';
 import { UserResponseFactory } from './drivers';
 import { mapErrorToResponseData } from '../Error';
+import { reportError } from '../shared/SentryConnector';
 type Router = express.Router;
 const version = require('../../package.json').version;
 
@@ -82,24 +83,26 @@ export default class RouteHandler {
         const user = new AuthUser(req.body);
         try {
           const token = await register(this.dataStore, this.hasher, user);
-          try {
-            const otaCode = await OTACodeInteractor.generateOTACode(
-              this.dataStore,
-              ACCOUNT_ACTIONS.VERIFY_EMAIL,
-              user.email
-            );
-            MailerInteractor.sendEmailVerification(
-              this.mailer,
-              user.email,
-              otaCode
-            );
-            responder.setCookie('presence', token.bearer);
-            responder.sendUser({ ...token, user: token.user.toPlainObject() });
-          } catch (e) {
-            console.log(e);
-          }
+
+          OTACodeInteractor.generateOTACode(
+            this.dataStore,
+            ACCOUNT_ACTIONS.VERIFY_EMAIL,
+            user.email
+          )
+            .then(otaCode => {
+              MailerInteractor.sendEmailVerification(
+                this.mailer,
+                user.email,
+                otaCode
+              );
+            })
+            .catch(e => reportError(e));
+
+          responder.setCookie('presence', token.bearer);
+          res.send({ ...token, user: token.user.toPlainObject() });
         } catch (e) {
-          responder.sendOperationError(e);
+          const { code, message } = mapErrorToResponseData(e);
+          res.status(code).json({ message });
         }
       });
 
@@ -125,7 +128,7 @@ export default class RouteHandler {
           req.body.password
         );
         responder.setCookie('presence', token.bearer);
-        responder.sendUser({ ...token, user: token.user.toPlainObject() });
+        res.send({ ...token, user: token.user.toPlainObject() });
       } catch (e) {
         const { code, message } = mapErrorToResponseData(e);
         res.status(code).json({ message });
