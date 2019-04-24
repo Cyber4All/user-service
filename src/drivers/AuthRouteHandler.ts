@@ -99,33 +99,36 @@ export default class AuthRouteHandler {
       }
     });
 
-    router
-      .route('/users/tokens')
-      // Validate Token
-      // Param: Valid token (for testing, get from users/tokens route)
-      // if valid, returns OK
-      // else, returns "INVALID TOKEN"
-      .get(async (req, res) => {
-        const responder = this.responseFactory.buildResponder(res);
-        try {
-          responder.sendUser(req.user);
-        } catch (e) {
-          responder.sendOperationError('Invalid token');
-        }
-      });
+    router.route('/users/tokens').get(async (req, res) => {
+      const responder = this.responseFactory.buildResponder(res);
+      try {
+        const requester: UserToken = req.user;
+        const token = await AuthInteractor.refreshToken({
+          requester,
+          dataStore: this.dataStore
+        });
+        responder.setCookie('presence', token.bearer);
+        responder.sendUser({ ...token, user: token.user.toPlainObject() });
+      } catch (e) {
+        const { code, message } = mapErrorToResponseData(e);
+        res.status(code).json({ message });
+      }
+    });
 
     // refresh token
     router.get('/users/tokens/refresh', async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
-        const userPayload = await AuthInteractor.refreshToken({
-          dataStore: this.dataStore,
-          username: req.user.username
+        const requester: UserToken = req.user;
+        const token = await AuthInteractor.refreshToken({
+          requester,
+          dataStore: this.dataStore
         });
-        responder.setCookie('presence', userPayload.token);
-        responder.sendUser(userPayload.user.toPlainObject());
+        responder.setCookie('presence', token.bearer);
+        responder.sendUser({ ...token, user: token.user.toPlainObject() });
       } catch (error) {
-        responder.sendOperationError(`Error refreshing token ${error}`);
+        const { code, message } = mapErrorToResponseData(e);
+        res.status(code).json({ message });
       }
     });
 

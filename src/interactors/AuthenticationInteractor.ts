@@ -25,7 +25,7 @@ export async function login(
   hasher: HashInterface,
   username: string,
   password: string
-): Promise<{ bearer: string; openId: OpenIdToken; user: User }> {
+): Promise<{ bearer: string; openId: OpenIdToken; user: AuthUser }> {
   const invalidCredentialsError = new ResourceError(
     'Invalid username or password',
     ResourceErrorReason.BAD_REQUEST
@@ -76,7 +76,7 @@ export async function register(
   datastore: DataStore,
   hasher: HashInterface,
   user: AuthUser
-): Promise<{ token: string; user: User }> {
+): Promise<{ token: string; openId: OpenIdToken; user: AuthUser }> {
   try {
     if (
       isValidUsername(user.username) &&
@@ -85,9 +85,27 @@ export async function register(
       const pwdhash = await hasher.hash(user.password);
       user.password = pwdhash;
       const formattedUser = sanitizeUser(user);
-      await datastore.insertUser(formattedUser);
+      formattedUser.accessGroups = [];
+      const id = await datastore.insertUser(formattedUser);
+      user.id = id;
       const token = TokenManager.generateToken(user);
-      return { token, user: new User(formattedUser) };
+      const requester: UserToken = {
+        id,
+        username: user.username,
+        name: user.name,
+        email: user.email,
+        organization: user.organization,
+        emailVerified: user.emailVerified,
+        accessGroups: user.accessGroups
+      };
+      const openId = await CognitoIdentityManager.getOpenIdToken({
+        requester
+      });
+      return {
+        token,
+        openId,
+        user: new AuthUser(formattedUser.toPlainObject())
+      };
     }
     return Promise.reject(new Error('Invalid username provided'));
   } catch (e) {
@@ -137,18 +155,36 @@ export async function passwordMatch(
  * @export
  * @param {{
  *   dataStore: DataStore;
- *   username: string;
+ *   requester: UserToken;
  * }} params
- * @returns {Promise<{ token: string; user: User }>}
+ * @returns {Promise<{ bearer: string; openId: OpenIdToken; user: AuthUser }>}
  */
-export async function refreshToken(params: {
+export async function refreshToken({
+  dataStore,
+  requester
+}: {
   dataStore: DataStore;
-  username: string;
-}): Promise<{ token: string; user: User }> {
-  const id = await params.dataStore.findUser(params.username);
-  const user = await params.dataStore.loadUser(id);
-  const token = TokenManager.generateToken(user);
-  return { token, user: new User(user) };
+  requester: UserToken;
+}): Promise<{ bearer: string; openId: OpenIdToken; user: AuthUser }> {
+  try {
+    const user = await dataStore.loadUser(requester.id);
+    const bearer = TokenManager.generateToken(user);
+    const newUserToken: UserToken = {
+      id: user.id,
+      username: user.username,
+      name: user.name,
+      email: user.email,
+      organization: user.organization,
+      emailVerified: user.emailVerified,
+      accessGroups: user.accessGroups
+    };
+    const openId = await CognitoIdentityManager.getOpenIdToken({
+      requester: newUserToken
+    });
+    return { bearer, openId, user };
+  } catch (e) {
+    handleError(e);
+  }
 }
 
 function sanitizeUser(user: AuthUser): AuthUser {
