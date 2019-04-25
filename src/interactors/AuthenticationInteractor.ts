@@ -42,7 +42,7 @@ export async function login(
     if (!authenticated) {
       throw invalidCredentialsError;
     }
-    const bearer = TokenManager.generateToken(user);
+    const bearer = TokenManager.generateBearerToken(user);
     const requester: UserToken = {
       id: user.id,
       username: user.username,
@@ -100,7 +100,7 @@ export async function register(
     const id = await datastore.insertUser(formattedUser);
     user.id = id;
 
-    const bearer = TokenManager.generateToken(user);
+    const bearer = TokenManager.generateBearerToken(user);
     const requester: UserToken = {
       id,
       username: user.username,
@@ -173,7 +173,7 @@ export async function refreshToken({
 }): Promise<{ bearer: string; openId: OpenIdToken; user: AuthUser }> {
   try {
     const user = await dataStore.loadUser(requester.id);
-    const bearer = TokenManager.generateToken(user);
+    const bearer = TokenManager.generateBearerToken(user);
     const newUserToken: UserToken = {
       id: user.id,
       username: user.username,
