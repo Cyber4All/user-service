@@ -8,14 +8,21 @@ import MockDriver from '../drivers/MockDriver';
 import { MOCK_OBJECTS } from '../tests/mocks';
 import { MockHashDriver } from '../drivers/MockHashDriver';
 import { AuthUser } from '../types/auth-user';
+import { MockCognitoGateway } from '../drivers/MockCognitoGateway';
 const driver = new MockDriver(); // DataStore
 const hasher = new MockHashDriver(); // Hasher
 const expect = require('chai').expect;
-
+const cognitoGateway = new MockCognitoGateway();
 describe('AuthenticationInteractor', () => {
   describe('#login', () => {
     it('should pass for correct username and password', done => {
-      login(driver, hasher, MOCK_OBJECTS.USERNAME, MOCK_OBJECTS.PASSWORD)
+      login(
+        driver,
+        hasher,
+        MOCK_OBJECTS.USERNAME,
+        MOCK_OBJECTS.PASSWORD,
+        cognitoGateway
+      )
         .then(val => {
           expect(val).to.be.a('object');
           done();
@@ -28,7 +35,13 @@ describe('AuthenticationInteractor', () => {
     });
 
     it('should fail for incorrect password', done => {
-      login(driver, hasher, MOCK_OBJECTS.USERNAME, MOCK_OBJECTS.EMPTY_STRING)
+      login(
+        driver,
+        hasher,
+        MOCK_OBJECTS.USERNAME,
+        MOCK_OBJECTS.EMPTY_STRING,
+        cognitoGateway
+      )
         .then(val => {
           expect.fail();
           done();
@@ -39,7 +52,13 @@ describe('AuthenticationInteractor', () => {
         });
     });
     it('should fail for incorrect user', done => {
-      login(driver, hasher, MOCK_OBJECTS.EMPTY_STRING, MOCK_OBJECTS.PASSWORD)
+      login(
+        driver,
+        hasher,
+        MOCK_OBJECTS.EMPTY_STRING,
+        MOCK_OBJECTS.PASSWORD,
+        cognitoGateway
+      )
         .then(val => {
           expect.fail();
           done();
@@ -54,7 +73,8 @@ describe('AuthenticationInteractor', () => {
         driver,
         hasher,
         MOCK_OBJECTS.EMPTY_STRING,
-        MOCK_OBJECTS.EMPTY_STRING
+        MOCK_OBJECTS.EMPTY_STRING,
+        cognitoGateway
       )
         .then(val => {
           expect.fail();
@@ -71,9 +91,15 @@ describe('AuthenticationInteractor', () => {
 describe('AuthenticationInteractor', () => {
   describe('#register', () => {
     it('should fail for existing username', done => {
-      login(driver, hasher, MOCK_OBJECTS.USERNAME, MOCK_OBJECTS.PASSWORD)
+      login(
+        driver,
+        hasher,
+        MOCK_OBJECTS.USERNAME,
+        MOCK_OBJECTS.PASSWORD,
+        cognitoGateway
+      )
         .then(val => {
-          return register(driver, hasher, val['user'])
+          return register(driver, hasher, val['user'], cognitoGateway)
             .then(val => {
               expect.fail();
               done();
@@ -98,7 +124,7 @@ describe('AuthenticationInteractor', () => {
         bio: ''
       });
       try {
-        await register(driver, hasher, registrationRequest);
+        await register(driver, hasher, registrationRequest, cognitoGateway);
         expect.fail();
       } catch (error) {
         expect(error).to.be.a('error');

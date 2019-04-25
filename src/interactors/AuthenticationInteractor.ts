@@ -5,9 +5,12 @@ import { sanitizeText } from './UserInteractor';
 import { AuthUser } from '../types/auth-user';
 import { UserToken } from '../types/user-token';
 import { reportError } from '../shared/SentryConnector';
-import { CognitoIdentityManager } from '../CognitoIdentityManager';
-import { OpenIdToken } from '../CognitoIdentityManager/typings';
 import { ResourceError, ResourceErrorReason, handleError } from '../Error';
+import { OpenIdToken } from '../CognitoIdentityManager/typings';
+
+export interface CognitoGateway {
+  getOpenIdToken(params: { requester: UserToken }): Promise<OpenIdToken>;
+}
 
 /**
  * Attempts user login via datastore and issues JWT access token
@@ -24,7 +27,8 @@ export async function login(
   dataStore: DataStore,
   hasher: HashInterface,
   username: string,
-  password: string
+  password: string,
+  cognitoGateway: CognitoGateway
 ): Promise<{ bearer: string; openId: OpenIdToken; user: AuthUser }> {
   const invalidCredentialsError = new ResourceError(
     'Invalid username or password',
@@ -52,7 +56,7 @@ export async function login(
       emailVerified: user.emailVerified,
       accessGroups: user.accessGroups
     };
-    const openId = await CognitoIdentityManager.getOpenIdToken({
+    const openId = await cognitoGateway.getOpenIdToken({
       requester
     });
 
@@ -75,7 +79,8 @@ export async function login(
 export async function register(
   datastore: DataStore,
   hasher: HashInterface,
-  user: AuthUser
+  user: AuthUser,
+  cognitoGateway: CognitoGateway
 ): Promise<{ bearer: string; openId: OpenIdToken; user: AuthUser }> {
   try {
     if (!isValidUsername(user.username)) {
@@ -110,7 +115,7 @@ export async function register(
       emailVerified: user.emailVerified,
       accessGroups: user.accessGroups
     };
-    const openId = await CognitoIdentityManager.getOpenIdToken({
+    const openId = await cognitoGateway.getOpenIdToken({
       requester
     });
     return {
@@ -166,10 +171,12 @@ export async function passwordMatch(
  */
 export async function refreshToken({
   dataStore,
-  requester
+  requester,
+  cognitoGateway
 }: {
   dataStore: DataStore;
   requester: UserToken;
+  cognitoGateway: CognitoGateway;
 }): Promise<{ bearer: string; openId: OpenIdToken; user: AuthUser }> {
   try {
     const user = await dataStore.loadUser(requester.id);
@@ -183,7 +190,7 @@ export async function refreshToken({
       emailVerified: user.emailVerified,
       accessGroups: user.accessGroups
     };
-    const openId = await CognitoIdentityManager.getOpenIdToken({
+    const openId = await cognitoGateway.getOpenIdToken({
       requester: newUserToken
     });
     return { bearer, openId, user };

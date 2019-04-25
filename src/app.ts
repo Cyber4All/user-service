@@ -25,12 +25,14 @@ import {
   sentryErrorHandler
 } from './shared/SentryConnector';
 import { CognitoIdentityManager } from './CognitoIdentityManager';
+import { ProcessCognitoGateway } from './drivers/ProcessCognitoGateway';
 
 const HTTP_SERVER_PORT = process.env.PORT || 3000;
 
 const sendgridDriver = new SendgridDriver();
 const bcryptDriver = new BcryptDriver(10);
 const responseFactory = new UserResponseFactory();
+const cognitoGateway = new ProcessCognitoGateway();
 
 /**
  * Starts the application by
@@ -117,6 +119,7 @@ function attachPublicRouters(app: express.Express) {
       MongoDriver.getInstance(),
       bcryptDriver,
       sendgridDriver,
+      cognitoGateway,
       responseFactory
     )
   );
@@ -132,6 +135,7 @@ function attachAuthenticatedRouters(app: express.Express) {
     AuthRouteHandler.buildRouter(
       MongoDriver.getInstance(),
       bcryptDriver,
+      cognitoGateway,
       responseFactory
     )
   );

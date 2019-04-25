@@ -1,7 +1,11 @@
 import * as express from 'express';
 import * as request from 'request';
 import { REDIRECT_ROUTES } from '../environment/routes';
-import { login, register } from '../interactors/AuthenticationInteractor';
+import {
+  login,
+  register,
+  CognitoGateway
+} from '../interactors/AuthenticationInteractor';
 import {
   MailerInteractor,
   OTACodeInteractor,
@@ -22,6 +26,7 @@ export default class RouteHandler {
     private dataStore: DataStore,
     private hasher: HashInterface,
     private mailer: Mailer,
+    private cognitoGateway: CognitoGateway,
     private responseFactory: UserResponseFactory
   ) {}
 
@@ -34,9 +39,16 @@ export default class RouteHandler {
     dataStore: DataStore,
     hasher: HashInterface,
     mailer: Mailer,
+    cognitoGateway: CognitoGateway,
     responseFactory: UserResponseFactory
   ) {
-    const e = new RouteHandler(dataStore, hasher, mailer, responseFactory);
+    const e = new RouteHandler(
+      dataStore,
+      hasher,
+      mailer,
+      cognitoGateway,
+      responseFactory
+    );
     const router: Router = express.Router();
     e.setRoutes(router);
     return router;
@@ -82,7 +94,12 @@ export default class RouteHandler {
         const responder = this.responseFactory.buildResponder(res);
         const user = new AuthUser(req.body);
         try {
-          const token = await register(this.dataStore, this.hasher, user);
+          const token = await register(
+            this.dataStore,
+            this.hasher,
+            user,
+            this.cognitoGateway
+          );
 
           OTACodeInteractor.generateOTACode(
             this.dataStore,
@@ -125,7 +142,8 @@ export default class RouteHandler {
           this.dataStore,
           this.hasher,
           req.body.username,
-          req.body.password
+          req.body.password,
+          this.cognitoGateway
         );
         responder.setCookie('presence', token.bearer);
         res.send({ ...token, user: token.user.toPlainObject() });

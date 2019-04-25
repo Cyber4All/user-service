@@ -1,19 +1,23 @@
 import * as express from 'express';
 type Router = express.Router;
 import { DataStore, HashInterface } from '../interfaces/interfaces';
-import { passwordMatch } from '../interactors/AuthenticationInteractor';
+import {
+  passwordMatch,
+  CognitoGateway
+} from '../interactors/AuthenticationInteractor';
 import { UserResponseFactory } from './drivers';
 import { UserInteractor } from '../interactors/interactors';
+// tslint:disable-next-line:no-duplicate-imports
 import * as AuthInteractor from '../interactors/AuthenticationInteractor';
 import { initializePrivate } from '../collection-role/RouteHandler';
 import { reportError } from '../shared/SentryConnector';
 import { UserToken } from '../types/user-token';
 import { mapErrorToResponseData } from '../Error';
-import { CognitoIdentityManager } from '../CognitoIdentityManager';
 export default class AuthRouteHandler {
   constructor(
     private dataStore: DataStore,
     private hasher: HashInterface,
+    private cognitoGateway: CognitoGateway,
     private responseFactory: UserResponseFactory
   ) {}
 
@@ -25,9 +29,15 @@ export default class AuthRouteHandler {
   public static buildRouter(
     dataStore: DataStore,
     hasher: HashInterface,
+    cognitoGateway: CognitoGateway,
     responseFactory: UserResponseFactory
   ) {
-    const e = new AuthRouteHandler(dataStore, hasher, responseFactory);
+    const e = new AuthRouteHandler(
+      dataStore,
+      hasher,
+      cognitoGateway,
+      responseFactory
+    );
     const router: Router = express.Router();
     e.setRoutes(router);
     return router;
@@ -115,7 +125,8 @@ export default class AuthRouteHandler {
         const requester: UserToken = req.user;
         const token = await AuthInteractor.refreshToken({
           requester,
-          dataStore: this.dataStore
+          dataStore: this.dataStore,
+          cognitoGateway: this.cognitoGateway
         });
         responder.setCookie('presence', token.bearer);
         res.send({ ...token, user: token.user.toPlainObject() });
