@@ -23,7 +23,7 @@ const DEVELOPER_PROVIDER = process.env.COGNITO_DEVELOPER_PROVIDER;
 const IDENTITY_POOL_ID = process.env.COGNITO_IDENTITY_POOL_ID;
 const ADMIN_IDENTITY_POOL_ID = process.env.COGNITO_ADMIN_IDENTITY_POOL_ID;
 
-const TOKEN_DURATION = 86400;
+const TOKEN_DURATION = 86400; // 24 hours in seconds
 
 /**
  * Retrieves OpenIdToken for user
