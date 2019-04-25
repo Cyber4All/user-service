@@ -100,15 +100,8 @@ export default class AuthRouteHandler {
     });
 
     router.route('/users/tokens').get(async (req, res) => {
-      const responder = this.responseFactory.buildResponder(res);
       try {
-        const requester: UserToken = req.user;
-        const token = await AuthInteractor.refreshToken({
-          requester,
-          dataStore: this.dataStore
-        });
-        responder.setCookie('presence', token.bearer);
-        res.send({ ...token, user: token.user.toPlainObject() });
+        res.send(req.user);
       } catch (e) {
         const { code, message } = mapErrorToResponseData(e);
         res.status(code).json({ message });
