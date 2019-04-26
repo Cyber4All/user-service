@@ -7,7 +7,7 @@ import { AuthUser } from '../types/auth-user';
  *
  * TODO: Excess data should be removed from the token's payload (name, organization, email)
  */
-export function generateToken(user: AuthUser) {
+export function generateBearerToken(user: AuthUser) {
   const payload = {
     id: user.id,
     username: user.username,

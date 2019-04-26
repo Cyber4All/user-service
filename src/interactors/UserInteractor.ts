@@ -101,7 +101,7 @@ export class UserInteractor {
       if (edits.password) {
         this.updatePassword(dataStore, hasher, userName, edits.password);
       }
-      responder.setCookie('presence', TokenManager.generateToken(user));
+      responder.setCookie('presence', TokenManager.generateBearerToken(user));
       return Promise.resolve();
     } catch (e) {
       return Promise.reject(e);

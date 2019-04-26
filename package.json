@@ -1,6 +1,6 @@
 {
   "name": "user-service",
-  "version": "2.3.3",
+  "version": "2.4.0",
   "description": "A microservice for handling user account actions in the CLARK platform.",
   "main": "app.js",
   "scripts": {
@@ -30,6 +30,7 @@
     "@cyber4all/clark-taxonomy": "^2.0.0",
     "@sendgrid/mail": "^6.2.1",
     "@sentry/node": "^4.4.1",
+    "aws-sdk": "^2.440.0",
     "bcrypt": "^3.0.3",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
@@ -44,6 +45,7 @@
     "request-promise": "^4.2.2"
   },
   "devDependencies": {
+    "@types/aws-sdk": "^2.7.0",
     "@types/bcrypt": "^3.0.0",
     "@types/chai": "^4.1.5",
     "@types/cookie-parser": "^1.4.1",
