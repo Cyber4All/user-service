@@ -146,7 +146,9 @@ export default class RouteHandler {
           this.cognitoGateway
         );
         responder.setCookie('presence', token.bearer);
-        res.send({ ...token, user: token.user.toPlainObject() });
+        const user = token.user.toPlainObject();
+        const tokens = { bearer: token.bearer, openId: token.openId };
+        res.send({ ...user, tokens });
       } catch (e) {
         const { code, message } = mapErrorToResponseData(e);
         res.status(code).json({ message });
