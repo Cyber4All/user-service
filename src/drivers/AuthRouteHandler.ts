@@ -123,13 +123,13 @@ export default class AuthRouteHandler {
       const responder = this.responseFactory.buildResponder(res);
       try {
         const requester: UserToken = req.user;
-        const token = await AuthInteractor.refreshToken({
+        const tokens = await AuthInteractor.refreshToken({
           requester,
           dataStore: this.dataStore,
           cognitoGateway: this.cognitoGateway
         });
-        responder.setCookie('presence', token.bearer);
-        res.send({ ...token, user: token.user.toPlainObject() });
+        responder.setCookie('presence', tokens.bearer);
+        res.send({ ...tokens.user.toPlainObject(), tokens });
       } catch (error) {
         const { code, message } = mapErrorToResponseData(error);
         res.status(code).json({ message });
