@@ -4,7 +4,6 @@ import { DataStore, Mailer } from '../interfaces/interfaces';
 import { UserResponseFactory } from './drivers';
 import { AdminUserInteractor } from '../interactors/AdminUserInteractor';
 import { MailerInteractor } from '../interactors/interactors';
-const version = require('../../package.json').version;
 
 export default class AdminRouteHandler {
   constructor(
@@ -30,15 +29,6 @@ export default class AdminRouteHandler {
   }
 
   private setRoutes(router: Router) {
-    // GET: returns welcome message and version number
-    // No params necessary
-    router.get('/', (req, res) => {
-      res.json({
-        version,
-        message: `Welcome to the Users Admin API v${version}`
-      });
-    });
-
     // User Routes
     router.get('/users', async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
