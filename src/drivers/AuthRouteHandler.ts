@@ -131,7 +131,7 @@ export default class AuthRouteHandler {
         responder.setCookie('presence', token.bearer);
         res.send({ ...token, user: token.user.toPlainObject() });
       } catch (error) {
-        const { code, message } = mapErrorToResponseData(e);
+        const { code, message } = mapErrorToResponseData(error);
         res.status(code).json({ message });
       }
     });
