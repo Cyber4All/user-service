@@ -24,12 +24,15 @@ import {
   sentryRequestHandler,
   sentryErrorHandler
 } from './shared/SentryConnector';
+import { CognitoIdentityManager } from './CognitoIdentityManager';
+import { ProcessCognitoGateway } from './drivers/ProcessCognitoGateway';
 
 const HTTP_SERVER_PORT = process.env.PORT || 3000;
 
 const sendgridDriver = new SendgridDriver();
 const bcryptDriver = new BcryptDriver(10);
 const responseFactory = new UserResponseFactory();
+const cognitoGateway = new ProcessCognitoGateway();
 
 /**
  * Starts the application by
@@ -54,6 +57,7 @@ async function startApp() {
  */
 function initModules() {
   UserMetaRetriever.initialize();
+  CognitoIdentityManager.initialize();
 }
 
 /**
@@ -115,6 +119,7 @@ function attachPublicRouters(app: express.Express) {
       MongoDriver.getInstance(),
       bcryptDriver,
       sendgridDriver,
+      cognitoGateway,
       responseFactory
     )
   );
@@ -130,11 +135,11 @@ function attachAuthenticatedRouters(app: express.Express) {
     AuthRouteHandler.buildRouter(
       MongoDriver.getInstance(),
       bcryptDriver,
+      cognitoGateway,
       responseFactory
     )
   );
   app.use(UserMetaRetriever.expressRouter);
-
   // TODO: Deprecate admin router and middleware in favor of default router with proper authorization logic in interactors
   app.use(enforceAdminAccess);
   app.use(

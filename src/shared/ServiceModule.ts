@@ -26,11 +26,9 @@ export interface ClassProvider {
  * @class ServiceModule
  */
 export abstract class ServiceModule {
-  private static dependencies = new DependencyContainer();
+  private static dependencies: DependencyContainer;
   private static providerKeys: InjectionKey[] = [];
   private static _initialized: boolean = false;
-
-  protected static _adapter: any;
 
   protected constructor() {}
 
@@ -66,31 +64,10 @@ export abstract class ServiceModule {
     if (this._initialized) {
       this.dependencies = new DependencyContainer();
       this.providerKeys = [];
-      this._adapter = undefined;
       this._initialized = false;
     } else {
       throw new Error(`No instance of ${this.name} has been initialized.`);
     }
-  }
-
-  /**
-   * Returns the adapter for this module if the module has been initialized
-   * The adapter is used for connecting into a module's functionality
-   *
-   * @readonly
-   * @static
-   * @type {*}
-   * @memberof ServiceModule
-   */
-  static get adapter(): any {
-    if (!this._initialized) {
-      throw new Error(
-        `${
-          this.name
-        } has not yet been initialized. Please use the initializer to utilize this module.`
-      );
-    }
-    return this._adapter;
   }
 
   /**
@@ -114,6 +91,7 @@ export abstract class ServiceModule {
    * @memberof ServiceModule
    */
   static set providers(myProviders: ClassProvider[]) {
+    this.dependencies = new DependencyContainer();
     if (!this._initialized) {
       myProviders.forEach(provider => {
         let injectionKey = '';
@@ -160,22 +138,18 @@ export abstract class ServiceModule {
 
 /**
  * Decorator for the ServiceModule Class
- * Provides a clean interface for setting module's adapter and providers
+ * Provides a clean interface for setting module's providers
  *
  * @export
- * @param {any} adapter [The module's adapter that allows external modules to utilize functionality within the module]
  * @param {ClassProvider[]} providers [List of static dependencies to provide to the module]
  * @returns
  */
 export function serviceModule({
-  adapter,
   providers = []
 }: {
-  adapter: any;
   providers: ClassProvider[];
 }) {
   return function(target: any) {
-    target._adapter = adapter;
     target.providers = providers;
   };
 }

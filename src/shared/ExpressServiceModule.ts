@@ -34,25 +34,22 @@ export abstract class ExpressServiceModule extends ServiceModule {
 
 /**
  * Decorator for the ExpressServiceModule Class
- * Provides a clean interface for setting module's adapter, expressRouter,  and providers
+ * Provides a clean interface for setting module's, expressRouter,  and providers
  *
  * @export
- * @param {any} adapter [The module's adapter that allows external modules to utilize functionality within the module]
  * @param {Router} expressRouter [The module's adapter that allows express applications to utilize functionality within the module]
  * @param {ClassProvider[]} providers [List of static dependencies to provide to the module]
  * @returns
  */
 export function expressServiceModule({
-  adapter,
   expressRouter,
   providers = []
 }: {
-  adapter: any;
   expressRouter: Router;
   providers: ClassProvider[];
 }) {
   return function(target: any) {
     target._expressRouter = expressRouter;
-    serviceModule({ adapter, providers })(target);
+    serviceModule({ providers })(target);
   };
 }
