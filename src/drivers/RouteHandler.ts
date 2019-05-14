@@ -94,7 +94,7 @@ export default class RouteHandler {
         const responder = this.responseFactory.buildResponder(res);
         const user = new AuthUser(req.body);
         try {
-          const token = await register(
+          const tokens = await register(
             this.dataStore,
             this.hasher,
             user,
@@ -106,7 +106,7 @@ export default class RouteHandler {
             ACCOUNT_ACTIONS.VERIFY_EMAIL,
             user.email
           )
-            .then(otaCode => {
+            .then((otaCode) => {
               MailerInteractor.sendEmailVerification(
                 this.mailer,
                 user.email,
@@ -115,8 +115,8 @@ export default class RouteHandler {
             })
             .catch(e => reportError(e));
 
-          responder.setCookie('presence', token.bearer);
-          res.send({ ...token, user: token.user.toPlainObject() });
+          responder.setCookie('presence', tokens.bearer);
+          res.send({ ...tokens.user.toPlainObject(), tokens });
         } catch (e) {
           const { code, message } = mapErrorToResponseData(e);
           res.status(code).json({ message });
