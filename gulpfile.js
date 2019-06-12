@@ -8,7 +8,7 @@ const JSON_FILES = ['package.json', 'src/*.json', 'src/**/*.json'];
 // pull in the project TypeScript config
 const tsProject = ts.createProject('tsconfig.json');
 
-gulp.task('tsc', () => {
+gulp.task('tsc', ['assets'], () => {
   const tsResult = tsProject.src().pipe(tsProject());
   return tsResult.js.pipe(gulp.dest('dist'));
 });

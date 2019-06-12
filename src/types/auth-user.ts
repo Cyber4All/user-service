@@ -21,4 +21,7 @@ export class AuthUser extends User {
     this._password = user.password || '';
     this._accessGroups = user.accessGroups || [];
   }
+  toPlainObject(): Partial<AuthUser> {
+    return { ...super.toPlainObject(), accessGroups: this.accessGroups };
+  }
 }

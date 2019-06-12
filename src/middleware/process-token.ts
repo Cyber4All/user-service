@@ -34,7 +34,7 @@ export const handleProcessTokenError = (
   __: Response,
   next: NextFunction
 ) => {
-  if (error.name !== 'JsonWebTokenError') {
+  if (error.name !== 'UnauthorizedError' && error.name !== 'JsonWebTokenError') {
     reportError(error);
   }
   next();

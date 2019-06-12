@@ -3,6 +3,7 @@ import { UserToken } from '../types/user-token';
 
 describe('LearningObjectDownload: TokenEncoder', () => {
   const userToken: UserToken = {
+    id: '123',
     username: 'hello',
     name: 'hello world',
     email: 'someemail@email.com',

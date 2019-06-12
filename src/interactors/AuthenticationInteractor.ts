@@ -5,6 +5,12 @@ import { sanitizeText } from './UserInteractor';
 import { AuthUser } from '../types/auth-user';
 import { UserToken } from '../types/user-token';
 import { reportError } from '../shared/SentryConnector';
+import { ResourceError, ResourceErrorReason, handleError } from '../Error';
+import { OpenIdToken } from '../CognitoIdentityManager/typings';
+
+export interface CognitoGateway {
+  getOpenIdToken(params: { requester: UserToken }): Promise<OpenIdToken>;
+}
 
 /**
  * Attempts user login via datastore and issues JWT access token
@@ -21,38 +27,42 @@ export async function login(
   dataStore: DataStore,
   hasher: HashInterface,
   username: string,
-  password: string
-): Promise<boolean | { token: string; user: UserToken }> {
+  password: string,
+  cognitoGateway: CognitoGateway
+): Promise<{ bearer: string; openId: OpenIdToken; user: AuthUser }> {
+  const invalidCredentialsError = new ResourceError(
+    'Invalid username or password',
+    ResourceErrorReason.BAD_REQUEST
+  );
   try {
-    let id;
-    let authenticated = false;
     const userName = sanitizeText(username);
-    try {
-      id = await dataStore.findUser(userName);
-    } catch (e) {
-      console.error(e);
-      return authenticated;
+    const id = await dataStore.findUser(userName);
+    if (!id) {
+      throw invalidCredentialsError;
     }
 
     const user = await dataStore.loadUser(id);
-    authenticated = await hasher.verify(password, user.password);
-
-    if (authenticated) {
-      const token = TokenManager.generateToken(user);
-      const userResponse: UserToken = {
-        username: user.username,
-        name: user.name,
-        email: user.email,
-        organization: user.organization,
-        emailVerified: user.emailVerified,
-        accessGroups: user.accessGroups
-      };
-      return {token, user: userResponse};
+    const authenticated = await hasher.verify(password, user.password);
+    if (!authenticated) {
+      throw invalidCredentialsError;
     }
-    return authenticated;
+    const bearer = TokenManager.generateBearerToken(user);
+    const requester: UserToken = {
+      id: user.id,
+      username: user.username,
+      name: user.name,
+      email: user.email,
+      organization: user.organization,
+      emailVerified: user.emailVerified,
+      accessGroups: user.accessGroups
+    };
+    const openId = await cognitoGateway.getOpenIdToken({
+      requester
+    });
+
+    return { bearer, openId, user };
   } catch (e) {
-    console.log(e);
-    return Promise.reject(`Problem while trying to login. Error:${e}`);
+    handleError(e);
   }
 }
 
@@ -69,29 +79,52 @@ export async function login(
 export async function register(
   datastore: DataStore,
   hasher: HashInterface,
-  user: AuthUser
-): Promise<{ token: string; user: User }> {
+  user: AuthUser,
+  cognitoGateway: CognitoGateway
+): Promise<{ bearer: string; openId: OpenIdToken; user: AuthUser }> {
   try {
-    if (
-      isValidUsername(user.username) &&
-      !(await datastore.identifierInUse(user.username))
-    ) {
-      const pwdhash = await hasher.hash(user.password);
-      user.password = pwdhash;
-      const formattedUser = sanitizeUser(user);
-      await datastore.insertUser(formattedUser);
-      const token = TokenManager.generateToken(user);
-      return { token, user: new User(formattedUser) };
+    if (!isValidUsername(user.username)) {
+      throw new ResourceError(
+        'Invalid username provided.',
+        ResourceErrorReason.BAD_REQUEST
+      );
     }
-    return Promise.reject(new Error('Invalid username provided'));
+    if (await datastore.identifierInUse(user.username)) {
+      throw new ResourceError(
+        'Username is already in use',
+        ResourceErrorReason.BAD_REQUEST
+      );
+    }
+
+    const pwdhash = await hasher.hash(user.password);
+    user.password = pwdhash;
+
+    const formattedUser = sanitizeUser(user);
+    formattedUser.accessGroups = [];
+
+    const id = await datastore.insertUser(formattedUser);
+    user.id = id;
+
+    const bearer = TokenManager.generateBearerToken(user);
+    const requester: UserToken = {
+      id,
+      username: user.username,
+      name: user.name,
+      email: user.email,
+      organization: user.organization,
+      emailVerified: user.emailVerified,
+      accessGroups: user.accessGroups
+    };
+    const openId = await cognitoGateway.getOpenIdToken({
+      requester
+    });
+    return {
+      bearer,
+      openId,
+      user: new AuthUser(formattedUser.toPlainObject())
+    };
   } catch (e) {
-    if (e.message.includes('email')) {
-      return Promise.reject(new Error('Duplicate/Invalid Email Found'))
-    }
-    else {
-      reportError(e);
-      return Promise.reject(new Error('Internal Server Error'));
-    }
+    handleError(e);
   }
 }
 
@@ -132,18 +165,38 @@ export async function passwordMatch(
  * @export
  * @param {{
  *   dataStore: DataStore;
- *   username: string;
+ *   requester: UserToken;
  * }} params
- * @returns {Promise<{ token: string; user: User }>}
+ * @returns {Promise<{ bearer: string; openId: OpenIdToken; user: AuthUser }>}
  */
-export async function refreshToken(params: {
+export async function refreshToken({
+  dataStore,
+  requester,
+  cognitoGateway
+}: {
   dataStore: DataStore;
-  username: string;
-}): Promise<{ token: string; user: User }> {
-  const id = await params.dataStore.findUser(params.username);
-  const user = await params.dataStore.loadUser(id);
-  const token = TokenManager.generateToken(user);
-  return { token, user: new User(user) };
+  requester: UserToken;
+  cognitoGateway: CognitoGateway;
+}): Promise<{ bearer: string; openId: OpenIdToken; user: AuthUser }> {
+  try {
+    const user = await dataStore.loadUser(requester.id);
+    const bearer = TokenManager.generateBearerToken(user);
+    const newUserToken: UserToken = {
+      id: user.id,
+      username: user.username,
+      name: user.name,
+      email: user.email,
+      organization: user.organization,
+      emailVerified: user.emailVerified,
+      accessGroups: user.accessGroups
+    };
+    const openId = await cognitoGateway.getOpenIdToken({
+      requester: newUserToken
+    });
+    return { bearer, openId, user };
+  } catch (e) {
+    handleError(e);
+  }
 }
 
 function sanitizeUser(user: AuthUser): AuthUser {

@@ -1,13 +1,23 @@
 import * as express from 'express';
 import * as request from 'request';
 import { REDIRECT_ROUTES } from '../environment/routes';
-import { login, register } from '../interactors/AuthenticationInteractor';
-import { MailerInteractor, OTACodeInteractor, UserInteractor } from '../interactors/interactors';
+import {
+  login,
+  register,
+  CognitoGateway
+} from '../interactors/AuthenticationInteractor';
+import {
+  MailerInteractor,
+  OTACodeInteractor,
+  UserInteractor
+} from '../interactors/interactors';
 import { DataStore, HashInterface, Mailer } from '../interfaces/interfaces';
 import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
 import { AuthUser } from '../types/auth-user';
 import * as UserStatsRouteHandler from '../UserStats/UserStatsRouteHandler';
 import { UserResponseFactory } from './drivers';
+import { mapErrorToResponseData } from '../Error';
+import { reportError } from '../shared/SentryConnector';
 type Router = express.Router;
 const version = require('../../package.json').version;
 
@@ -16,6 +26,7 @@ export default class RouteHandler {
     private dataStore: DataStore,
     private hasher: HashInterface,
     private mailer: Mailer,
+    private cognitoGateway: CognitoGateway,
     private responseFactory: UserResponseFactory
   ) {}
 
@@ -28,9 +39,16 @@ export default class RouteHandler {
     dataStore: DataStore,
     hasher: HashInterface,
     mailer: Mailer,
+    cognitoGateway: CognitoGateway,
     responseFactory: UserResponseFactory
   ) {
-    const e = new RouteHandler(dataStore, hasher, mailer, responseFactory);
+    const e = new RouteHandler(
+      dataStore,
+      hasher,
+      mailer,
+      cognitoGateway,
+      responseFactory
+    );
     const router: Router = express.Router();
     e.setRoutes(router);
     return router;
@@ -76,29 +94,32 @@ export default class RouteHandler {
         const responder = this.responseFactory.buildResponder(res);
         const user = new AuthUser(req.body);
         try {
-          const registeredUser = await register(
+          const tokens = await register(
             this.dataStore,
             this.hasher,
-            user
+            user,
+            this.cognitoGateway
           );
-          try {
-            const otaCode = await OTACodeInteractor.generateOTACode(
-              this.dataStore,
-              ACCOUNT_ACTIONS.VERIFY_EMAIL,
-              user.email
-            );
-            MailerInteractor.sendEmailVerification(
-              this.mailer,
-              user.email,
-              otaCode
-            );
-            responder.setCookie('presence', registeredUser.token);
-            responder.sendUser(registeredUser.user.toPlainObject());
-          } catch (e) {
-            console.log(e);
-          }
+
+          OTACodeInteractor.generateOTACode(
+            this.dataStore,
+            ACCOUNT_ACTIONS.VERIFY_EMAIL,
+            user.email
+          )
+            .then((otaCode) => {
+              MailerInteractor.sendEmailVerification(
+                this.mailer,
+                user.email,
+                otaCode
+              );
+            })
+            .catch(e => reportError(e));
+
+          responder.setCookie('presence', tokens.bearer);
+          res.send({ ...tokens.user.toPlainObject(), tokens });
         } catch (e) {
-          responder.sendOperationError(e);
+          const { code, message } = mapErrorToResponseData(e);
+          res.status(code).json({ message });
         }
       });
 
@@ -117,20 +138,20 @@ export default class RouteHandler {
     router.post('/users/tokens', async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
-        const userPayload = await login(
+        const token = await login(
           this.dataStore,
           this.hasher,
           req.body.username,
-          req.body.password
+          req.body.password,
+          this.cognitoGateway
         );
-        if (userPayload === false) {
-          responder.invalidLogin();
-        } else if (typeof userPayload !== 'boolean') {
-          responder.setCookie('presence', userPayload.token);
-          responder.sendUser(userPayload.user);
-        }
+        responder.setCookie('presence', token.bearer);
+        const user = token.user.toPlainObject();
+        const tokens = { bearer: token.bearer, openId: token.openId };
+        res.send({ ...user, tokens });
       } catch (e) {
-        responder.sendOperationError(e);
+        const { code, message } = mapErrorToResponseData(e);
+        res.status(code).json({ message });
       }
     });
 

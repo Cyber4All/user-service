@@ -4,9 +4,12 @@ import { AuthUser } from '../types/auth-user';
 /**
  * Takes a user object and generates a JWT for the user
  * @param AuthUser contains the user's id, username, firstname, lastname, and email
+ *
+ * TODO: Excess data should be removed from the token's payload (name, organization, email)
  */
-export function generateToken(user: AuthUser) {
+export function generateBearerToken(user: AuthUser) {
   const payload = {
+    id: user.id,
     username: user.username,
     name: user.name,
     email: user.email,

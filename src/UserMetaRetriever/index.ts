@@ -4,8 +4,8 @@ import {
 } from '../shared/ExpressServiceModule';
 import { UserMetaDatastore } from './interfaces';
 import { MongoUserMetaDatastore } from './drivers';
-import { ModuleAdapter, ExpressRouterAdapter } from './adapters';
-
+import { ExpressRouterAdapter } from './adapters';
+import * as Interactor from './Interactor';
 /**
  * Module encapsulating all things related to user fetching metadata for users
  * Since this module is an extension of `ExpressServiceModule`
@@ -16,8 +16,11 @@ import { ModuleAdapter, ExpressRouterAdapter } from './adapters';
  * @extends {ExpressServiceModule}
  */
 @expressServiceModule({
-  adapter: ModuleAdapter,
   expressRouter: ExpressRouterAdapter.buildRouter(),
   providers: [{ provide: UserMetaDatastore, useClass: MongoUserMetaDatastore }]
 })
 export class UserMetaRetriever extends ExpressServiceModule {}
+
+export namespace UserMetaRetriever {
+  export const getUserRoles = Interactor.getUserRoles;
+}

@@ -146,25 +146,19 @@ export default class MongoDriver implements DataStore {
    * @returns {UserID}
    */
   async findUser(username: string): Promise<string> {
-    try {
-      const query: any = {};
-      if (isEmail(username)) {
-        query.email = username;
-      } else {
-        query.username = username;
-      }
-      const userRecord: { _id: string } = await this.db
-        .collection(COLLECTIONS.USERS)
-        .findOne(query, { projection: { _id: 1 } });
-      if (!userRecord) {
-        return Promise.reject(
-          `No user with username or email ${username}, exists.`
-        );
-      }
-      return `${userRecord._id}`;
-    } catch (e) {
-      return Promise.reject(e);
+    const query: any = {};
+    if (isEmail(username)) {
+      query.email = username;
+    } else {
+      query.username = username;
     }
+    const userRecord: { _id: string } = await this.db
+      .collection(COLLECTIONS.USERS)
+      .findOne(query, { projection: { _id: 1 } });
+    if (userRecord) {
+      return `${userRecord._id}`;
+    }
+    return null;
   }
 
   async searchUsers(

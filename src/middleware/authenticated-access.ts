@@ -42,7 +42,7 @@ function decodeToken(req: Request) {
     const token = getToken(req);
     user = jwt.verify(token, process.env.KEY);
   } catch (e) {
-    if (e.name !== 'UnauthorizedError') {
+    if (e.name !== 'UnauthorizedError' && e.name !== 'JsonWebTokenError') {
       reportError(e);
     }
   }
