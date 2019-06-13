@@ -158,10 +158,13 @@ function attachAuthenticatedRouters(app: express.Express) {
  * @param {Express} app [The express app to use as servers request listener]
  */
 function startHttpServer(app: express.Express) {
-  const version = require('./package.json').version;
+  // root-require handles package.json being in different locations for prod and dev
+  const version = require('root-require')('package.json').version;
   const server = http.createServer(app);
   server.listen(HTTP_SERVER_PORT, () => {
-    console.log(`User Service ${version} is running on port ${HTTP_SERVER_PORT}`);
+    console.log(
+      `User Service ${version} is running on port ${HTTP_SERVER_PORT}`
+    );
   });
 }
 
