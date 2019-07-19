@@ -6,3 +6,9 @@ dist.zip
 coverage
 coverage/
 /coverage
+
+.vscode/*
+
+# Include Launch Config for Debugging
+!/.vscode/launch.json
+
