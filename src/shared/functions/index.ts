@@ -12,16 +12,16 @@ import { User, AuthUser } from '../typings';
  */
 export function mapUserDataToUser(user: User): User {
   return {
-      id: user.id,
-      bio: user.bio,
-      cognitoIdentityId: user.cognitoIdentityId,
-      createdAt: user.createdAt,
-      email: user.email,
-      emailVerified: user.emailVerified,
-      name: user.name,
-      organization: user.organization,
-      username: user.username,
-    };
+    id: user.id,
+    bio: user.bio,
+    cognitoIdentityId: user.cognitoIdentityId,
+    createdAt: user.createdAt,
+    email: user.email,
+    emailVerified: user.emailVerified,
+    name: user.name,
+    organization: user.organization,
+    username: user.username,
+  };
 }
 
 /**
@@ -35,8 +35,8 @@ export function mapUserDataToUser(user: User): User {
  */
 export function mapUserDataToAuthUser(user: AuthUser): AuthUser {
   return {
-      ...mapUserDataToUser(user),
-      accessGroups: user.accessGroups,
-      password: user.password
-    };
+    ...mapUserDataToUser(user),
+    accessGroups: user.accessGroups,
+    password: user.password
+  };
 }

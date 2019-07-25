@@ -11,11 +11,11 @@ export class ModuleCognitoIdentityGateway implements CognitoIdentityGateway{
      * @memberof ModuleCognitoIdentityGateway
      */
   async getCognitoIdentityId(params: { username: string; isAdminOrEditor?: boolean; }): Promise<string> {
-      const openIdToken = await CognitoIdentityManager.getOpenIdToken(params);
-      if (openIdToken) {
-          return openIdToken.IdentityId;
-        }
-      return null;
-    }
+    const openIdToken = await CognitoIdentityManager.getOpenIdToken(params);
+    if (openIdToken) {
+        return openIdToken.IdentityId;
+      }
+    return null;
+  }
 
 }
