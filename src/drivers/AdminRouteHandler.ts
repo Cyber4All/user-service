@@ -40,7 +40,7 @@ export default class AdminRouteHandler {
         );
         responder.sendObject({
           ...payload,
-          users: payload.users.map(user => user.toPlainObject())
+          users: payload.users
         });
       } catch (e) {
         responder.sendOperationError(e);
