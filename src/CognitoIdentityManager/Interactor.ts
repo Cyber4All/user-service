@@ -2,10 +2,6 @@ import 'dotenv/config';
 import * as AWS from 'aws-sdk';
 import { UserToken, OpenIdToken } from './typings';
 import { handleError } from '../Error';
-import {
-  authorizeRequest,
-  requesterIsAdminOrEditor
-} from './AuthorizationManager';
 
 const SDK_CONFIG = {
   credentials: {

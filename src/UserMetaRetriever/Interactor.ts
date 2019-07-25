@@ -1,6 +1,6 @@
 import { UserMetaRetriever as Module } from '.';
 import { UserToken } from './typings';
-import { authorizeRequest, requesterIsAdmin } from './AuthorizationManager';
+import { authorizeRequest, requesterIsAdmin, requesterIsAdminOrEditor, userIsAdminOrEditor } from '../shared/AuthorizationManager';
 import { handleError, ResourceError, ResourceErrorReason } from '../Error';
 import { UserMetaDatastore } from './interfaces';
 
