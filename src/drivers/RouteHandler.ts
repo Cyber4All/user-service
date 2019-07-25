@@ -13,7 +13,6 @@ import {
 } from '../interactors/interactors';
 import { DataStore, HashInterface, Mailer } from '../interfaces/interfaces';
 import { ACCOUNT_ACTIONS } from '../interfaces/Mailer.defaults';
-import { AuthUser } from '../types/auth-user';
 import * as UserStatsRouteHandler from '../UserStats/UserStatsRouteHandler';
 import { UserResponseFactory } from './drivers';
 import { mapErrorToResponseData } from '../Error';
@@ -84,7 +83,7 @@ export default class RouteHandler {
         try {
           const query = req.query;
           const users = await UserInteractor.searchUsers(this.dataStore, query);
-          responder.sendObject(users.map(user => user.toPlainObject()));
+          responder.sendObject(users);
         } catch (e) {
           responder.sendOperationError(e);
         }
@@ -92,7 +91,7 @@ export default class RouteHandler {
       // register
       .post(async (req, res) => {
         const responder = this.responseFactory.buildResponder(res);
-        const user = new AuthUser(req.body);
+        const user = req.body;
         try {
           const tokens = await register(
             this.dataStore,
@@ -116,7 +115,7 @@ export default class RouteHandler {
             .catch(e => reportError(e));
 
           responder.setCookie('presence', tokens.bearer);
-          res.send({ ...tokens.user.toPlainObject(), tokens });
+          res.send({ ...tokens.user, tokens });
         } catch (e) {
           const { code, message } = mapErrorToResponseData(e);
           res.status(code).json({ message });
@@ -128,7 +127,7 @@ export default class RouteHandler {
       try {
         const query = req.query.username;
         const user = await UserInteractor.loadUser(this.dataStore, query);
-        this.responseFactory.buildResponder(res).sendUser(user.toPlainObject());
+        this.responseFactory.buildResponder(res).sendUser(user);
       } catch (e) {
         this.responseFactory.buildResponder(res).sendOperationError(e);
       }
@@ -146,7 +145,7 @@ export default class RouteHandler {
           this.cognitoGateway
         );
         responder.setCookie('presence', token.bearer);
-        const user = token.user.toPlainObject();
+        const user = token.user;
         const tokens = { bearer: token.bearer, openId: token.openId };
         res.send({ ...user, tokens });
       } catch (e) {
@@ -162,7 +161,7 @@ export default class RouteHandler {
           this.dataStore,
           req.params.username
         );
-        responder.sendUser(user.toPlainObject());
+        responder.sendUser(user);
       } catch (e) {
         responder.sendOperationError(e);
       }

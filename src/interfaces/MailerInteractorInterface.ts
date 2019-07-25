@@ -1,4 +1,4 @@
-import { User } from '@cyber4all/clark-entity';
+import { User } from "../shared/typings";
 
 export interface MailerInteractorInterface {
   sendEmailVerification(email: string, otaCode: string): Promise<void>;

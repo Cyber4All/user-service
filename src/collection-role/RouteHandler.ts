@@ -9,7 +9,7 @@ import {
 } from './Interactor';
 import { DataStore } from '../interfaces/DataStore';
 import { mapErrorToResponseData } from '../Error';
-import { UserToken } from '../types/user-token';
+import { UserToken } from '../shared/typings';
 
 export function initializePrivate({ dataStore }: { dataStore: DataStore }) {
   const router: Router = Router();
@@ -86,7 +86,7 @@ export function initializePrivate({ dataStore }: { dataStore: DataStore }) {
           );
           break;
       }
-      res.status(200).json(members.map(user => user.toPlainObject()));
+      res.status(200).json(members);
     } catch (e) {
       const { code, message } = mapErrorToResponseData(e);
       res.status(code).json({ message });

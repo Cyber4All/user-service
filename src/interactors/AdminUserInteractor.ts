@@ -1,7 +1,8 @@
 import { UserInteractor } from './interactors';
 import { DataStore } from '../interfaces/DataStore';
-import { User } from '@cyber4all/clark-entity';
 import { UserQuery } from '../interfaces/Query';
+import { User } from '../shared/typings';
+import { mapUserDataToUser } from '../shared/functions';
 
 export class AdminUserInteractor {
   private static userInteractor = UserInteractor;
@@ -21,10 +22,7 @@ export class AdminUserInteractor {
     try {
       const response = await dataStore.searchUsers(query);
       const users = await Promise.all(
-        response.users.map(async user => {
-          user.password = undefined;
-          return user;
-        })
+        response.users.map(mapUserDataToUser)
       );
       return { users, total: response.total };
     } catch (e) {

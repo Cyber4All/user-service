@@ -1,3 +1,3 @@
-import { UserToken } from '../../types/user-token';
+import { User, AuthUser, UserToken } from '../../shared/typings';
 
-export { UserToken };
+export { UserToken, AuthUser, User };

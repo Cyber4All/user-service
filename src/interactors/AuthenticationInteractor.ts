@@ -1,12 +1,11 @@
 import { DataStore, HashInterface } from './../interfaces/interfaces';
 import { TokenManager } from '../drivers/drivers';
-import { User } from '@cyber4all/clark-entity';
 import { sanitizeText } from './UserInteractor';
-import { AuthUser } from '../types/auth-user';
-import { UserToken } from '../types/user-token';
-import { reportError } from '../shared/SentryConnector';
+import { AuthUser } from '../shared/typings/auth-user';
+import { UserToken } from '../shared/typings/user-token';
 import { ResourceError, ResourceErrorReason, handleError } from '../Error';
 import { OpenIdToken } from '../CognitoIdentityManager/typings';
+import { mapUserDataToAuthUser } from '../shared/functions';
 
 export interface CognitoGateway {
   getOpenIdToken(params: { requester: UserToken }): Promise<OpenIdToken>;
@@ -59,7 +58,7 @@ export async function login(
     const openId = await cognitoGateway.getOpenIdToken({
       requester
     });
-
+    delete user.password;
     return { bearer, openId, user };
   } catch (e) {
     handleError(e);
@@ -118,10 +117,11 @@ export async function register(
     const openId = await cognitoGateway.getOpenIdToken({
       requester
     });
+    delete formattedUser.password;
     return {
       bearer,
       openId,
-      user: new AuthUser(formattedUser.toPlainObject())
+      user: mapUserDataToAuthUser(formattedUser)
     };
   } catch (e) {
     handleError(e);
@@ -193,6 +193,7 @@ export async function refreshToken({
     const openId = await cognitoGateway.getOpenIdToken({
       requester: newUserToken
     });
+    delete user.password;
     return { bearer, openId, user };
   } catch (e) {
     handleError(e);

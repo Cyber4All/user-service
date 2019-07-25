@@ -1,7 +1,8 @@
 import { DataStore, Responder, HashInterface } from '../interfaces/interfaces';
-import { User } from '@cyber4all/clark-entity';
 import { TokenManager } from '../drivers/drivers';
 import { UserQuery } from '../interfaces/Query';
+import { User } from '../shared/typings';
+import { mapUserDataToUser } from '../shared/functions';
 
 export class UserInteractor {
   public static async searchUsers(
@@ -15,9 +16,7 @@ export class UserInteractor {
         query[key] = sanitizeText(query[key]);
       }
       const response = await dataStore.searchUsers(query);
-      const users = response.users.map(user => {
-        return new User(user);
-      });
+      const users = response.users.map(mapUserDataToUser);
       return users;
     } catch (e) {
       return Promise.reject(`Problem searching users. Error: ${e}`);
@@ -44,7 +43,7 @@ export class UserInteractor {
       const userName = sanitizeText(username);
       const userID = await this.findUser(dataStore, userName);
       const user = await dataStore.loadUser(userID);
-      return new User(user);
+      return mapUserDataToUser(user);
     } catch (error) {
       return Promise.reject(`Problem finding specified user. Error: ${error}`);
     }
@@ -59,7 +58,7 @@ export class UserInteractor {
       const userID = await dataStore.findUser(eMail);
       await dataStore.editUser(userID, { emailVerified: true });
       const user = await dataStore.loadUser(userID);
-      return new User(user);
+      return mapUserDataToUser(user);
     } catch (e) {
       return Promise.reject(`Problem verifying email. Error: ${e}`);
     }
@@ -75,7 +74,7 @@ export class UserInteractor {
       const pwdhash = await hasher.hash(password);
       const userID = await dataStore.findUser(eMail);
       const user = await dataStore.editUser(userID, { password: pwdhash });
-      return new User(user);
+      return mapUserDataToUser(user);
     } catch (e) {
       return Promise.reject(`Problem updating password. Error:${e}`);
     }

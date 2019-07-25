@@ -1,6 +1,6 @@
 import { Responder } from '../interfaces/interfaces';
 import { Response } from 'express';
-import { User } from '@cyber4all/clark-entity';
+import { User } from '../shared/typings';
 
 export default class RouteResponder implements Responder {
   /**
