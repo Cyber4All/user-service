@@ -115,21 +115,21 @@ describe('AuthorizationManager', () => {
 
     describe('authorizeRequest', () => {
         it('should return void', () => {
-          expect(authorizeRequest([true])).toBeUndefined();
+            expect(authorizeRequest([true])).toBeUndefined();
         });
         it('should throw ResourceError (Only false)', () => {
-          try {
-            authorizeRequest([false]);
-          } catch (e) {
-            expect(e).toBeInstanceOf(ResourceError);
-          }
+            try {
+                authorizeRequest([false]);
+            } catch (e) {
+                expect(e).toBeInstanceOf(ResourceError);
+            }
         });
         it('should throw ResourceError (true and false)', () => {
-          try {
-            authorizeRequest([true, false]);
-          } catch (e) {
-            expect(e).toBeInstanceOf(ResourceError);
-          }
+            try {
+                authorizeRequest([true, false]);
+            } catch (e) {
+                expect(e).toBeInstanceOf(ResourceError);
+            }
         });
-      });
+    });
 })

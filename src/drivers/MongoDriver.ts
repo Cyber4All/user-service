@@ -194,8 +194,8 @@ export default class MongoDriver implements DataStore {
       objectCursor = orderBy
         ? objectCursor.sort(orderBy, sortType ? sortType : 1)
         : objectCursor
-            .sort({ score: { $meta: 'textScore' } })
-            .project({ score: { $meta: 'textScore' } });
+          .sort({ score: { $meta: 'textScore' } })
+          .project({ score: { $meta: 'textScore' } });
 
       const userDocs = await objectCursor.toArray();
 
@@ -503,7 +503,7 @@ export default class MongoDriver implements DataStore {
   }
 
   private generateUser(userRecord: UserDocument): AuthUser {
-    return mapUserDataToAuthUser({...userRecord as any, id: userRecord._id})
+    return mapUserDataToAuthUser({ ...userRecord as any, id: userRecord._id })
   }
 }
 
