@@ -7,7 +7,6 @@ import {
 import MockDriver from '../drivers/MockDriver';
 import { MOCK_OBJECTS } from '../tests/mocks';
 import { MockHashDriver } from '../drivers/MockHashDriver';
-import { AuthUser } from '../types/auth-user';
 import { MockCognitoGateway } from '../drivers/MockCognitoGateway';
 const driver = new MockDriver(); // DataStore
 const hasher = new MockHashDriver(); // Hasher
@@ -115,14 +114,14 @@ describe('AuthenticationInteractor', () => {
         });
     });
     it('should fail for existing email', async done => {
-      const registrationRequest = new AuthUser({
+      const registrationRequest = {
         username: 'areallycoolhuman',
         name: 'So Fun',
         email: 'cool@test.com',
         organization: 'towson university',
         password: 'mypassissecure',
-        bio: ''
-      });
+        bio: '',
+      } as any;
       try {
         await register(driver, hasher, registrationRequest, cognitoGateway);
         expect.fail();
