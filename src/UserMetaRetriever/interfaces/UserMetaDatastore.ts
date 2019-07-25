@@ -1,4 +1,4 @@
-import { AuthUser } from "../typings";
+import { AuthUser } from '../typings';
 
 export abstract class UserMetaDatastore {
   /**

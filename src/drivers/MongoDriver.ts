@@ -68,12 +68,12 @@ export default class MongoDriver implements DataStore {
       .collection(COLLECTIONS.USERS)
       .findOne<{ accessGroups: string[] }>(
         { _id: userId, accessGroups: { $regex: new RegExp(collection, 'ig') } },
-        {
-          projection: {
+      {
+        projection: {
             _id: 0,
             'accessGroups.$': 1
           }
-        }
+      }
       );
     if (doc) {
       return doc.accessGroups[0];
@@ -503,7 +503,7 @@ export default class MongoDriver implements DataStore {
   }
 
   private generateUser(userRecord: UserDocument): AuthUser {
-    return mapUserDataToAuthUser({...userRecord as any, id: userRecord._id})
+    return mapUserDataToAuthUser({ ...userRecord as any, id: userRecord._id });
   }
 }
 

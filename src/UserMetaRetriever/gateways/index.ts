@@ -1,3 +1,3 @@
-import { ModuleCognitoIdentityGateway } from "./CognitoIdentityGateway/ModuleCognitoIdentityGateway";
+import { ModuleCognitoIdentityGateway } from './CognitoIdentityGateway/ModuleCognitoIdentityGateway';
 
-export {ModuleCognitoIdentityGateway}
+export { ModuleCognitoIdentityGateway };
