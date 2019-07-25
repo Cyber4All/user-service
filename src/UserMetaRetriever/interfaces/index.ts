@@ -1,3 +1,4 @@
 import { UserMetaDatastore } from './UserMetaDatastore';
+import { CognitoIdentityGateway } from './CognitoIdentityGateway';
 
-export { UserMetaDatastore };
+export { UserMetaDatastore, CognitoIdentityGateway };

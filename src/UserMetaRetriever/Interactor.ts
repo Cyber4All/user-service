@@ -2,13 +2,47 @@ import { UserMetaRetriever as Module } from '.';
 import { UserToken } from './typings';
 import { authorizeRequest, requesterIsAdmin, requesterIsAdminOrEditor, userIsAdminOrEditor } from '../shared/AuthorizationManager';
 import { handleError, ResourceError, ResourceErrorReason } from '../Error';
-import { UserMetaDatastore } from './interfaces';
+import { UserMetaDatastore, CognitoIdentityGateway } from './interfaces';
+import { mapUserDataToUser } from '../shared/functions';
 
 /**
  * Encapsulates Drivers used within this interactor in a namespace
  */
 namespace Drivers {
   export const datastore = () => Module.resolveDependency(UserMetaDatastore);
+}
+
+namespace Gateways {
+  export const cognitoIdentityManager = () => Module.resolveDependency(CognitoIdentityGateway)
+}
+
+
+/**
+ * Retrieves user data by id
+ * If the requester is an admin or editor, additional information is returned
+ *
+ * @export
+ * @param {UserToken} request [Information about the requester of this resource]
+ * @param {string} id [The id of the user to retrieve]
+ * 
+ * @returns {Promise<any>}
+ */
+export async function getUser({ requester, id }: { requester: UserToken, id: string }): Promise<any> {
+  try {
+    if (!id) {
+      throw new ResourceError('Invalid parameters. Id must be provided.', ResourceErrorReason.BAD_REQUEST)
+    }
+    const user = await Drivers.datastore().fetchUser(id);
+    if (!user) {
+      throw new ResourceError(`User ${id} does not exist.`, ResourceErrorReason.NOT_FOUND);
+    }
+    if (requesterIsAdminOrEditor(requester)) {
+      user.cognitoIdentityId = await Gateways.cognitoIdentityManager().getCognitoIdentityId({ username: user.username, isAdminOrEditor: userIsAdminOrEditor(user) });
+    }
+    return mapUserDataToUser(user);
+  } catch (e) {
+    handleError(e)
+  }
 }
 
 /**
@@ -75,7 +109,7 @@ function validateRequestParams({
     if (Array.isArray(mustProvide)) {
       message = `Must provide ${multipleParams ? '' : 'a'} valid value${
         multipleParams ? 's' : ''
-      } for ${mustProvide}`;
+        } for ${mustProvide}`;
     }
     throw new ResourceError(message, ResourceErrorReason.BAD_REQUEST);
   }

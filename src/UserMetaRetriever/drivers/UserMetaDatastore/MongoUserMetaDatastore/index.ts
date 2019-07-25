@@ -1,16 +1,34 @@
 import { Db } from 'mongodb';
 import { UserMetaDatastore } from '../../../interfaces';
 import { MongoConnectionManager } from '../../../../config/mongodb';
+import { AuthUser } from '../../../typings';
+import { mapUserDataToAuthUser } from '../../../../shared/functions';
 
 const USER_COLLECTION = 'users';
 
 export class MongoUserMetaDatastore implements UserMetaDatastore {
+  
   private db: Db;
   private static instance: MongoUserMetaDatastore;
 
   private constructor() {
     this.db = MongoConnectionManager.getDbClient();
   }
+
+  /**
+   * @inheritdoc
+   *
+   * @returns {Promise<AuthUser>}
+   * @memberof MongoUserMetaDatastore
+   */
+  async fetchUser(id: string): Promise<AuthUser> {
+    const user = await this.db.collection(USER_COLLECTION).findOne({_id: id});
+    if(user){
+      return mapUserDataToAuthUser({...user as AuthUser, id: user._id});
+    }
+    return null;
+  }
+
   /**
    * Returns an instance of MongoUserMetaDatastore
    *
