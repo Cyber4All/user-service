@@ -23,21 +23,6 @@ export function requesterIsAdmin(requester: UserToken): boolean {
   );
 }
 
-/**
- * Checks if requester is an Editor by checking if their `accessGroups` contain the editor privilege
- *
- * @export
- * @param {UserToken} requester [Token data of the requester]
- * @returns {boolean}
- */
-export function requesterIsAdmin(requester: UserToken): boolean {
-  return (
-      requester != null &&
-      Array.isArray(requester.accessGroups) &&
-      requester.accessGroups.includes(AccessGroup.ADMIN)
-    );
-}
-
   /**
    * Checks if requester is an Editor by checking if their `accessGroups` contain the editor privilege
    *
@@ -75,16 +60,6 @@ export function userIsAdminOrEditor(user: AuthUser): boolean {
     return requesterIsAdmin(user) || requesterIsEditor(user);
   }
 
-/**
- * Checks if user is an Admin or Editor by checking if their `accessGroups` contain the admin or editor privileges
- *
- * @export
- * @param {AuthUser} user [Token data of the requester]
- * @returns {boolean}
- */
-export function userIsAdminOrEditor(user: AuthUser): boolean {
-  return requesterIsAdmin(user) || requesterIsEditor(user);
-}
 
 /**
 * Checks if request should be authorized by checking if `authorizationCases` contains `true`.
