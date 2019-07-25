@@ -17,23 +17,23 @@ namespace Gateways {
 }
 
 /**
- * Retrieves user data by id
+ * Retrieves user data by username
  * If the requester is an admin or editor, additional information is returned
  *
  * @export
  * @param {UserToken} request [Information about the requester of this resource]
- * @param {string} id [The id of the user to retrieve]
+ * @param {string} username [The username of the user to retrieve]
  *
  * @returns {Promise<any>}
  */
-export async function getUser({ requester, id }: { requester: UserToken, id: string }): Promise<any> {
+export async function getUser({ requester, username }: { requester: UserToken, username: string }): Promise<any> {
   try {
-    if (!id) {
-      throw new ResourceError('Invalid parameters. Id must be provided.', ResourceErrorReason.BAD_REQUEST);
+    if (!username) {
+      throw new ResourceError('Invalid parameters. Username must be provided.', ResourceErrorReason.BAD_REQUEST);
     }
-    const user = await Drivers.datastore().fetchUser(id);
+    const user = await Drivers.datastore().fetchUser(username);
     if (!user) {
-      throw new ResourceError(`User ${id} does not exist.`, ResourceErrorReason.NOT_FOUND);
+      throw new ResourceError(`User ${username} does not exist.`, ResourceErrorReason.NOT_FOUND);
     }
     if (requesterIsAdminOrEditor(requester)) {
       user.cognitoIdentityId = await Gateways.cognitoIdentityManager().getCognitoIdentityId({ username: user.username, isAdminOrEditor: userIsAdminOrEditor(user) });

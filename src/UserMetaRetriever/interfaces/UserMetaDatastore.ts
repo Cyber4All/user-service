@@ -2,14 +2,14 @@ import { AuthUser } from '../typings';
 
 export abstract class UserMetaDatastore {
   /**
-   * Fetches user data by id
+   * Fetches user data by username
    *
    * @abstract
-   * @param {string} id [The unique id of the user to fetch]
+   * @param {string} username [The human readable unique id of the user to fetch]
    * @returns {Promise<AuthUser>}
    * @memberof UserMetaDatastore
    */
-  abstract fetchUser(id: string): Promise<AuthUser>;
+  abstract fetchUser(username: string): Promise<AuthUser>;
   /**
    * Fetches roles for specified user
    *
