@@ -13,8 +13,8 @@ export class ModuleCognitoIdentityGateway implements CognitoIdentityGateway{
   async getCognitoIdentityId(params: { username: string; isAdminOrEditor?: boolean; }): Promise<string> {
     const openIdToken = await CognitoIdentityManager.getOpenIdToken(params);
     if (openIdToken) {
-        return openIdToken.IdentityId;
-      }
+      return openIdToken.IdentityId;
+    }
     return null;
   }
 
