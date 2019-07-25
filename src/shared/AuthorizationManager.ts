@@ -1,5 +1,5 @@
-import { UserToken, AuthUser } from "./typings";
-import { ResourceError, ResourceErrorReason } from "../Error";
+import { UserToken, AuthUser } from './typings';
+import { ResourceError, ResourceErrorReason } from '../Error';
 
 export enum AccessGroup {
   ADMIN = 'admin',
@@ -30,24 +30,50 @@ export function requesterIsAdmin(requester: UserToken): boolean {
  * @param {UserToken} requester [Token data of the requester]
  * @returns {boolean}
  */
-export function requesterIsEditor(requester: UserToken): boolean {
+export function requesterIsAdmin(requester: UserToken): boolean {
   return (
-    requester != null &&
-    Array.isArray(requester.accessGroups) &&
-    requester.accessGroups.includes(AccessGroup.EDITOR)
-  );
+      requester != null &&
+      Array.isArray(requester.accessGroups) &&
+      requester.accessGroups.includes(AccessGroup.ADMIN)
+    );
 }
 
-/**
- * Checks if requester is an Admin or Editor by checking if their `accessGroups` contain the admin or editor privileges
- *
- * @export
- * @param {UserToken} requester [Token data of the requester]
- * @returns {boolean}
- */
+  /**
+   * Checks if requester is an Editor by checking if their `accessGroups` contain the editor privilege
+   *
+   * @export
+   * @param {UserToken} requester [Token data of the requester]
+   * @returns {boolean}
+   */
+export function requesterIsEditor(requester: UserToken): boolean {
+    return (
+      requester != null &&
+      Array.isArray(requester.accessGroups) &&
+      requester.accessGroups.includes(AccessGroup.EDITOR)
+    );
+  }
+
+  /**
+   * Checks if requester is an Admin or Editor by checking if their `accessGroups` contain the admin or editor privileges
+   *
+   * @export
+   * @param {UserToken} requester [Token data of the requester]
+   * @returns {boolean}
+   */
 export function requesterIsAdminOrEditor(requester: UserToken): boolean {
-  return requesterIsAdmin(requester) || requesterIsEditor(requester);
-}
+    return requesterIsAdmin(requester) || requesterIsEditor(requester);
+  }
+
+  /**
+   * Checks if user is an Admin or Editor by checking if their `accessGroups` contain the admin or editor privileges
+   *
+   * @export
+   * @param {AuthUser} user [Token data of the requester]
+   * @returns {boolean}
+   */
+export function userIsAdminOrEditor(user: AuthUser): boolean {
+    return requesterIsAdmin(user) || requesterIsEditor(user);
+  }
 
 /**
  * Checks if user is an Admin or Editor by checking if their `accessGroups` contain the admin or editor privileges
@@ -69,9 +95,10 @@ export function userIsAdminOrEditor(user: AuthUser): boolean {
 */
 export function authorizeRequest(authorizationCases: boolean[], message?: string): never | void {
   if (!authorizationCases.includes(true)) {
-    throw new ResourceError(
-      message || 'Invalid access',
-      ResourceErrorReason.INVALID_ACCESS
-    );
-  }
+      throw new ResourceError(
+        message || 'Invalid access',
+        ResourceErrorReason.INVALID_ACCESS
+      );
+    }
 }
+

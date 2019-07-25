@@ -7,7 +7,7 @@ import { mapUserDataToAuthUser } from '../../../../shared/functions';
 const USER_COLLECTION = 'users';
 
 export class MongoUserMetaDatastore implements UserMetaDatastore {
-  
+
   private db: Db;
   private static instance: MongoUserMetaDatastore;
 
@@ -22,9 +22,9 @@ export class MongoUserMetaDatastore implements UserMetaDatastore {
    * @memberof MongoUserMetaDatastore
    */
   async fetchUser(id: string): Promise<AuthUser> {
-    const user = await this.db.collection(USER_COLLECTION).findOne({_id: id});
-    if(user){
-      return mapUserDataToAuthUser({...user as AuthUser, id: user._id});
+    const user = await this.db.collection(USER_COLLECTION).findOne({ _id: id });
+    if (user) {
+      return mapUserDataToAuthUser({ ...user as AuthUser, id: user._id });
     }
     return null;
   }

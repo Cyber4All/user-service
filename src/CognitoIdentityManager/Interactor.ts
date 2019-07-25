@@ -3,7 +3,6 @@ import * as AWS from 'aws-sdk';
 import { OpenIdToken } from './typings';
 import { handleError } from '../Error';
 
-
 const SDK_CONFIG = {
   credentials: {
     accessKeyId: process.env.COGNITO_IAM_ACCESS_KEY_ID,
@@ -31,7 +30,7 @@ const TOKEN_DURATION = 86400; // 24 hours in seconds
  *
  * @returns {Promise<OpenIdToken>}
  */
-export function getOpenIdToken({ username, isAdminOrEditor }: { username: string, isAdminOrEditor?: boolean }): Promise<OpenIdToken> {
+export function getOpenIdToken({ username, isAdminOrEditor }:{username: string, isAdminOrEditor?: boolean}): Promise<OpenIdToken> {
   try {
     const Logins = {};
     Logins[DEVELOPER_PROVIDER] = username;

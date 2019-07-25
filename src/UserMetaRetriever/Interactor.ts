@@ -13,9 +13,8 @@ namespace Drivers {
 }
 
 namespace Gateways {
-  export const cognitoIdentityManager = () => Module.resolveDependency(CognitoIdentityGateway)
+  export const cognitoIdentityManager = () => Module.resolveDependency(CognitoIdentityGateway);
 }
-
 
 /**
  * Retrieves user data by id
@@ -24,13 +23,13 @@ namespace Gateways {
  * @export
  * @param {UserToken} request [Information about the requester of this resource]
  * @param {string} id [The id of the user to retrieve]
- * 
+ *
  * @returns {Promise<any>}
  */
 export async function getUser({ requester, id }: { requester: UserToken, id: string }): Promise<any> {
   try {
     if (!id) {
-      throw new ResourceError('Invalid parameters. Id must be provided.', ResourceErrorReason.BAD_REQUEST)
+      throw new ResourceError('Invalid parameters. Id must be provided.', ResourceErrorReason.BAD_REQUEST);
     }
     const user = await Drivers.datastore().fetchUser(id);
     if (!user) {
@@ -41,7 +40,7 @@ export async function getUser({ requester, id }: { requester: UserToken, id: str
     }
     return mapUserDataToUser(user);
   } catch (e) {
-    handleError(e)
+    handleError(e);
   }
 }
 
