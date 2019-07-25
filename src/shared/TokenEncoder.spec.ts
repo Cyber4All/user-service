@@ -1,5 +1,5 @@
 import * as encoder from './TokenEncoder';
-import { UserToken } from '../types/user-token';
+import { UserToken } from './typings';
 
 describe('LearningObjectDownload: TokenEncoder', () => {
   const userToken: UserToken = {
