@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import * as jwt from 'jsonwebtoken';
-import { UserToken } from './typings/user-token';
+import { UserToken } from './typings';
 
 const SECRET_KEY = process.env.KEY;
 
