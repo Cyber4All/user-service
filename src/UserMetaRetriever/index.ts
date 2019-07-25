@@ -1,8 +1,7 @@
 import {
   ExpressServiceModule,
   expressServiceModule
-} from '../shared/ExpressServiceModule';
-import { UserMetaDatastore } from './interfaces';
+} from 'node-service-module';
 import { MongoUserMetaDatastore } from './drivers';
 import { ExpressRouterAdapter } from './adapters';
 import * as Interactor from './Interactor';
