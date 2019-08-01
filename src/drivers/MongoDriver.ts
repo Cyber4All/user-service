@@ -70,9 +70,9 @@ export default class MongoDriver implements DataStore {
         { _id: userId, accessGroups: { $regex: new RegExp(collection, 'ig') } },
       {
         projection: {
-            _id: 0,
-            'accessGroups.$': 1
-          }
+          _id: 0,
+          'accessGroups.$': 1
+        }
       }
       );
     if (doc) {
