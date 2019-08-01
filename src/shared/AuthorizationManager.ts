@@ -35,7 +35,7 @@ export function requesterIsEditor(requester: UserToken): boolean {
       requester != null &&
       Array.isArray(requester.accessGroups) &&
       requester.accessGroups.includes(AccessGroup.EDITOR)
-    );
+  );
 }
 
   /**
