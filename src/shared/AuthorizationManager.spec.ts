@@ -1,5 +1,5 @@
 import { requesterIsAdmin, requesterIsAdminOrEditor, authorizeRequest } from './AuthorizationManager';
-import { UserToken } from './typings';
+import { UserToken } from '../types/user-token';
 import { ResourceError } from '../Error';
 
 describe('AuthorizationManager', () => {
