@@ -1,4 +1,4 @@
-import { User } from "../shared/typings";
+import { User } from '../shared/typings';
 
 export interface MailerInteractorInterface {
   sendEmailVerification(email: string, otaCode: string): Promise<void>;

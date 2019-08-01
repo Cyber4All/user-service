@@ -9,37 +9,37 @@ export interface User{
     /**
      * Unique identifier of the user
      */
-    id: string;
+  id: string;
     /**
      * A brief profile description of the user
      */
-    bio: string;
+  bio: string;
     /**
      * The Cognito Identity Id of the user. Used to reference set of permissions the user has over AWS services
      */
-    cognitoIdentityId?: string;
+  cognitoIdentityId?: string;
     /**
      * The date the user was created
      */
-    createdAt: string;
+  createdAt: string;
     /**
      * The email address of the user
      */
-    email: string;
+  email: string;
     /**
      * Whether or not the user's provided email address has been verified
      */
-    emailVerified: boolean;
+  emailVerified: boolean;
     /**
      * The full name of the user
      */
-    name: string;
+  name: string;
     /**
      * The organization the user is apart of
      */
-    organization: string;
+  organization: string;
     /**
      * Human readable unique identifier of the user
      */
-    username: string;
+  username: string;
 }
