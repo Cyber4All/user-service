@@ -20,7 +20,7 @@ export function requesterIsAdmin(requester: UserToken): boolean {
       requester != null &&
       Array.isArray(requester.accessGroups) &&
       requester.accessGroups.includes(AccessGroup.ADMIN)
-    );
+  );
 }
 
   /**
@@ -31,12 +31,12 @@ export function requesterIsAdmin(requester: UserToken): boolean {
    * @returns {boolean}
    */
 export function requesterIsEditor(requester: UserToken): boolean {
-    return (
+  return (
       requester != null &&
       Array.isArray(requester.accessGroups) &&
       requester.accessGroups.includes(AccessGroup.EDITOR)
     );
-  }
+}
 
   /**
    * Checks if requester is an Admin or Editor by checking if their `accessGroups` contain the admin or editor privileges
@@ -46,8 +46,8 @@ export function requesterIsEditor(requester: UserToken): boolean {
    * @returns {boolean}
    */
 export function requesterIsAdminOrEditor(requester: UserToken): boolean {
-    return requesterIsAdmin(requester) || requesterIsEditor(requester);
-  }
+  return requesterIsAdmin(requester) || requesterIsEditor(requester);
+}
 
   /**
    * Checks if user is an Admin or Editor by checking if their `accessGroups` contain the admin or editor privileges
@@ -57,8 +57,8 @@ export function requesterIsAdminOrEditor(requester: UserToken): boolean {
    * @returns {boolean}
    */
 export function userIsAdminOrEditor(user: AuthUser): boolean {
-    return requesterIsAdmin(user) || requesterIsEditor(user);
-  }
+  return requesterIsAdmin(user) || requesterIsEditor(user);
+}
 
   /**
  * Checks if request should be authorized by checking if `authorizationCases` contains `true`.
@@ -69,10 +69,9 @@ export function userIsAdminOrEditor(user: AuthUser): boolean {
  */
 export function authorizeRequest(authorizationCases: boolean[], message?: string): never | void {
   if (!authorizationCases.includes(true)) {
-      throw new ResourceError(
+    throw new ResourceError(
         message || 'Invalid access',
         ResourceErrorReason.INVALID_ACCESS
       );
-    }
+  }
 }
-
