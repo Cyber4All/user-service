@@ -24,11 +24,11 @@ describe('AuthorizationManager', () => {
     });
     it('should return true (All accessGroups)', () => {
       userToken.accessGroups = [
-          'admin',
-          'editor',
-          'curator@collection',
-          'reviewer@collection'
-        ];
+        'admin',
+        'editor',
+        'curator@collection',
+        'reviewer@collection'
+      ];
       expect(requesterIsAdmin(userToken)).toBe(true);
     });
     it('should return false (No accessGroups)', () => {
@@ -49,10 +49,10 @@ describe('AuthorizationManager', () => {
     });
     it('should return false (All accessGroups except admin)', () => {
       userToken.accessGroups = [
-          'editor',
-          'curator@collection',
-          'reviewer@collection'
-        ];
+        'editor',
+        'curator@collection',
+        'reviewer@collection'
+      ];
       expect(requesterIsAdmin(userToken)).toBe(false);
     });
     it('should return false (undefined userToken)', () => {
@@ -78,11 +78,11 @@ describe('AuthorizationManager', () => {
     });
     it('should return true (All accessGroups)', () => {
       userToken.accessGroups = [
-          'admin',
-          'editor',
-          'curator@collection',
-          'reviewer@collection'
-        ];
+        'admin',
+        'editor',
+        'curator@collection',
+        'reviewer@collection'
+      ];
       expect(requesterIsAdminOrEditor(userToken)).toBe(true);
     });
     it('should return false (No accessGroups)', () => {
@@ -119,17 +119,17 @@ describe('AuthorizationManager', () => {
     });
     it('should throw ResourceError (Only false)', () => {
       try {
-          authorizeRequest([false]);
-        } catch (e) {
-          expect(e).toBeInstanceOf(ResourceError);
-        }
+        authorizeRequest([false]);
+      } catch (e) {
+        expect(e).toBeInstanceOf(ResourceError);
+      }
     });
     it('should throw ResourceError (true and false)', () => {
       try {
-          authorizeRequest([true, false]);
-        } catch (e) {
-          expect(e).toBeInstanceOf(ResourceError);
-        }
+        authorizeRequest([true, false]);
+      } catch (e) {
+        expect(e).toBeInstanceOf(ResourceError);
+      }
     });
   });
 });
