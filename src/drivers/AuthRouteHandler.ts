@@ -47,7 +47,7 @@ export default class AuthRouteHandler {
     router.use((req, res, next) => {
       // If the username in the cookie is not lowercase and error will be reported
       // and the value adjusted to be lowercase
-      if (!(req.user.username === req.user.username.toLowerCase())) {
+      if (!req.user.SERVICE_KEY && !(req.user.username === req.user.username.toLowerCase())) {
         // This odd try/catch setup is so that we don't abort the current operation,
         // but still have Sentry realize that an error was thrown.
         try {
