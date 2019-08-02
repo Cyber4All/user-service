@@ -1,8 +1,8 @@
-import * as auth from './AuthorizationManager';
-import { UserToken } from './typings';
+import { requesterIsAdmin, requesterIsAdminOrEditor, authorizeRequest } from './AuthorizationManager';
+import { UserToken } from '../types/user-token';
 import { ResourceError } from '../Error';
 
-describe('LearningObjectDownload: AuthorizationManager', () => {
+describe('AuthorizationManager', () => {
   let userToken: UserToken;
 
   beforeEach(() => {
@@ -20,7 +20,7 @@ describe('LearningObjectDownload: AuthorizationManager', () => {
   describe('requesterIsAdmin', () => {
     it('should return true (Only admin accessGroup)', () => {
       userToken.accessGroups = ['admin'];
-      expect(auth.requesterIsAdmin(userToken)).toBe(true);
+      expect(requesterIsAdmin(userToken)).toBe(true);
     });
     it('should return true (All accessGroups)', () => {
       userToken.accessGroups = [
@@ -29,23 +29,23 @@ describe('LearningObjectDownload: AuthorizationManager', () => {
         'curator@collection',
         'reviewer@collection'
       ];
-      expect(auth.requesterIsAdmin(userToken)).toBe(true);
+      expect(requesterIsAdmin(userToken)).toBe(true);
     });
     it('should return false (No accessGroups)', () => {
       userToken.accessGroups = [];
-      expect(auth.requesterIsAdmin(userToken)).toBe(false);
+      expect(requesterIsAdmin(userToken)).toBe(false);
     });
     it('should return false (Only editor accessGroup)', () => {
       userToken.accessGroups = ['editor'];
-      expect(auth.requesterIsAdmin(userToken)).toBe(false);
+      expect(requesterIsAdmin(userToken)).toBe(false);
     });
     it('should return false (Only curator@collection accessGroup)', () => {
       userToken.accessGroups = ['curator@collection'];
-      expect(auth.requesterIsAdmin(userToken)).toBe(false);
+      expect(requesterIsAdmin(userToken)).toBe(false);
     });
     it('should return false (Only reviewer@collection accessGroup)', () => {
       userToken.accessGroups = ['reviewer@collection'];
-      expect(auth.requesterIsAdmin(userToken)).toBe(false);
+      expect(requesterIsAdmin(userToken)).toBe(false);
     });
     it('should return false (All accessGroups except admin)', () => {
       userToken.accessGroups = [
@@ -53,28 +53,28 @@ describe('LearningObjectDownload: AuthorizationManager', () => {
         'curator@collection',
         'reviewer@collection'
       ];
-      expect(auth.requesterIsAdmin(userToken)).toBe(false);
+      expect(requesterIsAdmin(userToken)).toBe(false);
     });
     it('should return false (undefined userToken)', () => {
-      // @ts-ignore
+            // @ts-ignore
       userToken = undefined;
-      expect(auth.requesterIsAdmin(userToken)).toBe(false);
+      expect(requesterIsAdmin(userToken)).toBe(false);
     });
     it('should return false (undefined accessGroups)', () => {
-      // @ts-ignore
+            // @ts-ignore
       userToken.accessGroups = undefined;
-      expect(auth.requesterIsAdmin(userToken)).toBe(false);
+      expect(requesterIsAdmin(userToken)).toBe(false);
     });
   });
 
   describe('requesterIsAdminOrEditor', () => {
     it('should return true (Only admin accessGroup)', () => {
       userToken.accessGroups = ['admin'];
-      expect(auth.requesterIsAdminOrEditor(userToken)).toBe(true);
+      expect(requesterIsAdminOrEditor(userToken)).toBe(true);
     });
     it('should return true (Only editor accessGroup)', () => {
       userToken.accessGroups = ['editor'];
-      expect(auth.requesterIsAdminOrEditor(userToken)).toBe(true);
+      expect(requesterIsAdminOrEditor(userToken)).toBe(true);
     });
     it('should return true (All accessGroups)', () => {
       userToken.accessGroups = [
@@ -83,50 +83,50 @@ describe('LearningObjectDownload: AuthorizationManager', () => {
         'curator@collection',
         'reviewer@collection'
       ];
-      expect(auth.requesterIsAdminOrEditor(userToken)).toBe(true);
+      expect(requesterIsAdminOrEditor(userToken)).toBe(true);
     });
     it('should return false (No accessGroups)', () => {
       userToken.accessGroups = [];
-      expect(auth.requesterIsAdminOrEditor(userToken)).toBe(false);
+      expect(requesterIsAdminOrEditor(userToken)).toBe(false);
     });
     it('should return false (Only curator@collection accessGroup)', () => {
       userToken.accessGroups = ['curator@collection'];
-      expect(auth.requesterIsAdminOrEditor(userToken)).toBe(false);
+      expect(requesterIsAdminOrEditor(userToken)).toBe(false);
     });
     it('should return false (Only reviewer@collection accessGroup)', () => {
       userToken.accessGroups = ['reviewer@collection'];
-      expect(auth.requesterIsAdminOrEditor(userToken)).toBe(false);
+      expect(requesterIsAdminOrEditor(userToken)).toBe(false);
     });
     it('should return false (All accessGroups except admin and editor)', () => {
       userToken.accessGroups = ['curator@collection', 'reviewer@collection'];
-      expect(auth.requesterIsAdminOrEditor(userToken)).toBe(false);
+      expect(requesterIsAdminOrEditor(userToken)).toBe(false);
     });
     it('should return false (undefined userToken)', () => {
-      // @ts-ignore
+            // @ts-ignore
       userToken = undefined;
-      expect(auth.requesterIsAdminOrEditor(userToken)).toBe(false);
+      expect(requesterIsAdminOrEditor(userToken)).toBe(false);
     });
     it('should return false (undefined accessGroups)', () => {
-      // @ts-ignore
+            // @ts-ignore
       userToken.accessGroups = undefined;
-      expect(auth.requesterIsAdminOrEditor(userToken)).toBe(false);
+      expect(requesterIsAdminOrEditor(userToken)).toBe(false);
     });
   });
 
   describe('authorizeRequest', () => {
     it('should return void', () => {
-      expect(auth.authorizeRequest([true])).toBeUndefined();
+      expect(authorizeRequest([true])).toBeUndefined();
     });
     it('should throw ResourceError (Only false)', () => {
       try {
-        auth.authorizeRequest([false]);
+        authorizeRequest([false]);
       } catch (e) {
         expect(e).toBeInstanceOf(ResourceError);
       }
     });
     it('should throw ResourceError (true and false)', () => {
       try {
-        auth.authorizeRequest([true, false]);
+        authorizeRequest([true, false]);
       } catch (e) {
         expect(e).toBeInstanceOf(ResourceError);
       }
