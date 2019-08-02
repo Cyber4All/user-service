@@ -1,22 +1,21 @@
-/**
- * Set of reusable functions used to authorize requests within this module
- */
-
-import { UserToken } from './typings';
+import { AuthUser } from '../types/auth-user';
+import { UserToken } from '../types/user-token';
 import { ResourceError, ResourceErrorReason } from '../Error';
 
-enum AccessGroup {
+export enum AccessGroup {
   ADMIN = 'admin',
-  EDITOR = 'editor'
+  EDITOR = 'editor',
+  CURATOR = 'curator',
+  REVIEWER = 'reviewer'
 }
 
 /**
- * Checks if requester is an Admin by checking if their `accessGroups` contain the admin privilege
- *
- * @export
- * @param {UserToken} requester [Token data of the requester]
- * @returns {boolean}
- */
+* Checks if requester is an Admin by checking if their `accessGroups` contain the admin privilege
+*
+* @export
+* @param {UserToken} requester [Token data of the requester]
+* @returns {boolean}
+*/
 export function requesterIsAdmin(requester: UserToken): boolean {
   return (
     requester != null &&
@@ -52,15 +51,27 @@ export function requesterIsAdminOrEditor(requester: UserToken): boolean {
 }
 
 /**
- * Checks if request should be authorized by checking if `authorizationCases` contains `true`.
+ * Checks if user is an Admin or Editor by checking if their `accessGroups` contain the admin or editor privileges
  *
  * @export
- * @param {boolean[]} authorizationCases [List of boolean values from the result of an authorization check]
+ * @param {AuthUser} user [Token data of the requester]
+ * @returns {boolean}
  */
-export function authorizeRequest(authorizationCases: boolean[]) {
+export function userIsAdminOrEditor(user: AuthUser): boolean {
+  return requesterIsAdmin(user) || requesterIsEditor(user);
+}
+
+/**
+* Checks if request should be authorized by checking if `authorizationCases` contains `true`.
+*
+* @export
+* @param {boolean[]} authorizationCases [List of boolean values from the result of an authorization check]
+* @param {string} message [The error message to set if checks fail]
+*/
+export function authorizeRequest(authorizationCases: boolean[], message?: string): never | void {
   if (!authorizationCases.includes(true)) {
     throw new ResourceError(
-      'Invalid access',
+      message || 'Invalid access',
       ResourceErrorReason.INVALID_ACCESS
     );
   }
