@@ -1,4 +1,4 @@
-import { serviceModule, ServiceModule } from '../shared/ServiceModule';
+import { serviceModule, ServiceModule } from 'node-service-module';
 import * as Interactor from './Interactor';
 /**
  * Module encapsulating all things related to managing Cognito Identities
