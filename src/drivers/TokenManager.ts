@@ -1,5 +1,5 @@
 import * as jwt from 'jsonwebtoken';
-import { AuthUser } from '../types/auth-user';
+import { AuthUser } from '../shared/typings';
 
 /**
  * Takes a user object and generates a JWT for the user

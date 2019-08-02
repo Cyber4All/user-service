@@ -1,10 +1,10 @@
 import { DataStore } from '../interfaces/interfaces';
-import { User } from '@cyber4all/clark-entity';
 import { OTACode } from './OTACodeManager';
 import { UserQuery } from '../interfaces/Query';
 import { MOCK_OBJECTS } from '../tests/mocks';
 import { UserStats } from '../UserStats/UserStatsInteractor';
-import { UserDocument } from '../types/user-document';
+import { UserDocument } from '../shared/typings/user-document';
+import { User } from '../shared/typings';
 
 export default class MockDriver implements DataStore {
   fetchUserCollectionRole(params: {

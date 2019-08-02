@@ -1,5 +1,5 @@
-import { UserToken } from '../types/user-token';
-import { UserDocument } from '../types/user-document';
+import { UserToken } from '../shared/typings';
+import { UserDocument } from '../shared/typings/user-document';
 import {
   ServiceError,
   ServiceErrorReason,

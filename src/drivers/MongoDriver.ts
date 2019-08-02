@@ -1,12 +1,13 @@
 import { Db, ObjectID } from 'mongodb';
 import { DataStore } from '../interfaces/interfaces';
 import { UserQuery } from '../interfaces/Query';
-import { AuthUser } from '../types/auth-user';
-import { UserDocument } from '../types/user-document';
+import { AuthUser } from '../shared/typings/auth-user';
+import { UserDocument } from '../shared/typings/user-document';
 import { UserStats } from '../UserStats/UserStatsInteractor';
 import { UserStatStore } from '../UserStats/UserStatStore';
 import { OTACode } from './OTACodeManager';
 import { MongoConnectionManager } from '../config/mongodb';
+import { mapUserDataToAuthUser } from '../shared/functions';
 
 export const COLLECTIONS = {
   USERS: 'users',
@@ -68,11 +69,11 @@ export default class MongoDriver implements DataStore {
       .findOne<{ accessGroups: string[] }>(
         { _id: userId, accessGroups: { $regex: new RegExp(collection, 'ig') } },
         {
-          projection: {
-            _id: 0,
-            'accessGroups.$': 1
-          }
+        projection: {
+          _id: 0,
+          'accessGroups.$': 1
         }
+      }
       );
     if (doc) {
       return doc.accessGroups[0];
@@ -502,19 +503,7 @@ export default class MongoDriver implements DataStore {
   }
 
   private generateUser(userRecord: UserDocument): AuthUser {
-    const user = new AuthUser({
-      id: userRecord._id,
-      username: userRecord.username,
-      name: userRecord.name,
-      email: userRecord.email,
-      emailVerified: userRecord.emailVerified,
-      bio: userRecord.bio,
-      organization: userRecord.organization,
-      createdAt: userRecord.createdAt,
-      password: userRecord.password,
-      accessGroups: userRecord.accessGroups
-    });
-    return user;
+    return mapUserDataToAuthUser({ ...userRecord as any, id: userRecord._id });
   }
 }
 

@@ -1,6 +1,6 @@
 import { Mailer, DataStore, Responder } from '../interfaces/interfaces';
 import * as MAIL_DEFAULTS from '../interfaces/Mailer.defaults';
-import { User } from '@cyber4all/clark-entity';
+import { User } from '../shared/typings';
 
 const RESPONSE_TEXT = {
   EMAIL_NOT_REGISTERED_WITH_ACCOUNT:

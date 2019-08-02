@@ -1,4 +1,4 @@
-import { UserToken } from '../types/user-token';
+import { UserToken, User } from '../shared/typings';
 import { DataStore } from '../interfaces/interfaces';
 import {
   hasRoleModificationAccess,
@@ -12,8 +12,8 @@ import {
   ResourceErrorReason,
   handleError
 } from '../Error';
-import { UserDocument } from '../types/user-document';
-import { User } from '@cyber4all/clark-entity';
+import { UserDocument } from '../shared/typings/user-document';
+import { mapUserDataToUser } from '../shared/functions';
 
 abstract class RoleActions {
 
@@ -219,9 +219,7 @@ export async function fetchReviewers(
 ): Promise<any[]> {
   if (verifyReadReviewerAccess(user, collection)) {
     const users = await dataStore.fetchReviewers(collection);
-    const reviewers = users.map(user => {
-      return new User(user);
-    });
+    const reviewers: User[] = users.map(mapUserDataToUser);
     return reviewers;
   }
   throw new ResourceError('Invalid Access', ResourceErrorReason.INVALID_ACCESS);
@@ -245,9 +243,7 @@ export async function fetchCurators(
 ): Promise<any[]> {
   if (isAdmin(user)) {
     const users = await dataStore.fetchCurators(collection);
-    const curators = users.map(user => {
-      return new User(user);
-    });
+    const curators = users.map(mapUserDataToUser);
     return curators;
   }
   throw new ResourceError('Invalid Access', ResourceErrorReason.INVALID_ACCESS);
@@ -271,9 +267,7 @@ export async function fetchMembers(
 ): Promise<any[]> {
   if (isAdmin(user)) {
     const users = await dataStore.fetchCollectionMembers(collection);
-    const members = users.map(user => {
-      return new User(user);
-    });
+    const members = users.map(mapUserDataToUser);
     return members;
   }
   throw new ResourceError('Invalid Access', ResourceErrorReason.INVALID_ACCESS);

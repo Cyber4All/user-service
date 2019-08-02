@@ -11,7 +11,7 @@ import { UserInteractor } from '../interactors/interactors';
 import * as AuthInteractor from '../interactors/AuthenticationInteractor';
 import { initializePrivate } from '../collection-role/RouteHandler';
 import { reportError } from '../shared/SentryConnector';
-import { UserToken } from '../types/user-token';
+import { UserToken } from '../shared/typings';
 import { mapErrorToResponseData } from '../Error';
 export default class AuthRouteHandler {
   constructor(
@@ -129,7 +129,7 @@ export default class AuthRouteHandler {
           cognitoGateway: this.cognitoGateway
         });
         responder.setCookie('presence', tokens.bearer);
-        res.send({ ...tokens.user.toPlainObject(), tokens });
+        res.send({ ...tokens.user, tokens });
       } catch (error) {
         const { code, message } = mapErrorToResponseData(error);
         res.status(code).json({ message });

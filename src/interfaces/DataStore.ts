@@ -1,8 +1,8 @@
 import { OTACode } from '../drivers/OTACodeManager';
 import { UserQuery } from './Query';
 import { UserStatDatastore } from '../UserStats/UserStatsInteractor';
-import { AuthUser } from '../types/auth-user';
-import { UserDocument } from '../types/user-document';
+import { AuthUser } from '../shared/typings';
+import { UserDocument } from '../shared/typings/user-document';
 
 export interface DataStore extends UserStatDatastore {
   identifierInUse(username: string): Promise<boolean>;
