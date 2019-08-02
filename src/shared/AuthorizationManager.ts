@@ -1,5 +1,4 @@
-import { AuthUser } from '../types/auth-user';
-import { UserToken } from '../types/user-token';
+import { AuthUser, UserToken } from './typings';
 import { ResourceError, ResourceErrorReason } from '../Error';
 
 export enum AccessGroup {
