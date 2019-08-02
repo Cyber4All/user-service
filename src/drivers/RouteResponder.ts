@@ -73,7 +73,7 @@ export default class RouteResponder implements Responder {
   }
 
   setCookie(key: string, value: string): any {
-    let options = {
+    const options = {
       maxAge: 604800000,
       httpOnly: false,
       domain: process.env.COOKIE_DOMAIN,
@@ -84,7 +84,7 @@ export default class RouteResponder implements Responder {
   }
 
   removeCookie(name: string): any {
-    let options = {
+    const options = {
       domain: process.env.COOKIE_DOMAIN,
       path: '/'
     };

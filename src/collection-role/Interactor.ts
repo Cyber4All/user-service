@@ -47,13 +47,13 @@ abstract class RoleActions {
       mustProvide: ['id', 'role', 'collection']
     });
     authorizeRequest([hasRoleModificationAccess(this.role, this.user, this.collection)]);
-      const userDocument = await this.dataStore.findUserById(this.userId);
+    const userDocument = await this.dataStore.findUserById(this.userId);
     if (!userDocument) {
       throw new ResourceError('User Not Found', ResourceErrorReason.NOT_FOUND);
     }
-        const formattedAccessGroup = `${this.role}@${this.collection}`;
+    const formattedAccessGroup = `${this.role}@${this.collection}`;
     await this.performRoleAction(formattedAccessGroup, userDocument);
-      }
+  }
   abstract performRoleAction(
     formattedAccessGroup: string,
     userDocument: UserDocument,

@@ -68,7 +68,7 @@ export default class MongoDriver implements DataStore {
       .collection(COLLECTIONS.USERS)
       .findOne<{ accessGroups: string[] }>(
         { _id: userId, accessGroups: { $regex: new RegExp(collection, 'ig') } },
-        {
+      {
         projection: {
           _id: 0,
           'accessGroups.$': 1
