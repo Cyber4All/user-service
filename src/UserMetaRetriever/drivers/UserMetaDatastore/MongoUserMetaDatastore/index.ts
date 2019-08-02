@@ -22,7 +22,7 @@ export class MongoUserMetaDatastore implements UserMetaDatastore {
    * @memberof MongoUserMetaDatastore
    */
   async fetchUser(username: string): Promise<AuthUser> {
-    const user = await this.db.collection(USER_COLLECTION).findOne({username});
+    const user = await this.db.collection(USER_COLLECTION).findOne({ username });
     if (user) {
       return mapUserDataToAuthUser({ ...user as AuthUser, id: user._id });
     }
