@@ -1,11 +1,11 @@
 import {
   ExpressServiceModule,
   expressServiceModule
-} from '../shared/ExpressServiceModule';
-import { UserMetaDatastore } from './interfaces';
+} from 'node-service-module';
 import { MongoUserMetaDatastore } from './drivers';
 import { ExpressRouterAdapter } from './adapters';
 import * as Interactor from './Interactor';
+import { UserMetaDatastore } from './interfaces';
 /**
  * Module encapsulating all things related to user fetching metadata for users
  * Since this module is an extension of `ExpressServiceModule`
