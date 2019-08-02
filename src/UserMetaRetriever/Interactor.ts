@@ -2,13 +2,46 @@ import { UserMetaRetriever as Module } from '.';
 import { UserToken } from './typings';
 import { authorizeRequest, requesterIsAdmin, requesterIsAdminOrEditor, userIsAdminOrEditor } from '../shared/AuthorizationManager';
 import { handleError, ResourceError, ResourceErrorReason } from '../Error';
-import { UserMetaDatastore } from './interfaces';
+import { UserMetaDatastore, CognitoIdentityGateway } from './interfaces';
+import { mapUserDataToUser } from '../shared/functions';
 
 /**
  * Encapsulates Drivers used within this interactor in a namespace
  */
 namespace Drivers {
   export const datastore = () => Module.resolveDependency(UserMetaDatastore);
+}
+
+namespace Gateways {
+  export const cognitoIdentityManager = () => Module.resolveDependency(CognitoIdentityGateway);
+}
+
+/**
+ * Retrieves user data by username
+ * If the requester is an admin or editor, additional information is returned
+ *
+ * @export
+ * @param {UserToken} request [Information about the requester of this resource]
+ * @param {string} username [The username of the user to retrieve]
+ *
+ * @returns {Promise<any>}
+ */
+export async function getUser({ requester, username }: { requester: UserToken, username: string }): Promise<any> {
+  try {
+    if (!username) {
+      throw new ResourceError('Invalid parameters. Username must be provided.', ResourceErrorReason.BAD_REQUEST);
+    }
+    const user = await Drivers.datastore().fetchUser(username);
+    if (!user) {
+      throw new ResourceError(`User ${username} does not exist.`, ResourceErrorReason.NOT_FOUND);
+    }
+    if (requesterIsAdminOrEditor(requester)) {
+      user.cognitoIdentityId = await Gateways.cognitoIdentityManager().getCognitoIdentityId({ username: user.username, isAdminOrEditor: userIsAdminOrEditor(user) });
+    }
+    return mapUserDataToUser(user);
+  } catch (e) {
+    handleError(e);
+  }
 }
 
 /**
@@ -75,7 +108,7 @@ function validateRequestParams({
     if (Array.isArray(mustProvide)) {
       message = `Must provide ${multipleParams ? '' : 'a'} valid value${
         multipleParams ? 's' : ''
-      } for ${mustProvide}`;
+        } for ${mustProvide}`;
     }
     throw new ResourceError(message, ResourceErrorReason.BAD_REQUEST);
   }

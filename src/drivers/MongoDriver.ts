@@ -194,8 +194,8 @@ export default class MongoDriver implements DataStore {
       objectCursor = orderBy
         ? objectCursor.sort(orderBy, sortType ? sortType : 1)
         : objectCursor
-            .sort({ score: { $meta: 'textScore' } })
-            .project({ score: { $meta: 'textScore' } });
+          .sort({ score: { $meta: 'textScore' } })
+          .project({ score: { $meta: 'textScore' } });
 
       const userDocs = await objectCursor.toArray();
 

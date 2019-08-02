@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import * as AWS from 'aws-sdk';
-import { UserToken, OpenIdToken } from './typings';
+import { OpenIdToken } from './typings';
 import { handleError } from '../Error';
 
 const SDK_CONFIG = {
@@ -25,21 +25,17 @@ const TOKEN_DURATION = 86400; // 24 hours in seconds
  * Retrieves OpenIdToken for user
  *
  * @export
- * @param {UserToken} requester [Data about the requester]
+ * @param {string} username [The username to fetch associated Cognito Identity Id for]
+ * @param {string} isAdminOrEditor [Boolean indicating whether or not the user is an admin or editor]
  *
  * @returns {Promise<OpenIdToken>}
  */
-export function getOpenIdToken({
-  requester
-}: {
-  requester: UserToken;
-}): Promise<OpenIdToken> {
+export function getOpenIdToken({ username, isAdminOrEditor }:{username: string, isAdminOrEditor?: boolean}): Promise<OpenIdToken> {
   try {
-    authorizeRequest([requester != null]);
     const Logins = {};
-    Logins[DEVELOPER_PROVIDER] = requester.username;
+    Logins[DEVELOPER_PROVIDER] = username;
 
-    const IdentityPoolId = requesterIsAdminOrEditor(requester)
+    const IdentityPoolId = isAdminOrEditor
       ? ADMIN_IDENTITY_POOL_ID
       : IDENTITY_POOL_ID;
     const params = {

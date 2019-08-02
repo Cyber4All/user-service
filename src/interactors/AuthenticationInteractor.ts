@@ -6,9 +6,20 @@ import { UserToken } from '../shared/typings/user-token';
 import { ResourceError, ResourceErrorReason, handleError } from '../Error';
 import { OpenIdToken } from '../CognitoIdentityManager/typings';
 import { mapUserDataToAuthUser } from '../shared/functions';
+import { userIsAdminOrEditor } from '../shared/AuthorizationManager';
 
 export interface CognitoGateway {
-  getOpenIdToken(params: { requester: UserToken }): Promise<OpenIdToken>;
+  /**
+   * Retrieves the Cognito OpenId Token associated with the given username
+   *
+   * @abstract
+   * @param {string} username [The username to fetch associated Cognito Identity]
+   * @param {string} isAdminOrEditor [Boolean indicating whether or not the user is an admin or editor]
+   * 
+   * @returns {Promise<string>}
+   * @memberof CognitoIdentityGateway
+   */
+  getOpenIdToken(params: { username: string, isAdminOrEditor?: boolean }): Promise<OpenIdToken>;
 }
 
 /**
@@ -46,17 +57,9 @@ export async function login(
       throw invalidCredentialsError;
     }
     const bearer = TokenManager.generateBearerToken(user);
-    const requester: UserToken = {
-      id: user.id,
-      username: user.username,
-      name: user.name,
-      email: user.email,
-      organization: user.organization,
-      emailVerified: user.emailVerified,
-      accessGroups: user.accessGroups
-    };
     const openId = await cognitoGateway.getOpenIdToken({
-      requester
+      username: user.username,
+      isAdminOrEditor: userIsAdminOrEditor(user)
     });
     delete user.password;
     return { bearer, openId, user };
@@ -105,17 +108,9 @@ export async function register(
     user.id = id;
 
     const bearer = TokenManager.generateBearerToken(user);
-    const requester: UserToken = {
-      id,
-      username: user.username,
-      name: user.name,
-      email: user.email,
-      organization: user.organization,
-      emailVerified: user.emailVerified,
-      accessGroups: user.accessGroups
-    };
     const openId = await cognitoGateway.getOpenIdToken({
-      requester
+      username: user.username,
+      isAdminOrEditor: userIsAdminOrEditor(user)
     });
     delete formattedUser.password;
     return {
@@ -181,17 +176,9 @@ export async function refreshToken({
   try {
     const user = await dataStore.loadUser(requester.id);
     const bearer = TokenManager.generateBearerToken(user);
-    const newUserToken: UserToken = {
-      id: user.id,
-      username: user.username,
-      name: user.name,
-      email: user.email,
-      organization: user.organization,
-      emailVerified: user.emailVerified,
-      accessGroups: user.accessGroups
-    };
     const openId = await cognitoGateway.getOpenIdToken({
-      requester: newUserToken
+      username: user.username,
+      isAdminOrEditor: userIsAdminOrEditor(user)
     });
     delete user.password;
     return { bearer, openId, user };
