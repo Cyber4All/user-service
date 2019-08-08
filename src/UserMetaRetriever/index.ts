@@ -18,7 +18,10 @@ import { ModuleCognitoIdentityGateway } from './gateways';
  */
 @expressServiceModule({
   expressRouter: ExpressRouterAdapter.buildRouter(),
-  providers: [{ provide: UserMetaDatastore, useClass: MongoUserMetaDatastore }, { provide: CognitoIdentityGateway, useClass: ModuleCognitoIdentityGateway }]
+  providers: [
+    { provide: UserMetaDatastore, useClass: MongoUserMetaDatastore },
+    { provide: CognitoIdentityGateway, useClass: ModuleCognitoIdentityGateway },
+  ]
 })
 export class UserMetaRetriever extends ExpressServiceModule {
   static getUserRoles = Interactor.getUserRoles;

@@ -123,6 +123,7 @@ function attachPublicRouters(app: express.Express) {
       responseFactory
     )
   );
+  app.use(UserMetaRetriever.expressRouter);
 }
 /**
  * Attaches route handlers that require authentication to Express app
@@ -139,7 +140,6 @@ function attachAuthenticatedRouters(app: express.Express) {
       responseFactory
     )
   );
-  app.use(UserMetaRetriever.expressRouter);
   // TODO: Deprecate admin router and middleware in favor of default router with proper authorization logic in interactors
   app.use(enforceAdminAccess);
   app.use(
