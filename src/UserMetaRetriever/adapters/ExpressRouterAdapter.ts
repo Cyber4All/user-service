@@ -22,10 +22,15 @@ export function buildRouter() {
  * @param {Request} req [The express request object]
  * @param {Response} res [The express response object]
  */
-async function handleGetUser(req: Request, res: Response) {
+async function handleGetUser(req: Request, res: Response, next: Function) {
   try {
-    const requester: UserToken = req['user'];
     const username: string = req.params.username;
+    if (username === 'tokens') {
+      next();
+      return;
+    }
+    const requester: UserToken = req['user'];
+    
     const user = await Interactor.getUser({ requester, username });
     res.send(user);
   } catch (e) {
