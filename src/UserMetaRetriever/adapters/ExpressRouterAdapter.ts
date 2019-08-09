@@ -25,6 +25,7 @@ export function buildRouter() {
 async function handleGetUser(req: Request, res: Response, next: Function) {
   try {
     const username: string = req.params.username;
+    // FIXME: Remove this conditional once the /principal route is active
     if (username === 'tokens') {
       next();
       return;
