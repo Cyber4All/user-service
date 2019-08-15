@@ -7,6 +7,7 @@ import { ResourceError, ResourceErrorReason, handleError } from '../Error';
 import { OpenIdToken } from '../CognitoIdentityManager/typings';
 import { mapUserDataToAuthUser } from '../shared/functions';
 import { userIsAdminOrEditor } from '../shared/AuthorizationManager';
+import { HttpFileAccessIdentityGateway } from '../gateways/file-access-identities/HttpFileAccessIdentityGateway';
 
 export interface CognitoGateway {
   /**
@@ -111,6 +112,10 @@ export async function register(
     const openId = await cognitoGateway.getOpenIdToken({
       username: user.username,
       isAdminOrEditor: userIsAdminOrEditor(user)
+    });
+    await HttpFileAccessIdentityGateway.createFileAccessIdentity({
+      fileAccessIdentity: openId.IdentityId,
+      username: user.username,
     });
     delete formattedUser.password;
     return {
