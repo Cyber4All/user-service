@@ -2,6 +2,7 @@ import { FILE_ACCESS_IDENTITY_ROUTES } from './routes';
 import { generateServiceToken } from '../../drivers/TokenManager';
 import * as request from 'request-promise';
 
+// FIXME: Create interface for this Gateway
 export class HttpFileAccessIdentityGateway {
     private static options = {
       uri: '',
