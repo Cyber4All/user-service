@@ -161,6 +161,7 @@ function startHttpServer(app: express.Express) {
   // root-require handles package.json being in different locations for prod and dev
   const version = require('root-require')('package.json').version;
   const server = http.createServer(app);
+  server.keepAliveTimeout = 95000;
   server.listen(HTTP_SERVER_PORT, () => {
     console.log(
       `User Service ${version} is running on port ${HTTP_SERVER_PORT}`
