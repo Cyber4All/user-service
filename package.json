@@ -31,7 +31,6 @@
     "@cyber4all/clark-taxonomy": "^2.0.0",
     "@sendgrid/mail": "^6.2.1",
     "@sentry/node": "^4.4.1",
-    "@types/request-promise": "^4.1.44",
     "aws-sdk": "^2.440.0",
     "bcrypt": "^3.0.3",
     "cookie-parser": "^1.4.3",

@@ -17,4 +17,5 @@ export class ModuleCognitoIdentityGateway implements CognitoIdentityGateway{
     }
     return null;
   }
+
 }
