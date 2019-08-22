@@ -7,6 +7,7 @@ import { ResourceError, ResourceErrorReason, handleError } from '../Error';
 import { OpenIdToken } from '../CognitoIdentityManager/typings';
 import { mapUserDataToAuthUser } from '../shared/functions';
 import { userIsAdminOrEditor } from '../shared/AuthorizationManager';
+import { HttpFileAccessIdentityGateway } from '../gateways/file-access-identities/HttpFileAccessIdentityGateway';
 
 export interface CognitoGateway {
   /**
