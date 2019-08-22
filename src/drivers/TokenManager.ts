@@ -26,18 +26,6 @@ export function generateBearerToken(user: AuthUser) {
   return token;
 }
 
-export function generateServiceToken() {
-  const payload = {
-    SERVICE_KEY: process.env.SERVICE_KEY,
-  };
-  const options = {
-    issuer: process.env.ISSUER,
-    expiresIn: 86400,
-    audience: 'https://clark.center',
-  };
-  return jwt.sign(payload, process.env.KEY, options);
-}
-
 /**
  * Accepts a JWT and verifies that the token has been properly issued
  *

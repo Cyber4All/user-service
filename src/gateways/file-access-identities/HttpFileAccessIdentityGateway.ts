@@ -26,7 +26,7 @@ export class HttpFileAccessIdentityGateway {
         method: 'POST',
         body: {
           fileAccessID: fileAccessIdentity,
-        },
+        }
       }
       options.uri = FILE_ACCESS_IDENTITY_ROUTES.createFileAccessIdentity(username);
       options.headers.Authorization = `Bearer ${generateServiceToken()}`;
