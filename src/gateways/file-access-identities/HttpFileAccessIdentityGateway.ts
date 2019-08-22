@@ -21,7 +21,13 @@ export class HttpFileAccessIdentityGateway {
         username: string,
         fileAccessIdentity: string,
     }): Promise<string> {
-      const options = { ...this.options };
+      const options = { 
+        ...this.options,
+        method: 'POST',
+        body: {
+          fileAccessID: fileAccessIdentity,
+        },
+      }
       options.uri = FILE_ACCESS_IDENTITY_ROUTES.createFileAccessIdentity(username);
       options.headers.Authorization = `Bearer ${generateServiceToken()}`;
       const res = await request(options);

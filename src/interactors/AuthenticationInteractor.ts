@@ -113,10 +113,12 @@ export async function register(
       username: user.username,
       isAdminOrEditor: userIsAdminOrEditor(user)
     });
+
     await HttpFileAccessIdentityGateway.createFileAccessIdentity({
       fileAccessIdentity: openId.IdentityId,
       username: user.username,
     });
+    
     delete formattedUser.password;
     return {
       bearer,
