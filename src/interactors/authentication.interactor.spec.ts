@@ -132,7 +132,7 @@ describe('AuthenticationInteractor', () => {
     });
     it('should return a lowercased user on success', async () => {
       const registrationRequest = {
-        username: 'aCAPITALIZEDreallycoolhuman',
+        username: 'aCAPreallycoolhuman',
         name: 'So Fun',
         email: 'thisemaildoesntexist@test.com',
         organization: 'towson university',
