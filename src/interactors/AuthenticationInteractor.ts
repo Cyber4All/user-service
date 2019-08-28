@@ -16,7 +16,7 @@ export interface CognitoGateway {
    * @abstract
    * @param {string} username [The username to fetch associated Cognito Identity]
    * @param {string} isAdminOrEditor [Boolean indicating whether or not the user is an admin or editor]
-   * 
+   *
    * @returns {Promise<string>}
    * @memberof CognitoIdentityGateway
    */
@@ -118,7 +118,7 @@ export async function register(
       fileAccessIdentity: openId.IdentityId,
       username: user.username,
     });
-    
+
     delete formattedUser.password;
     return {
       bearer,
@@ -195,7 +195,7 @@ export async function refreshToken({
 }
 
 function sanitizeUser(user: AuthUser): AuthUser {
-  user.username = sanitizeText(user.username)
+  user.username = sanitizeText(user.username);
   user.email = sanitizeText(user.email);
   user.name = sanitizeText(user.name);
   user.organization = sanitizeText(user.organization);
