@@ -142,8 +142,8 @@ describe('AuthenticationInteractor', () => {
 
       const registrationResponse =
         await register(driver, hasher, registrationRequest, cognitoGateway);
-      expect(registrationResponse.user.username).toBe(registrationRequest.username.toLowerCase())
-    })
+      expect(registrationResponse.user.username).toBe(registrationRequest.username.toLowerCase());
+    });
   });
 });
 
