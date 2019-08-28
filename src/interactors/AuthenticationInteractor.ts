@@ -16,7 +16,7 @@ export interface CognitoGateway {
    * @abstract
    * @param {string} username [The username to fetch associated Cognito Identity]
    * @param {string} isAdminOrEditor [Boolean indicating whether or not the user is an admin or editor]
-   * 
+   *
    * @returns {Promise<string>}
    * @memberof CognitoIdentityGateway
    */
@@ -86,24 +86,24 @@ export async function register(
   cognitoGateway: CognitoGateway
 ): Promise<{ bearer: string; openId: OpenIdToken; user: AuthUser }> {
   try {
-    if (!isValidUsername(user.username)) {
+    const formattedUser = sanitizeUser(user);
+    formattedUser.accessGroups = [];
+
+    if (!isValidUsername(formattedUser.username)) {
       throw new ResourceError(
         'Invalid username provided.',
         ResourceErrorReason.BAD_REQUEST
       );
     }
-    if (await datastore.identifierInUse(user.username)) {
+    if (await datastore.identifierInUse(formattedUser.username)) {
       throw new ResourceError(
         'Username is already in use',
         ResourceErrorReason.BAD_REQUEST
       );
     }
 
-    const pwdhash = await hasher.hash(user.password);
+    const pwdhash = await hasher.hash(formattedUser.password);
     user.password = pwdhash;
-
-    const formattedUser = sanitizeUser(user);
-    formattedUser.accessGroups = [];
 
     const id = await datastore.insertUser(formattedUser);
     user.id = id;
@@ -118,7 +118,7 @@ export async function register(
       fileAccessIdentity: openId.IdentityId,
       username: user.username,
     });
-    
+
     delete formattedUser.password;
     return {
       bearer,
@@ -195,6 +195,7 @@ export async function refreshToken({
 }
 
 function sanitizeUser(user: AuthUser): AuthUser {
+  user.username = sanitizeText(user.username);
   user.email = sanitizeText(user.email);
   user.name = sanitizeText(user.name);
   user.organization = sanitizeText(user.organization);
