@@ -130,6 +130,19 @@ describe('AuthenticationInteractor', () => {
         done();
       }
     });
+    it('should return a lowercased user on success', async () => {
+      const registrationRequest = {
+        username: 'aCAPITALIZEDreallycoolhuman',
+        name: 'So Fun',
+        email: 'thisemaildoesntexist@test.com',
+        organization: 'towson university',
+        password: 'mypassissecure',
+        bio: '',
+      } as any;
+
+      const registrationResponse = await register(driver, hasher, registrationRequest, cognitoGateway);
+      expect(registrationResponse.user.username).toBe(registrationRequest.username.toLowerCase())
+    })
   });
 });
 
