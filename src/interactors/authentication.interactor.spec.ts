@@ -140,9 +140,13 @@ describe('AuthenticationInteractor', () => {
         bio: '',
       } as any;
 
-      const registrationResponse =
-        await register(driver, hasher, registrationRequest, cognitoGateway);
-      expect(registrationResponse.user.username).toBe(registrationRequest.username.toLowerCase());
+      try {
+        const registrationResponse =
+          await register(driver, hasher, registrationRequest, cognitoGateway);
+        expect(registrationResponse.user.username).toBe(registrationRequest.username.toLowerCase());
+      } catch (e) {
+        console.log('E', e)
+      }
     });
   });
 });

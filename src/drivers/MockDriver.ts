@@ -23,7 +23,7 @@ export default class MockDriver implements DataStore {
   }
 
   async identifierInUse(username: string): Promise<boolean> {
-    return Promise.resolve(username !== 'thisDOESNTexist');
+    return Promise.resolve(username !== 'thisdoesntexist');
   }
 
   insertUser(user: User): Promise<string> {
