@@ -145,7 +145,7 @@ describe('AuthenticationInteractor', () => {
           await register(driver, hasher, registrationRequest, cognitoGateway);
         expect(registrationResponse.user.username).toBe(registrationRequest.username.toLowerCase());
       } catch (e) {
-        console.log('E', e)
+        console.log('E', e);
       }
     });
   });
