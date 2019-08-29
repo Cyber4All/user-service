@@ -22,8 +22,8 @@ export default class MockDriver implements DataStore {
     return;
   }
 
-  async identifierInUse(username: string): Promise<boolean> {
-    return Promise.resolve(username !== 'thisdoesntexist');
+  async identifierInUse(identifier: string): Promise<boolean> {
+    return Promise.resolve(!['thisdoesntexist', 'thisemaildoesntexist@test.com'].includes(identifier));
   }
 
   insertUser(user: User): Promise<string> {
@@ -31,11 +31,11 @@ export default class MockDriver implements DataStore {
   }
 
   async findUser(username: string): Promise<string> {
-    return Promise.resolve(MOCK_OBJECTS.USER_ID);
+    return Promise.resolve(username ? MOCK_OBJECTS.USER_ID : undefined);
   }
 
   async loadUser(id: string): Promise<any> {
-    return Promise.resolve(MOCK_OBJECTS.USER);
+    return Promise.resolve(Object.assign({}, MOCK_OBJECTS.USER));
   }
 
   async editUser(id: string, user: {}): Promise<any> {

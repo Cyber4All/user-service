@@ -11,8 +11,10 @@ describe('LearningObjectDownload: TokenEncoder', () => {
     organization: '',
     accessGroups: []
   };
+
   describe('encodeToken', () => {
     it('should convert object to jwt string', () => {
+      process.env.KEY = 'shhh im a secret'
       const token = encoder.encodeToken(userToken);
       expect(typeof token).toBe('string');
     });

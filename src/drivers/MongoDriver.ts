@@ -96,17 +96,17 @@ export default class MongoDriver implements DataStore {
   /**
    * Check if an username or email is registered to a user in the database.
    *
-   * @param {string} username the user's email
+   * @param {string} identifier the user's email address or username
    *
-   * @returns {boolean} true iff userid/pwd pair is valid
+   * @returns {boolean} true if the supplied identifier is already in use, false otherwise
    */
-  async identifierInUse(username: string): Promise<boolean> {
+  async identifierInUse(identifier: string): Promise<boolean> {
     try {
       const query: any = {};
-      if (isEmail(username)) {
-        query.email = username;
+      if (isEmail(identifier)) {
+        query.email = identifier;
       } else {
-        query.username = username;
+        query.username = identifier;
       }
       const exists = await this.db
         .collection(COLLECTIONS.USERS)

@@ -1,3 +1,7 @@
+// set environment variables required before imports
+process.env.KEY = 'shhh im a secret';
+process.env.ISSUER = 'shhh im the issuer';
+
 import * as supertest from 'supertest';
 import * as express from 'express';
 import {
@@ -14,6 +18,7 @@ import { encodeToken } from '../../shared/TokenEncoder';
 describe('UserMetaRetriever: ExpressRouterAdapter', () => {
   let request: supertest.SuperTest<supertest.Test>;
   const validToken = encodeToken(userToken);
+
   beforeAll(() => {
     UserMetaRetriever.providers = [
       {

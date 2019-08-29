@@ -9,6 +9,6 @@ export class MockHashDriver implements HashInterface {
   }    
     
   verify(password: string, hash: string): Promise<boolean> {
-    return Promise.resolve(true);
+    return Promise.resolve(password === hash);
   }
 }

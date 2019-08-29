@@ -2,8 +2,6 @@ import 'dotenv/config';
 import * as jwt from 'jsonwebtoken';
 import { UserToken } from './typings';
 
-const SECRET_KEY = process.env.KEY;
-
 /**
  * Converts user token to jwt string
  *
@@ -13,5 +11,6 @@ const SECRET_KEY = process.env.KEY;
  * @returns {string}
  */
 export function encodeToken(userToken: UserToken): string {
+  const SECRET_KEY = process.env.KEY;
   return jwt.sign(userToken, SECRET_KEY);
 }
