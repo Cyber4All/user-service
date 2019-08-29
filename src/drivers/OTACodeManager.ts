@@ -44,11 +44,14 @@ export function generate(
         jwtid: otaID
       },
       (err, token) => {
+        if (err) {
+          reject(err);
+        }
         const code = token.replace(
           process.env.TOKEN_REPLACER,
           process.env.OTA_CODE_REPLACEMENT
         );
-        err ? reject(err) : resolve({ code, id: otaID });
+        resolve({ code, id: otaID });
       }
     );
   });
