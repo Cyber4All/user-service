@@ -24,7 +24,7 @@ export const MOCK_OBJECTS = {
     name: 'Clark Can',
     email: 'test@test.com',
     organization: 'towson university',
-    password: '',
+    password: 'Clarktesting1!',
     bio: '',
     createdAt: '',
     emailVerified: false,
