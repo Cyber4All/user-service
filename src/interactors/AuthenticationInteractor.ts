@@ -95,9 +95,17 @@ export async function register(
         ResourceErrorReason.BAD_REQUEST
       );
     }
+
     if (await datastore.identifierInUse(formattedUser.username)) {
       throw new ResourceError(
         'Username is already in use',
+        ResourceErrorReason.BAD_REQUEST
+      );
+    }
+
+    if (await datastore.identifierInUse(formattedUser.email)) {
+      throw new ResourceError(
+        'Email address is already in use',
         ResourceErrorReason.BAD_REQUEST
       );
     }
