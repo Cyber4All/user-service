@@ -6,3 +6,10 @@ patch:
   SNYK-JS-LODASH-450202:
     - request-promise > request-promise-core > lodash:
         patched: '2019-08-22T16:27:01.113Z'
+  SNYK-JS-HTTPSPROXYAGENT-469131:
+    - '@sentry/node > https-proxy-agent':
+        patched: '2019-10-04T04:14:31.924Z'
+    - snyk > proxy-agent > https-proxy-agent:
+        patched: '2019-10-04T04:14:31.924Z'
+    - snyk > proxy-agent > pac-proxy-agent > https-proxy-agent:
+        patched: '2019-10-04T04:14:31.924Z'
