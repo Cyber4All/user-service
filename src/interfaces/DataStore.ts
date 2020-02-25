@@ -18,6 +18,7 @@ export interface DataStore extends UserStatDatastore {
   findOrganizations(query: string): Promise<any[]>;
   fetchReviewers(collection: string): Promise<any[]>;
   fetchCurators(collection: string): Promise<any[]>;
+  fetchMappers(): Promise<any[]>;
   fetchCollectionMembers(collection: string): Promise<any[]>;
   findUserById(userId: string): Promise<UserDocument>;
   fetchUserCollectionRole(params: {userId: string, collection: string}): Promise<string>;
