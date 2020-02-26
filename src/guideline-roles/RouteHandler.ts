@@ -5,7 +5,7 @@ import { mapUserDataToUser } from '../shared/functions';
 import { isAdmin } from '../collection-role/AuthManager';
 import { requesterIsAdmin } from '../shared/AuthorizationManager';
 
-export function initializePrivate({ dataStore }: { dataStore: DataStore }) {
+export function initializePrivate({ dataStore }: { dataStore: DataStore }): Router {
     const router: Router = Router();
 
     const ACCESS_GROUP = {
@@ -32,7 +32,7 @@ export function initializePrivate({ dataStore }: { dataStore: DataStore }) {
             mappers = mappers.map(mapUserDataToUser);
             res.status(200).json(mappers);
         } catch (error) {
-            const { code, message } = mapErrorToResponseData(e);
+            const { code, message } = mapErrorToResponseData(error);
             res.status(code).json({ message });
         }
     };
@@ -45,15 +45,17 @@ export function initializePrivate({ dataStore }: { dataStore: DataStore }) {
             }
 
             const memberId = req.params.memberId;
-            const user = await dataStore.findUserById(memberId);
-            if (user.accessGroups.includes(ACCESS_GROUP.MAPPER)) {
-                throw new ResourceError(ERROR_MESSAGES.ALREADY_IS_MAPPER, ResourceErrorReason.INVALID_ACCESS);
+
+            const user = await dataStore.loadUser(memberId);
+            if (user && user.accessGroups && user.accessGroups.includes(ACCESS_GROUP.MAPPER)) {
+                throw new ResourceError(ERROR_MESSAGES.ALREADY_IS_MAPPER, ResourceErrorReason.BAD_REQUEST);
             }
 
             await dataStore.assignAccessGroup(memberId, ACCESS_GROUP.MAPPER);
-            return res.sendStatus(201);
+            
+            res.sendStatus(201);
         } catch (error) {
-            const { code, message } = mapErrorToResponseData(e);
+            const { code, message } = mapErrorToResponseData(error);
             res.status(code).json({ message });
         }
     };
@@ -66,15 +68,15 @@ export function initializePrivate({ dataStore }: { dataStore: DataStore }) {
             }
 
             const memberId = req.params.memberId;
-            const user = await dataStore.findUserById(memberId);
+            const user = await dataStore.loadUser(memberId);
             if (!(user.accessGroups.includes(ACCESS_GROUP.MAPPER))) {
                 throw new ResourceError(ERROR_MESSAGES.IS_NOT_MAPPER, ResourceErrorReason.INVALID_ACCESS);
             }
 
             await dataStore.removeAccessGroup(memberId, ACCESS_GROUP.MAPPER);
-            return res.sendStatus(204);
+            res.sendStatus(204);
         } catch (error) {
-            const { code, message } = mapErrorToResponseData(e);
+            const { code, message } = mapErrorToResponseData(error);
             res.status(code).json({ message });
         }
     };
@@ -82,4 +84,6 @@ export function initializePrivate({ dataStore }: { dataStore: DataStore }) {
     router.get('/guidelines/members', (req, res) => getMappers(req, res));
     router.put('/guidelines/members/:memberId', (req, res) => addMapper(req, res));
     router.delete('/guidelines/members/:memberId', (req, res) => removeMapper(req, res));
+
+    return router;
 }

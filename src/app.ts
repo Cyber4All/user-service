@@ -140,6 +140,7 @@ function attachAuthenticatedRouters(app: express.Express) {
       responseFactory
     )
   );
+
   // TODO: Deprecate admin router and middleware in favor of default router with proper authorization logic in interactors
   app.use(enforceAdminAccess);
   app.use(

@@ -10,6 +10,7 @@ import { UserInteractor } from '../interactors/interactors';
 // tslint:disable-next-line:no-duplicate-imports
 import * as AuthInteractor from '../interactors/AuthenticationInteractor';
 import { initializePrivate } from '../collection-role/RouteHandler';
+import { initializePrivate as initializePrivateGuidelines } from '../guideline-roles/RouteHandler';
 import { reportError } from '../shared/SentryConnector';
 import { UserToken } from '../shared/typings';
 import { mapErrorToResponseData } from '../Error';
@@ -166,6 +167,7 @@ export default class AuthRouteHandler {
     });
 
     router.use(initializePrivate({ dataStore: this.dataStore }));
+    router.use(initializePrivateGuidelines({ dataStore: this.dataStore }));
   }
 
   private hasAccess(token: any, propName: string, value: any): boolean {
