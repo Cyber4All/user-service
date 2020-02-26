@@ -7,6 +7,9 @@ import { UserDocument } from '../shared/typings/user-document';
 import { User } from '../shared/typings';
 
 export default class MockDriver implements DataStore {
+  fetchMappers(): Promise<any[]> {
+    throw new Error("Method not implemented.");
+  }
   fetchUserCollectionRole(params: {
     userId: string;
     collection: string;

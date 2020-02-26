@@ -357,7 +357,7 @@ export default class MongoDriver implements DataStore {
         { projection: { _id: 1, username: 1, email: 1, accessGroups: 1 }}
       )
       .toArray();
-    
+
     return users;
   }
 
