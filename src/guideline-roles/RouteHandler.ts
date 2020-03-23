@@ -2,8 +2,8 @@ import { DataStore } from '../interfaces/DataStore';
 import { Router, Request, Response } from 'express';
 import { mapErrorToResponseData, ResourceError, ResourceErrorReason } from '../Error';
 import { mapUserDataToUser } from '../shared/functions';
-import { isAdmin } from '../collection-role/AuthManager';
 import { requesterIsAdmin } from '../shared/AuthorizationManager';
+import { UserToken } from '../shared/typings';
 
 export function initializePrivate({ dataStore }: { dataStore: DataStore }): Router {
     const router: Router = Router();
@@ -23,10 +23,7 @@ export function initializePrivate({ dataStore }: { dataStore: DataStore }): Rout
     
     const getMappers = async (req: Request, res: Response) => {
         try {
-            const isAdmin = requesterIsAdmin(req.user);
-            if (!isAdmin) {
-                throw new ResourceError(ERROR_MESSAGES.VIEW_INVALID_ACCESS, ResourceErrorReason.INVALID_ACCESS);
-            }
+            checkForAdminAccess(req.user);
 
             let mappers = await dataStore.fetchMappers();
             mappers = mappers.map(mapUserDataToUser);
@@ -39,10 +36,7 @@ export function initializePrivate({ dataStore }: { dataStore: DataStore }): Rout
 
     const addMapper = async (req: Request, res: Response) => {
         try {
-            requesterIsAdmin(req.user);
-            if (!isAdmin) {
-                throw new ResourceError(ERROR_MESSAGES.ADD_INVALID_ACCESS, ResourceErrorReason.INVALID_ACCESS);
-            }
+            checkForAdminAccess(req.user);
 
             const memberId = req.params.memberId;
 
@@ -62,10 +56,7 @@ export function initializePrivate({ dataStore }: { dataStore: DataStore }): Rout
 
     const removeMapper = async (req: Request, res: Response) => {
         try {
-            requesterIsAdmin(req.user);
-            if (!isAdmin) {
-                throw new ResourceError(ERROR_MESSAGES.REMOVE_INVALID_ACCESS, ResourceErrorReason.INVALID_ACCESS);
-            }
+            checkForAdminAccess(req.user);
 
             const memberId = req.params.memberId;
             const user = await dataStore.loadUser(memberId);
@@ -80,6 +71,13 @@ export function initializePrivate({ dataStore }: { dataStore: DataStore }): Rout
             res.status(code).json({ message });
         }
     };
+
+    const checkForAdminAccess = (user: UserToken) => {
+        const isAdmin = requesterIsAdmin(user);
+        if (!isAdmin) {
+            throw new ResourceError(ERROR_MESSAGES.REMOVE_INVALID_ACCESS, ResourceErrorReason.INVALID_ACCESS);
+        }
+    }
 
     router.get('/guidelines/members', (req, res) => getMappers(req, res));
     router.put('/guidelines/members/:memberId', (req, res) => addMapper(req, res));
