@@ -101,3 +101,44 @@ status | body | statusText
 status | body | statusText
 ---|---|---
 `Error` | `Cannot log out at this time` |
+
+### Access Groups
+
+#### Admin
+
+- see all objects in review
+
+- edit objects in review
+
+- create revisions of released Learning Objects
+
+- assign collection Curators and Reviewers
+
+#### Editor
+
+- see all objects in review
+
+- edit objects in review
+
+- create revisions of released Learning Objects
+
+#### Reviewer@<CollectionName>
+
+- see all Learning Objects in review for a given Collection
+
+#### Curator@<CollectionName>
+
+- see all Learning Objects in review for a given Collection
+
+- assign and remove Reviewers for a given Collection
+
+
+#### Mapper
+
+- see all released Learning Objects in the system
+
+- edit the mappings of Learning Outcomes in the system. They will have access to the Mapping dashboard and the Mapping builder
+
+- add Curricular Guidelines to our system
+
+- "retire" Curricular Guidelines as new ones replace them
