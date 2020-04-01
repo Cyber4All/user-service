@@ -31,7 +31,7 @@
   "dependencies": {
     "@cyber4all/clark-schema": "^1.0.2",
     "@cyber4all/clark-taxonomy": "^2.0.0",
-    "@sendgrid/mail": "^6.2.1",
+    "@sendgrid/mail": "^7.0.0",
     "@sentry/node": "^4.4.1",
     "@types/request-promise": "^4.1.44",
     "aws-sdk": "^2.440.0",
