@@ -238,14 +238,11 @@ export async function fetchReviewers(
  */
 export async function fetchCurators(
   dataStore: DataStore,
-  user: UserToken,
   collection: string,
 ): Promise<any[]> {
-  if (isAdmin(user)) {
     const users = await dataStore.fetchCurators(collection);
     const curators = users.map(mapUserDataToUser);
     return curators;
-  }
   throw new ResourceError('Invalid Access', ResourceErrorReason.INVALID_ACCESS);
 }
 

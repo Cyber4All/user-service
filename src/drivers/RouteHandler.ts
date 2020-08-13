@@ -17,6 +17,8 @@ import * as UserStatsRouteHandler from '../UserStats/UserStatsRouteHandler';
 import { UserResponseFactory } from './drivers';
 import { mapErrorToResponseData } from '../Error';
 import { reportError } from '../shared/SentryConnector';
+import { fetchCurators } from '../collection-role/Interactor'
+import { UserToken } from '../shared/typings';
 type Router = express.Router;
 const version = require('../../package.json').version;
 
@@ -177,6 +179,19 @@ export default class RouteHandler {
         responder.sendObject(orgs);
       } catch (e) {
         responder.sendOperationError('Invalid orgs request');
+      }
+    });
+
+    router.route('/users/curators/:collection').get(async (req, res, next) => {
+      try {
+        const collection = req.params.collection
+        const curators = await fetchCurators(
+          this.dataStore,
+          collection
+          );
+          res.send(curators)
+      } catch (e) {
+        next (e)
       }
     });
 

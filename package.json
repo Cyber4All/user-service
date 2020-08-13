@@ -4,7 +4,7 @@
   "description": "A microservice for handling user account actions in the CLARK platform.",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon",
+    "start": "node ./src/app.ts",
     "serve": "node -r ts-node/register ./src/app.ts",
     "serve:debug": "node --inspect=5858 -r ts-node/register ./src/app.ts",
     "build": "node_modules/.bin/gulp tsc",
