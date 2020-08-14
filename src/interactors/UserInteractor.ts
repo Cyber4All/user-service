@@ -134,12 +134,9 @@ export class UserInteractor {
 
   /**
  * Finds all curators for a specified collection
- * Authorization:
- * *** Must be admin ***
  * @export
  * @param params
  * @property { DataStore } dataStore [instance of DataStore]
- * @property { UserToken } user [the user who made the request]
  * @property { string } collection [the name of the collection]
  * @returns { Promise<any[]> }
  */
