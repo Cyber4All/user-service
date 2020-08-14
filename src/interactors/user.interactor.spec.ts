@@ -2,6 +2,7 @@ import { UserInteractor } from '../interactors/interactors';
 import { BcryptDriver } from '../drivers/BcryptDriver';
 import MockDriver from '../drivers/MockDriver';
 import { MOCK_OBJECTS } from '../tests/mocks';
+import { COLLECTION_ROLE_MOCK_OBJECTS } from '../collection-role/MocksObjects';
 
 const driver = new MockDriver(); // DataStore
 const hasher = new BcryptDriver(10); // Hasher
@@ -33,6 +34,14 @@ describe('updatePassword', () => {
   it('should return a user', async () => {
     await expect(
       UserInteractor.updatePassword(driver, hasher, MOCK_OBJECTS.EMAIL, MOCK_OBJECTS.PASSWORD)
+    ).resolves.toBeInstanceOf(Object);
+  });
+});
+
+describe('Finds all curators for a specified collection', () => {
+  it('return curators', async () => {
+    await expect(
+      UserInteractor.fetchCurators(driver,COLLECTION_ROLE_MOCK_OBJECTS.COLLECTION_NCCP)
     ).resolves.toBeInstanceOf(Object);
   });
 });

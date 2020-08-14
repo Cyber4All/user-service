@@ -185,7 +185,7 @@ export default class RouteHandler {
     router.route('/users/curators/:collection').get(async (req, res, next) => {
       try {
         const collection = req.params.collection
-        const curators = await fetchCurators(
+        const curators = await UserInteractor.fetchCurators(
           this.dataStore,
           collection
           );

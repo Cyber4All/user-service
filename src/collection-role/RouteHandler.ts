@@ -67,6 +67,7 @@ export function initializePrivate({ dataStore }: { dataStore: DataStore }) {
         case ACCESS_GROUP.CURATOR:
           members = await fetchCurators(
             dataStore,
+            user,
             collectionName
           );
           break;

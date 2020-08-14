@@ -304,29 +304,6 @@ describe('fetchReviewers', () => {
   });
 });
 
-describe('fetchCurators', () => {
-  it('allows an admin to fetch all curators for a colleciton', async () => {
-    expect.assertions(1);
-    await expect(
-      fetchCurators(
-        driver,
-        COLLECTION_ROLE_MOCK_OBJECTS.USER_TOKEN_ADMIN,
-        COLLECTION_ROLE_MOCK_OBJECTS.COLLECTION_NCCP
-      )
-    ).resolves.toBeInstanceOf(Array);
-  });
-  it('prevents a curator from fetching all curators for a colleciton', async () => {
-    expect.assertions(1);
-    await expect(
-      fetchCurators(
-        driver,
-        COLLECTION_ROLE_MOCK_OBJECTS.USER_TOKEN_CURATOR_NCCP,
-        COLLECTION_ROLE_MOCK_OBJECTS.COLLECTION_NCCP
-      )
-    ).rejects.toBeInstanceOf(ResourceError);
-  });
-});
-
 describe('fetchMembers', () => {
   it('allows an admin to fetch all members for a colleciton', async () => {
     expect.assertions(1);
