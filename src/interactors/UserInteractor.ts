@@ -144,7 +144,7 @@ public static async fetchCurators(dataStore: DataStore, collection: string): Pro
   try {
     const users = await dataStore.fetchCurators(collection)
     const getCurators = users.map(mapUserDataToUser);
-    return getCurators
+    return getCurators;
   } catch (e) {
     return Promise.reject(e);
   }

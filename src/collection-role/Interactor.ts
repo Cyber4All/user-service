@@ -14,7 +14,6 @@ import {
 } from '../Error';
 import { UserDocument } from '../shared/typings/user-document';
 import { mapUserDataToUser } from '../shared/functions';
-import { finished } from 'stream';
 
 abstract class RoleActions {
 
