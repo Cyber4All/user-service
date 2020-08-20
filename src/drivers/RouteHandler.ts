@@ -196,7 +196,7 @@ export default class RouteHandler {
           );
           responder.sendObject(curators);
         } else {
-          res.status(404).json({message: 'Invalid collection specified, make sure the specified collection is the correct abbreviation'});
+          res.status(404).json({message: 'Specified collection was not found.'});
         }
       } catch (e) {
         responder.sendOperationError('Invalid orgs request');
