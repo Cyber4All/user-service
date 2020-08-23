@@ -319,8 +319,7 @@ export default class MongoDriver implements DataStore {
       .collection(COLLECTIONS.USERS)
       .find<UserDocument>({ accessGroups: `curator@${collection}` })
       .toArray();
-
-    const curators: AuthUser[] = users.map((user: UserDocument) =>
+      const curators: AuthUser[] = users.map((user: UserDocument) =>
       this.generateUser(user)
     );
     return curators;

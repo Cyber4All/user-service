@@ -7,4 +7,10 @@ export const FILE_ACCESS_IDENTITY_ROUTES = {
     updateFileAccessIdentity(username: string) {
         return `${process.env.LEARNING_OBJECT_API}/users/${username}/file-access-identity`;
     }
+};
+
+export const LEARNING_OBJECT_ROUTE = {
+    getCollection() {
+        return `${process.env.LEARNING_OBJECT_API}/collections`
+    }
 }

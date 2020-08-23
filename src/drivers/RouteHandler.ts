@@ -17,6 +17,9 @@ import * as UserStatsRouteHandler from '../UserStats/UserStatsRouteHandler';
 import { UserResponseFactory } from './drivers';
 import { mapErrorToResponseData } from '../Error';
 import { reportError } from '../shared/SentryConnector';
+import { HttpFileAccessIdentityGateway } from '../gateways/file-access-identities/HttpFileAccessIdentityGateway';
+import { fetchCurators } from '../collection-role/Interactor'
+import { UserToken } from '../shared/typings';
 type Router = express.Router;
 const version = require('../../package.json').version;
 
@@ -175,6 +178,26 @@ export default class RouteHandler {
           req.query.query
         );
         responder.sendObject(orgs);
+      } catch (e) {
+        responder.sendOperationError('Invalid orgs request');
+      }
+    });
+
+    //we are using the abbreviated name of the collection to fetch
+    // for example, CAE Community = cae_community
+    router.route('/users/curators/:collection').get(async (req, res, next) => {
+      const responder = this.responseFactory.buildResponder(res);
+      try {
+        const getCollection = await HttpFileAccessIdentityGateway.getCollection();
+        if (getCollection.find(e => e.abvName === req.params.collection)) {
+          const curators = await UserInteractor.fetchCurators(
+            this.dataStore,
+            req.params.collection
+          );
+          responder.sendObject(curators);
+        } else {
+          res.status(404).json({message: 'Specified collection was not found.'});
+        }
       } catch (e) {
         responder.sendOperationError('Invalid orgs request');
       }
