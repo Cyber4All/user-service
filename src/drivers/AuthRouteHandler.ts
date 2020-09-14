@@ -112,12 +112,10 @@ export default class AuthRouteHandler {
 
     router.route('/users/tokens').get(async (req, res) => {
       try {
-        console.log(req.user);
         res.send(req.user);
       } catch (e) {
-        console.log(e)
         const { code, message } = mapErrorToResponseData(e);
-        // res.status(code).json({ message });
+        res.status(code).json({ message });
       }
     });
 
