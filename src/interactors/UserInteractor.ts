@@ -3,6 +3,7 @@ import { TokenManager } from '../drivers/drivers';
 import { UserQuery } from '../interfaces/Query';
 import { User } from '../shared/typings';
 import { mapUserDataToUser } from '../shared/functions';
+import { validatePassword } from './AuthenticationInteractor';
 
 export class UserInteractor {
   public static async searchUsers(
@@ -71,6 +72,7 @@ export class UserInteractor {
   ): Promise<User> {
     try {
       const eMail = sanitizeText(email);
+      validatePassword(password);
       const pwdhash = await hasher.hash(password);
       const userID = await dataStore.findUser(eMail);
       const user = await dataStore.editUser(userID, { password: pwdhash });
