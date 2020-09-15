@@ -1,4 +1,4 @@
-import { FILE_ACCESS_IDENTITY_ROUTES } from './routes';
+import { FILE_ACCESS_IDENTITY_ROUTES, LEARNING_OBJECT_ROUTE  } from './routes';
 import { generateServiceToken } from '../../drivers/TokenManager';
 import * as request from 'request-promise';
 
@@ -13,6 +13,17 @@ export class HttpFileAccessIdentityGateway {
       method: 'GET',
       body: {},
     };
+
+    static async getCollection(): Promise<any[]> {
+      const options = {
+        ...this.options,
+        method: 'GET',
+      }
+      options.uri = LEARNING_OBJECT_ROUTE.getCollection();
+      options.headers.Authorization = `Bearer ${generateServiceToken()}`;
+      return await request(options)
+
+    }
 
     static async createFileAccessIdentity({
         username,

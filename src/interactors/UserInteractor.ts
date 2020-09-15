@@ -134,6 +134,24 @@ export class UserInteractor {
     }
   }
 
+  /**
+ * Finds all curators for a specified collection
+ * @export
+ * @param params
+ * @property { DataStore } dataStore [instance of DataStore]
+ * @property { string } collection [the name of the collection]
+ * @returns { Promise<any[]> }
+ */
+public static async fetchCurators(dataStore: DataStore, collection: string): Promise<any[]> {
+  try {
+    const users = await dataStore.fetchCurators(collection)
+    const getCurators = users.map(mapUserDataToUser);
+    return getCurators;
+  } catch (e) {
+    return Promise.reject(e);
+  }
+}
+
   public static async deleteUser(
     dataStore: DataStore,
     username: string
