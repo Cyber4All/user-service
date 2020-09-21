@@ -20,6 +20,7 @@ import { reportError } from '../shared/SentryConnector';
 import { HttpFileAccessIdentityGateway } from '../gateways/file-access-identities/HttpFileAccessIdentityGateway';
 import { fetchCurators } from '../collection-role/Interactor'
 import { UserToken } from '../shared/typings';
+import { loginLimiter } from '../middleware/limiter';
 type Router = express.Router;
 const version = require('../../package.json').version;
 
@@ -137,7 +138,7 @@ export default class RouteHandler {
     });
 
     // Login
-    router.post('/users/tokens', async (req, res) => {
+    router.post('/users/tokens', loginLimiter, async (req, res) => {
       const responder = this.responseFactory.buildResponder(res);
       try {
         const token = await login(
