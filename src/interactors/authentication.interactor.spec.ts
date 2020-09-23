@@ -113,7 +113,7 @@ describe('AuthenticationInteractor', () => {
         name: 'So Fun',
         email: 'thisemaildoesntexist@test.com',
         organization: 'towson university',
-        password: 'mypassissecure',
+        password: 'myPassis$ecure3',
         bio: '',
       } as any;
 

@@ -110,6 +110,8 @@ export async function register(
       );
     }
 
+    validatePassword(formattedUser.password);
+
     const pwdhash = await hasher.hash(formattedUser.password);
     user.password = pwdhash;
 
@@ -222,4 +224,37 @@ function sanitizeUser(user: AuthUser): AuthUser {
  */
 export function isValidUsername(username: string): boolean {
   return username.length <= 20 && username.length >= 3;
+}
+
+/**
+ * Validates that a password meets the defined constraints.
+ * 
+ * Constraints:
+ * - At least 8 characters long
+ * - Contains 1 letter
+ * - Contains 1 capital letter
+ * - Contains 1 number 
+ * - Contains 1 symbol
+ * 
+ * @param password the password to be validated
+ */
+export function validatePassword(password: string): void {
+  if(password.length < 8) {
+    throw new ResourceError(
+      'Password is less than 8 characters',
+      ResourceErrorReason.BAD_REQUEST
+    );
+  } else {
+    const letter = password.match(/[a-z]/g);
+    const capitalLetter = password.match(/[A-Z]/g);
+    const number = password.match(/[0-9]+/g);
+    const symbol = password.match(/[@.,#$=%&-/:-?{-~!"^_`\[\]\(\)\*\+\\]/g);
+
+    if (!letter || !capitalLetter || !number || !symbol) {
+      throw new ResourceError(
+        'Password is not valid. Must contain at least 1 letter, 1 capital letter, 1 number and 1 symbol',
+        ResourceErrorReason.BAD_REQUEST
+      )
+    }
+  }
 }
