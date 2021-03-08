@@ -31,9 +31,10 @@
     "@cyber4all/clark-schema": "^1.0.2",
     "@cyber4all/clark-taxonomy": "^2.0.0",
     "@sendgrid/mail": "^6.2.1",
-    "@sentry/node": "^6.2.1",
+    "@sentry/node": "^4.4.1",
+    "@types/request-promise": "^4.1.44",
     "aws-sdk": "^2.440.0",
-    "bcrypt": "^5.0.1",
+    "bcrypt": "^3.0.3",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
     "dotenv": "^6.0.0",
@@ -45,8 +46,9 @@
     "morgan": "^1.9.0",
     "node-fetch": "^2.6.1",
     "node-service-module": "^1.1.0",
+    "nyc": "^13.2.0",
     "root-require": "^0.3.1",
-    "snyk": "^1.476.0"
+    "snyk": "^1.217.3"
   },
   "devDependencies": {
     "@types/aws-sdk": "^2.7.0",
@@ -62,7 +64,7 @@
     "@types/morgan": "^1.7.35",
     "@types/node": "^10.5.2",
     "@types/supertest": "^2.0.7",
-    "danger": "^10.6.3",
+    "danger": "^6.0.2",
     "jest": "^26.6.3",
     "nodemon": "^1.19.1",
     "prettier": "1.14.1",
