@@ -15,7 +15,6 @@ export const processToken = jwt({
   secret: process.env.KEY,
   issuer: process.env.ISSUER,
   credentialsRequired: false,
-  algorithms: ['HS256'],
   getToken
 });
 

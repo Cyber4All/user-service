@@ -1,12 +1,12 @@
 import { FILE_ACCESS_IDENTITY_ROUTES, LEARNING_OBJECT_ROUTE  } from './routes';
 import { generateServiceToken } from '../../drivers/TokenManager';
-
-const fetch = require('node-fetch');
+import * as request from 'request-promise';
 
 // FIXME: Create interface for this Gateway
 export class HttpFileAccessIdentityGateway {
     private static options = {
       uri: '',
+      json: true,
       headers: {
         Authorization: 'Bearer',
       },
@@ -21,8 +21,8 @@ export class HttpFileAccessIdentityGateway {
       }
       options.uri = LEARNING_OBJECT_ROUTE.getCollection();
       options.headers.Authorization = `Bearer ${generateServiceToken()}`;
-      delete options.body;
-      return await (await fetch(options.uri, options)).json();
+      return await request(options)
+
     }
 
     static async createFileAccessIdentity({
@@ -35,11 +35,14 @@ export class HttpFileAccessIdentityGateway {
       const options = { 
         ...this.options,
         method: 'POST',
-        body: JSON.stringify({ fileAccessID: fileAccessIdentity })
+        body: {
+          fileAccessID: fileAccessIdentity,
+        }
       }
       options.uri = FILE_ACCESS_IDENTITY_ROUTES.createFileAccessIdentity(username);
       options.headers.Authorization = `Bearer ${generateServiceToken()}`;
-      return await (await fetch(options.uri, options)).json();
+      const res = await request(options);
+      return res;
     }
 
     static async updateFileAccessIdentity({
@@ -50,9 +53,10 @@ export class HttpFileAccessIdentityGateway {
         fileAccessIdentity: string,
     }): Promise<string> {
         const options = { ...this.options };
-        options.body = JSON.stringify({ fileAccessID: fileAccessIdentity });
+        options.body = { fileAccessID: fileAccessIdentity };
         options.uri = FILE_ACCESS_IDENTITY_ROUTES.updateFileAccessIdentity(username);
         options.headers.Authorization = `Bearer ${generateServiceToken()}`;
-        return await (await fetch(options.uri, options)).json();
+        const res = await request(options);
+        return res;
     }
   }

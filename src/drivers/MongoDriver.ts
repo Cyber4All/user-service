@@ -351,8 +351,10 @@ export default class MongoDriver implements DataStore {
   async fetchMappers(): Promise<any[]> {
     const users = await this.db
       .collection(COLLECTIONS.USERS)
-      .find({ accessGroups: 'mapper' })
-      .project({ _id: 1, username: 1, email: 1, accessGroups: 1 })
+      .find<UserDocument>(
+        { accessGroups: 'mapper' },
+        { projection: { _id: 1, username: 1, email: 1, accessGroups: 1 }}
+      )
       .toArray();
 
     return users;
