@@ -1,5 +1,5 @@
 # Anything beyond local dev should pin this to a specific version at https://hub.docker.com/_/node/
-FROM node:8 as builder
+FROM node:12 as builder
 
 ARG UNIT_TEST=0
 
@@ -36,7 +36,7 @@ COPY . /opt/app
 # Build source and clean up
 RUN npm run build
 
-FROM node:8 as tester
+FROM node:12 as tester
 
 COPY --from=builder . .
 ENV PATH /opt/node_modules/.bin:$PATH
@@ -55,7 +55,7 @@ ARG OTA_CODE_REPLACEMENT=0000
 WORKDIR /opt
 RUN npm test
 
-FROM node:8-slim
+FROM node:12-alpine
 # Defaults the node environment to production, however compose will override this to use development
 # when working locally
 ARG NODE_ENV=production
