@@ -75,4 +75,4 @@ RUN npm uninstall --only=dev
 WORKDIR /opt/app/dist
 # Run the container! Using the node command instead of npm allows for better passing of signals
 # and graceful shutdown. Further examination would be useful here.
-CMD [ "node", "app.js" ] 
+CMD [ "node", "src/app.js" ] 

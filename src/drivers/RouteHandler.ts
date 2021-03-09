@@ -129,7 +129,7 @@ export default class RouteHandler {
     // Get user information
     router.get('/users/update', async (req, res) => {
       try {
-        const query = req.query.username;
+        const query = req.query.username as string;
         const user = await UserInteractor.loadUser(this.dataStore, query);
         this.responseFactory.buildResponder(res).sendUser(user);
       } catch (e) {
@@ -176,7 +176,7 @@ export default class RouteHandler {
       try {
         const orgs = await UserInteractor.findOrganizations(
           this.dataStore,
-          req.query.query
+          req.query.query as string
         );
         responder.sendObject(orgs);
       } catch (e) {
@@ -209,7 +209,7 @@ export default class RouteHandler {
       try {
         const inUse = await UserInteractor.identifierInUse(
           this.dataStore,
-          req.query.username
+          req.query.username as string
         );
         responder.sendObject(inUse);
       } catch (e) {
@@ -221,7 +221,7 @@ export default class RouteHandler {
       .route('/users/ota-codes')
       .post(async (req, res) => {
         try {
-          const action = req.query.action;
+          const action = req.query.action as ACCOUNT_ACTIONS;
           const email = req.body.email;
           const responder = this.responseFactory.buildResponder(res);
           const otaCode = await OTACodeInteractor.generateOTACode(
@@ -257,7 +257,7 @@ export default class RouteHandler {
       })
       .get(async (req, res) => {
         try {
-          const otaCode = req.query.otaCode;
+          const otaCode = req.query.otaCode as string;
           const responder = this.responseFactory.buildResponder(res);
           const decoded = await OTACodeInteractor.decode(
             this.dataStore,
@@ -288,7 +288,7 @@ export default class RouteHandler {
       .patch(async (req, res) => {
         const responder = this.responseFactory.buildResponder(res);
         try {
-          const otaCode = req.query.otaCode;
+          const otaCode = req.query.otaCode as string;
           const payload = req.body.payload;
 
           const decoded = await OTACodeInteractor.applyOTACode(

@@ -30,6 +30,7 @@ export function initializePrivate({ dataStore }: { dataStore: DataStore }) {
     action: string
   ) => {
     try {
+      // @ts-ignore
       const userToken: UserToken = req.user;
       const role: string = req.body.role;
       const collection: string = req.params.collectionName;
@@ -59,8 +60,9 @@ export function initializePrivate({ dataStore }: { dataStore: DataStore }) {
 
   const fetchCollectionReviewers = async (req: Request, res: Response) => {
     try {
+      // @ts-ignore
       const user: UserToken = req.user;
-      const role: string = req.query.role;
+      const role: string = req.query.role as string;
       const collectionName: string = req.params.collectionName;
       let members;
       switch (role) {
