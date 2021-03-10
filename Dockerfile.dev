@@ -1,4 +1,4 @@
-FROM node:8 as build
+FROM node:12 as build
 WORKDIR /build
 COPY . .
 RUN npm install
@@ -13,4 +13,4 @@ COPY --from=build /build/dist /opt/app/dist
 RUN apk add g++ make python
 RUN npm install --only=production
 EXPOSE $PORT
-CMD ["node", "dist/app.js"]
+CMD ["node", "dist/src/app.js"]

@@ -180,7 +180,7 @@ export default class MongoDriver implements DataStore {
 
       let objectCursor = await this.db
         .collection(COLLECTIONS.USERS)
-        .find<UserDocument>(mongoQuery);
+        .find(mongoQuery);
 
       const total = await objectCursor.count();
 
@@ -299,7 +299,7 @@ export default class MongoDriver implements DataStore {
   async fetchReviewers(collection: string): Promise<any[]> {
     const users = await this.db
       .collection(COLLECTIONS.USERS)
-      .find<UserDocument>({ accessGroups: `reviewer@${collection}` })
+      .find({ accessGroups: `reviewer@${collection}` })
       .toArray();
 
     const reviewers: AuthUser[] = users.map((user: UserDocument) =>
@@ -317,7 +317,7 @@ export default class MongoDriver implements DataStore {
   async fetchCurators(collection: string): Promise<any[]> {
     const users = await this.db
       .collection(COLLECTIONS.USERS)
-      .find<UserDocument>({ accessGroups: `curator@${collection}` })
+      .find({ accessGroups: `curator@${collection}` })
       .toArray();
       const curators: AuthUser[] = users.map((user: UserDocument) =>
       this.generateUser(user)
@@ -334,7 +334,7 @@ export default class MongoDriver implements DataStore {
   async fetchCollectionMembers(collection: string): Promise<any[]> {
     const users = await this.db
       .collection(COLLECTIONS.USERS)
-      .find<UserDocument>({
+      .find({
         $or: [
           { accessGroups: `reviewer@${collection}` },
           { accessGroups: `curator@${collection}` }
@@ -351,10 +351,8 @@ export default class MongoDriver implements DataStore {
   async fetchMappers(): Promise<any[]> {
     const users = await this.db
       .collection(COLLECTIONS.USERS)
-      .find<UserDocument>(
-        { accessGroups: 'mapper' },
-        { projection: { _id: 1, username: 1, email: 1, accessGroups: 1 }}
-      )
+      .find({ accessGroups: 'mapper' })
+      .project({ _id: 1, username: 1, email: 1, accessGroups: 1 })
       .toArray();
 
     return users;

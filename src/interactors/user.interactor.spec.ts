@@ -25,7 +25,7 @@ describe('findUser', () => {
   it('should return an error message', async () => {
     // Here we are passing an incorrect parameter for DataStore
     await expect(
-      UserInteractor.findUser(this.driver, MOCK_OBJECTS.USERNAME)
+      UserInteractor.findUser(undefined, MOCK_OBJECTS.USERNAME)
     ).rejects.toBeDefined();
   });
 });
