@@ -1,5 +1,5 @@
 export enum FROM {
-  NO_REPLY = 'C.L.A.R.K. <noreply@clark.center>'
+  NO_REPLY = 'C.L.A.R.K. <noreply@secured.team>'
 }
 export enum SUBJECTS {
   VERIFY_EMAIL = 'Verify your email',
