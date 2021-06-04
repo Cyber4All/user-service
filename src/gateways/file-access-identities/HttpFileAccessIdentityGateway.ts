@@ -10,6 +10,7 @@ export class HttpFileAccessIdentityGateway {
       json: true,
       headers: {
         Authorization: 'Bearer',
+        'Content-Type': 'application/json',
       },
       method: 'GET',
       body: {},
@@ -41,6 +42,8 @@ export class HttpFileAccessIdentityGateway {
       }
       options.uri = FILE_ACCESS_IDENTITY_ROUTES.createFileAccessIdentity(username);
       options.headers.Authorization = `Bearer ${generateServiceToken()}`;
+
+      console.log('\n\n\nSending to LO Service', options);
       
       return await (await fetch(options.uri, options)).json();
     }
