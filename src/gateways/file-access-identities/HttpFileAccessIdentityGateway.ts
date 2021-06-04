@@ -10,6 +10,7 @@ export class HttpFileAccessIdentityGateway {
       json: true,
       headers: {
         Authorization: 'Bearer',
+        'Content-Type': 'application/json',
       },
       method: 'GET',
       body: {},
