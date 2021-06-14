@@ -15,7 +15,7 @@ jobs:
             docker build -t user-service:$CIRCLE_SHA1 . --build-arg UNIT_TEST=1 --build-arg CLARK_DB_URI_TEST=$CLARK_DB_URI_TEST
       - run:
           name: Login to docker
-          command: docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
+          command: docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
       - run:
           name: Publish Image 
           command: |
@@ -49,7 +49,7 @@ jobs:
       - setup_remote_docker
       - run:
           name: Login to docker
-          command: docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
+          command: docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
       - run:
           name: Pull Image
           command: docker pull "${DOCKER_USER_ORG}/user-service:${CIRCLE_SHA1}"
@@ -72,6 +72,8 @@ workflows:
   build-and-test:
     jobs:
       - build:
+          context:
+            - DockerHub
           filters:
             branches:
               ignore: /master/
@@ -85,6 +87,8 @@ workflows:
   build-test-and-deploy-production:
     jobs:
       - build:
+          context:
+            - DockerHub
           filters:
             branches:
               only: /master/
@@ -97,6 +101,8 @@ workflows:
       - deploy-production:
           requires:
             - integration-test
+          context:
+            - DockerHub
           filters:
             branches:
               only: /master/
