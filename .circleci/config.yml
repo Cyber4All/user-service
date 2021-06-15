@@ -80,6 +80,8 @@ workflows:
       - integration-test:
           requires:
             - build
+          context:
+            - DockerHub
           filters:
             branches:
               ignore: /master/
@@ -95,6 +97,8 @@ workflows:
       - integration-test:
           requires:
             - build
+          context:
+            - DockerHub
           filters:
             branches:
               only: /master/
